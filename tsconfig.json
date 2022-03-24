@@ -1,0 +1,22 @@
+{
+    "rootDir": ".", 
+    "compilerOptions": {
+      "target": "es5",
+      "module": "none",
+      "lib": ["dom", "esnext"],  
+      "sourceMap": false,
+      "outFile": "pointsalad.js",
+    },
+    "files": [
+        "src/framework.d.ts",
+        "src/counter.d.ts",
+        "src/pointsalad.d.ts",
+        "src/slide-utils.ts",
+        "src/text-icons-formatter.ts",
+        "src/cards.ts",
+        "src/player-table.ts",
+        "src/table-center.ts",
+        "src/pointsalad.ts",
+        "src/define.ts"
+    ]
+}

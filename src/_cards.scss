@@ -1,0 +1,270 @@
+$name-left: 34px;
+$name-top: 14px;
+$name-width: 95px;
+$name-size: 10pt;
+
+$type-left: 0px;
+$type-size: 9pt;
+
+$description-left: 4px;
+$description-width: 124px;
+$description-size: 7pt;
+
+.stockitem, #deck {
+    border-radius: 10px;
+    margin: 5px;
+    // border: 1px solid white;
+    text-align: center;
+    overflow: hidden;
+    box-shadow: 1px 1px 2px 1px rgba(0,0,0,0.5);
+
+    .bottom {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: url('img/card-bottom.png');
+        background-position: center top;
+    }
+
+    .name-wrapper {
+        position: absolute;
+        top: $name-top;
+        left: $name-left;
+        font-size: $name-size;
+        color: white;
+        font-family: 'goodgirl';
+        width: $name-width;
+        text-align: center;
+
+        .text {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+    }
+
+    .type-wrapper {
+        position: absolute;
+        left: $type-left;
+        font-size: $type-size;
+        color: white;
+        transform: rotate(-5deg);
+        font-family: 'goodgirl';
+
+        &.keep .outline { // blue
+            -webkit-text-stroke: 4px #00aeef;
+        }
+
+        &.discard .outline { // red
+            -webkit-text-stroke: 4px #ef1923;
+        }
+
+        &.costume .outline { // orange
+            -webkit-text-stroke: 4px #f7941d;
+        }
+
+        &.transformation .outline { // teal
+            -webkit-text-stroke: 4px #13b48f;
+        }
+
+        .outline {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 120px;
+        }
+
+        .text {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 120px;
+        }
+    }
+
+    .description-wrapper {
+        position: absolute;
+        left: $description-left;
+        width: $description-width;
+        bottom: 4px;
+        text-overflow: ellipsis;
+        text-align: center;
+        color: black;
+        font-size: $description-size;
+
+        .icon {
+            width: 12px;
+            height: 12px;
+            margin-bottom: -2px;
+        }
+    }
+
+    .effect-wrapper {
+        position: absolute;
+        text-overflow: ellipsis;
+        text-align: center;
+        font-size: $description-size;
+        display: flex;
+        align-items: center;
+
+        div {
+            flex: 1;
+        }
+
+        .icon {
+            width: 12px;
+            height: 12px;
+            margin-bottom: -2px;
+        }
+
+        .effect-text {
+            &.overflow {
+                background: radial-gradient(#fefefe, #fdfaf3, #f8ead0);
+                margin: -5px;
+                padding: 2px;
+                border-radius: 7px;
+                &.permanent {
+                    background: radial-gradient(#0db9e9, #0fa2d8, #1265ab);
+                    border: 2px solid #42aad1;
+                }
+            }
+        }
+    }
+
+    .permanent-effect-wrapper {
+        left: 9px;
+        width: 116px;
+        top: 59px;
+        height: 38px;
+        color: white;
+    }
+
+    .ankh-effect-wrapper {
+        left: 6px;
+        width: 58px;
+        top: 124px;
+        height: 52px;
+        color: black;
+    }
+
+    .snake-effect-wrapper {
+        left: 68px;
+        width: 58px;
+        top: 124px;
+        height: 52px;
+        color: black;
+    }
+    
+    &[id$="goldenscarab"] {
+        pointer-events: none;
+    }
+
+    &.disabled {
+        filter: contrast(0.6);
+        cursor: not-allowed;
+    }
+
+    .card-token {
+        position: absolute;
+        z-index: 12;
+
+        &.mimic {
+            z-index: 13;
+        }
+
+        &.mimic-tile {
+            z-index: 11;
+
+            left: 0;
+            top: 32px;
+            width: 132px;
+            height: 82px; // TODOWI
+            background-image: url("img/green-wickedness-tiles.jpg"); 
+            background-position: -500% 0%;
+            margin: 0;
+        }
+    }
+}
+
+.energy-cube {
+    position: absolute;
+    background: url('img/energy-cube.png') center no-repeat;
+    width: 32px;
+    height: 32px;
+    background-size: contain;
+}
+
+.card-keep-text {
+    position: relative;
+    color: white;
+    font-family: 'goodgirl';
+    font-size: 7pt;
+    margin: 2px;
+    text-align: center;
+
+    .outline {
+        -webkit-text-stroke: 3px #00aeef;
+    }
+
+    .text {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+}
+
+.card-inner {
+    position: absolute;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+  
+    &[data-side="1"] {
+      transform: rotateY(180deg);
+    }
+  
+    &[data-side="0"] {
+      .card-back {
+        display: none;
+      }
+    }
+
+    &[data-side] {
+        background: unset !important; // to counter stock inline style
+        box-shadow: unset;
+        overflow: visible;
+    }
+
+    &[data-type="301"] {
+        .card-side {
+            background-image: url('img/transformation-cards.jpg');
+            &.front {
+                background-position: 0% 0%;
+            }
+            &.back {
+                background-position: 100% 0%;
+            }
+        }
+    }
+
+    .card-side {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 10px;
+      box-shadow: 1px 1px 2px 1px rgba(0,0,0,0.5);
+      overflow: hidden;
+    
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    
+      -webkit-backface-visibility: hidden; /* Safari */
+      backface-visibility: hidden;
+    
+      &.back {  
+        transform: rotateY(180deg);
+      }
+    }
+}

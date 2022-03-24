@@ -1,72 +1,833 @@
-/**
- *------
- * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * PointSalad implementation : © <Your name here> <Your email address here>
- *
- * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
- * See http://en.boardgamearena.com/#!doc/Studio for more information.
- * -----
- *
- * pointsalad.css
- *
- * PointSalad stylesheet
- *
- */
+.player-board {
+  background-color: white;
+}
+.player-board.active {
+  box-shadow: 0px 0px 2px 3px #ffcf13;
+}
+.player-board.eliminated-player {
+  background-color: #b9b9b9;
+}
+.player-board.eliminated-player .player-name a {
+  text-decoration: line-through;
+}
+.player-board.eliminated-player .counters {
+  display: none;
+}
+.player-board .monster-figure {
+  background-repeat: no-repeat;
+  background-position: 75% top;
+  margin-bottom: -5px;
+  height: 45px;
+  background-size: auto;
+  width: auto;
+}
+.player-board .player_score, .player-board .fa-star {
+  font-weight: bold;
+  color: #6787c3;
+}
+.player-board .player-hand-card {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  background-image: url("img/cards.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: bottom;
+}
 
-/*
-    This is the CSS stylesheet of your game User Interface.
-    
-    Styles defined on this file will be applied to the HTML elements you define in your
-    HTML template (pointsalad_pointsalad.tpl), and to HTML elements you create dynamically
-    (in pointsalad.js).
-    
-    Usually, you are using CSS to:
-    
-    1°) define the overall layout of your game
-        (ex: place the board on the top left, place player's hand beside, place the deck on the right, ...).
+.counters {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+.counters .counter {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.counters .counter span {
+  padding: 0 5px 0 5px;
+}
+.counters .counter .tokyo-tower-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+}
+.counters .counter .tokyo-tower-icon-wrapper .tokyo-tower-icon {
+  background: url("img/tokyo-tower.png");
+  background-position-x: 0%;
+  background-size: auto 100%;
+  height: 32px;
+  width: 9px;
+}
+.counters .counter .berserk-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+}
+.counters .counter .berserk-icon-wrapper .icon.berserk {
+  background: url("img/berserk-token.png") no-repeat;
+  background-size: contain;
+  opacity: 0.3;
+  width: 21px;
+  border-radius: 3px;
+}
+.counters .counter .berserk-icon-wrapper .icon.berserk.active {
+  opacity: 1;
+  box-shadow: 0 0 3px 1px red;
+}
+.counters .counter .icon.cultist {
+  background: url("img/cultist-tile.png");
+  background-size: contain;
+  border-radius: 3px;
+}
 
-    2°) create your CSS-sprites:
-        All images of your games should be gathered into a small number of image files. Then, using
-        background-image and background-position CSS properties, you create HTML blocks that can 
-        display these images correctly (see example below).
-    
-    3°) ... anything else:
-        It is really easy to add and remove CSS classes dynamically from your Javascript with
-        dojo.addClass and dojo.removeClass. It is also easy to check if an element has a class
-        (dojo.hasClass) or to get all elements with a specific class (dojo.query). This is why,
-        very often, using CSS classes for the logic of your user interface allow you to do complex
-        thing easily.
-        
-        
-     Note: on the production platform, this file will be compressed and comments will be removed.
-           Consequently, don't hesitate to put as many comments as necessary.
-*/
+.player-tokens {
+  display: flex;
+  flex-wrap: wrap;
+}
+.player-tokens .player-token:not(:empty) {
+  margin: 0 5px;
+}
+.player-tokens .player-token:not(:empty) > div:not(:first-child) {
+  margin-left: -25px;
+}
 
+.kot-token {
+  opacity: 0;
+  transition: opacity 1s;
+  width: 50px;
+  height: 50px;
+  background: url("img/kot-logo.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
 
-/* Note: you must not use any @import directive */
+.intokyo .kot-token {
+  opacity: 1;
+}
 
+.stockitem, #deck {
+  border-radius: 10px;
+  margin: 5px;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.5);
+}
+.stockitem .bottom, #deck .bottom {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: url("img/card-bottom.png");
+  background-position: center top;
+}
+.stockitem .name-wrapper, #deck .name-wrapper {
+  position: absolute;
+  top: 14px;
+  left: 34px;
+  font-size: 10pt;
+  color: white;
+  font-family: "goodgirl";
+  width: 95px;
+  text-align: center;
+}
+.stockitem .name-wrapper .text, #deck .name-wrapper .text {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+.stockitem .type-wrapper, #deck .type-wrapper {
+  position: absolute;
+  left: 0px;
+  font-size: 9pt;
+  color: white;
+  transform: rotate(-5deg);
+  font-family: "goodgirl";
+}
+.stockitem .type-wrapper.keep .outline, #deck .type-wrapper.keep .outline {
+  -webkit-text-stroke: 4px #00aeef;
+}
+.stockitem .type-wrapper.discard .outline, #deck .type-wrapper.discard .outline {
+  -webkit-text-stroke: 4px #ef1923;
+}
+.stockitem .type-wrapper.costume .outline, #deck .type-wrapper.costume .outline {
+  -webkit-text-stroke: 4px #f7941d;
+}
+.stockitem .type-wrapper.transformation .outline, #deck .type-wrapper.transformation .outline {
+  -webkit-text-stroke: 4px #13b48f;
+}
+.stockitem .type-wrapper .outline, #deck .type-wrapper .outline {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 120px;
+}
+.stockitem .type-wrapper .text, #deck .type-wrapper .text {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 120px;
+}
+.stockitem .description-wrapper, #deck .description-wrapper {
+  position: absolute;
+  left: 4px;
+  width: 124px;
+  bottom: 4px;
+  text-overflow: ellipsis;
+  text-align: center;
+  color: black;
+  font-size: 7pt;
+}
+.stockitem .description-wrapper .icon, #deck .description-wrapper .icon {
+  width: 12px;
+  height: 12px;
+  margin-bottom: -2px;
+}
+.stockitem .effect-wrapper, #deck .effect-wrapper {
+  position: absolute;
+  text-overflow: ellipsis;
+  text-align: center;
+  font-size: 7pt;
+  display: flex;
+  align-items: center;
+}
+.stockitem .effect-wrapper div, #deck .effect-wrapper div {
+  flex: 1;
+}
+.stockitem .effect-wrapper .icon, #deck .effect-wrapper .icon {
+  width: 12px;
+  height: 12px;
+  margin-bottom: -2px;
+}
+.stockitem .effect-wrapper .effect-text.overflow, #deck .effect-wrapper .effect-text.overflow {
+  background: radial-gradient(#fefefe, #fdfaf3, #f8ead0);
+  margin: -5px;
+  padding: 2px;
+  border-radius: 7px;
+}
+.stockitem .effect-wrapper .effect-text.overflow.permanent, #deck .effect-wrapper .effect-text.overflow.permanent {
+  background: radial-gradient(#0db9e9, #0fa2d8, #1265ab);
+  border: 2px solid #42aad1;
+}
+.stockitem .permanent-effect-wrapper, #deck .permanent-effect-wrapper {
+  left: 9px;
+  width: 116px;
+  top: 59px;
+  height: 38px;
+  color: white;
+}
+.stockitem .ankh-effect-wrapper, #deck .ankh-effect-wrapper {
+  left: 6px;
+  width: 58px;
+  top: 124px;
+  height: 52px;
+  color: black;
+}
+.stockitem .snake-effect-wrapper, #deck .snake-effect-wrapper {
+  left: 68px;
+  width: 58px;
+  top: 124px;
+  height: 52px;
+  color: black;
+}
+.stockitem[id$=goldenscarab], #deck[id$=goldenscarab] {
+  pointer-events: none;
+}
+.stockitem.disabled, #deck.disabled {
+  filter: contrast(0.6);
+  cursor: not-allowed;
+}
+.stockitem .card-token, #deck .card-token {
+  position: absolute;
+  z-index: 12;
+}
+.stockitem .card-token.mimic, #deck .card-token.mimic {
+  z-index: 13;
+}
+.stockitem .card-token.mimic-tile, #deck .card-token.mimic-tile {
+  z-index: 11;
+  left: 0;
+  top: 32px;
+  width: 132px;
+  height: 82px;
+  background-image: url("img/green-wickedness-tiles.jpg");
+  background-position: -500% 0%;
+  margin: 0;
+}
 
-/********* You can start writing your CSS below this line: **********/
+.energy-cube {
+  position: absolute;
+  background: url("img/energy-cube.png") center no-repeat;
+  width: 32px;
+  height: 32px;
+  background-size: contain;
+}
 
+.card-keep-text {
+  position: relative;
+  color: white;
+  font-family: "goodgirl";
+  font-size: 7pt;
+  margin: 2px;
+  text-align: center;
+}
+.card-keep-text .outline {
+  -webkit-text-stroke: 3px #00aeef;
+}
+.card-keep-text .text {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
 
-/*
-    Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):
+.card-inner {
+  position: absolute;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+.card-inner[data-side="1"] {
+  transform: rotateY(180deg);
+}
+.card-inner[data-side="0"] .card-back {
+  display: none;
+}
+.card-inner[data-side] {
+  background: unset !important;
+  box-shadow: unset;
+  overflow: visible;
+}
+.card-inner[data-type="301"] .card-side {
+  background-image: url("img/transformation-cards.jpg");
+}
+.card-inner[data-type="301"] .card-side.front {
+  background-position: 0% 0%;
+}
+.card-inner[data-type="301"] .card-side.back {
+  background-position: 100% 0%;
+}
+.card-inner .card-side {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 10px;
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+  -webkit-backface-visibility: hidden;
+  /* Safari */
+  backface-visibility: hidden;
+}
+.card-inner .card-side.back {
+  transform: rotateY(180deg);
+}
 
-    .white_token {
-        background-image: url('img/tokens.png');
-        background-position: 0px 0px;
-    }
-    .black_token {
-        background-image: url('img/tokens.png');
-        background-position: -20px 0px;
-    }
-    .token {
-        width: 20px;
-        height: 20px;
-        background-repeat: none;
-    }
-*/
+#table {
+  position: relative;
+  transform-origin: left top;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+#table .table-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+}
+#table #table-center {
+  position: relative;
+}
+#table #table-center #deck-wrapper {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  overflow: visible;
+}
+#table #table-center #deck-wrapper #deck {
+  width: 185px;
+  height: 132px;
+  background: url("img/card-back.jpg");
+  box-shadow: 4px 4px 0px 0px #333;
+}
+#table #table-center #deck-wrapper #deck[data-type=costume] {
+  background: url("img/card-back-costume.jpg");
+}
+#table #table-center #deck-wrapper #pick-stock {
+  position: absolute;
+  bottom: -5px;
+  width: 100%;
+  z-index: 5;
+}
+#table #table-center #visible-cards {
+  margin-bottom: 10px;
+  min-width: 420px;
+}
+#table #table-center #curse-wrapper {
+  display: flex;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.5);
+}
+#table #table-center #curse-wrapper #curse-deck {
+  width: 132px;
+  height: 185px;
+  background: url("img/anubis-cards.jpg");
+  background-position: 50% 50%;
+  box-shadow: 4px 4px 0px 0px #333;
+  border-radius: 10px;
+}
+#table #table-center #curse-wrapper #curse-card {
+  width: 132px;
+}
+#table #table-center #full-board {
+  display: flex;
+  align-items: flex-end;
+}
+#table #table-center #full-board #board {
+  margin-left: 10px;
+  position: relative;
+  width: 400px;
+  height: 400px;
+  background: url("img/tokyo.jpg");
+  background-size: cover;
+  box-shadow: 2px 2px 5px 2px black;
+  display: inline-block;
+}
+#table #table-center #full-board #board.twoPlayersVariant {
+  background: url("img/tokyo-2pvariant.jpg");
+}
+#table #table-center #full-board #board #tokyo-city {
+  position: absolute;
+  top: 72px;
+  left: -14px;
+  width: 200px;
+  height: 150px;
+}
+#table #table-center #full-board #board #tokyo-bay {
+  position: absolute;
+  bottom: 11px;
+  right: -2px;
+  width: 200px;
+  height: 150px;
+}
+#table #table-center #full-board #board #twoPlayersVariant-message {
+  position: absolute;
+  bottom: 50px;
+  left: 19px;
+  right: 19px;
+  background: #FFFFFFCC;
+  box-shadow: 0px 0px 5px 2px #FFFFFFCC;
+  padding: 5px;
+}
+#table #table-center #full-board #board #twoPlayersVariant-message #hide-twoPlayersVariant-message {
+  font-weight: bold;
+  cursor: pointer;
+}
+#table #table-center #full-board #board #board-corner-highlight {
+  position: absolute;
+  border: 3px solid #ffcf13;
+  margin: -3px;
+  box-shadow: 0px 0px 5px 2px #ffcf13;
+  bottom: 13px;
+  height: 26px;
+  left: 22px;
+  width: 83px;
+}
+#table #table-center #full-board #board .tokyo-tower-wrapper {
+  position: relative;
+}
+#table #table-center #full-board #wickedness-board-wrapper {
+  width: 300px;
+  height: 400px;
+  display: inline-block;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board {
+  position: relative;
+  width: 174px;
+  height: 400px;
+  background: url("img/wickedness-board.jpg");
+  background-size: cover;
+  box-shadow: 2px 2px 5px 2px black;
+  display: inline-block;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board #wickedness-tiles-reduced-3 {
+  top: 258px;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board #wickedness-tiles-reduced-6 {
+  top: 141px;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board #wickedness-tiles-reduced-10 {
+  top: 6px;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board #wickedness-tiles-expanded-3 {
+  bottom: 10px;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board #wickedness-tiles-expanded-6 {
+  bottom: 10px;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board #wickedness-tiles-expanded-10 {
+  top: 10px;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-reduced {
+  position: absolute;
+  left: 145px;
+  width: 132px;
+  height: 80px;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-reduced .wickedness-tiles-reduced-tile {
+  position: absolute;
+  margin: 0;
+  width: 132px;
+  height: 80px;
+  background: url("img/green-wickedness-tiles.jpg");
+  border-radius: 10px;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-expanded {
+  position: absolute;
+  left: 145px;
+  width: 142px;
+  background: white;
+  border-radius: 8px;
+  visibility: hidden;
+  padding-bottom: 1px;
+  z-index: 20;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-expanded.visible {
+  visibility: visible;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-expanded .close {
+  cursor: pointer;
+  text-align: right;
+  padding-top: 5px;
+  padding-right: 10px;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-expanded .wickedness-tile-stock {
+  width: 132px;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-expanded:not(.selectable) .wickedness-tile-stock {
+  pointer-events: none;
+}
+#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .monster-icon {
+  position: absolute;
+}
+#table .player-table {
+  width: 440px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+#table .player-table.eliminated {
+  filter: grayscale(1);
+}
+#table .player-table.active {
+  border: 3px solid #ffcf13;
+  box-shadow: 0px 0px 5px 2px #ffcf13;
+}
+#table .player-table .player-name {
+  padding: 5px;
+  position: relative;
+  height: 18px;
+  width: 100%;
+  text-align: center;
+  text-overflow: ellipsis;
+  z-index: 5;
+}
+#table .player-table .player-name .outline {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  display: block;
+  -webkit-text-stroke: 4px black;
+}
+#table .player-table .player-name .outline.white {
+  -webkit-text-stroke: 4px white;
+}
+#table .player-table .player-name .text {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+#table .player-table .player-name.standard {
+  font-weight: bold;
+  font-size: 15pt;
+}
+#table .player-table .player-name.goodgirl {
+  font-family: "goodgirl";
+  font-size: 16pt;
+}
+#table .player-table .player-name.goodgirl .outline {
+  top: 2px;
+}
+#table .player-table .player-name.goodgirl .text {
+  top: 2px;
+}
+#table .player-table .monster-board-wrapper {
+  position: relative;
+}
+#table .player-table .monster-board-wrapper .kot-token {
+  z-index: 3;
+  position: absolute;
+  top: -25px;
+  left: -25px;
+}
+#table .player-table .monster-board-wrapper .wheel {
+  position: absolute;
+  z-index: 1;
+  transition: transform 1s;
+}
+#table .player-table .monster-board-wrapper .wheel.blue {
+  background-image: url("img/blue-wheel.png");
+  width: 165px;
+  height: 165px;
+  top: 7px;
+  left: -5px;
+  transform: rotate(25deg);
+}
+#table .player-table .monster-board-wrapper .wheel.red {
+  background-image: url("img/red-wheel.png");
+  width: 122px;
+  height: 122px;
+  right: -5px;
+  bottom: 5px;
+  transform: rotate(98deg);
+}
+#table .player-table .monster-board-wrapper .monster-board {
+  width: 280px;
+  height: 219px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  box-shadow: 2px 2px 5px 2px black;
+  border-radius: 12px;
+  position: relative;
+  z-index: 2;
+}
+#table .player-table .monster-board-wrapper .monster-board .monster-board-figure-wrapper {
+  width: 200px;
+  height: 150px;
+}
+#table .player-table .monster-board-wrapper .monster-board.monster1 {
+  background-image: url("img/monster-board-1.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster2 {
+  background-image: url("img/monster-board-2.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster3 {
+  background-image: url("img/monster-board-3.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster4 {
+  background-image: url("img/monster-board-4.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster5 {
+  background-image: url("img/monster-board-5.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster6 {
+  background-image: url("img/monster-board-6.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster7 {
+  background-image: url("img/monster-board-7.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster8 {
+  background-image: url("img/monster-board-8.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster9 {
+  background-image: url("img/monster-board-9.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster10 {
+  background-image: url("img/monster-board-10.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster11 {
+  background-image: url("img/monster-board-11.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster12 {
+  background-image: url("img/monster-board-12.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster13 {
+  background-image: url("img/monster-board-13.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster14 {
+  background-image: url("img/monster-board-14.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster15 {
+  background-image: url("img/monster-board-15.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster16 {
+  background-image: url("img/monster-board-16.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster17 {
+  background-image: url("img/monster-board-17.png");
+}
+#table .player-table .monster-board-wrapper .monster-board.monster18 {
+  background-image: url("img/monster-board-18.png");
+}
+#table .player-table .energy-wrapper {
+  position: absolute;
+  z-index: 4;
+  top: 40px;
+  width: 65px;
+  height: 220px;
+}
+#table .player-table .energy-wrapper.left {
+  left: 5px;
+}
+#table .player-table .energy-wrapper.right {
+  right: 5px;
+}
+#table .player-table .token-wrapper {
+  position: absolute;
+  z-index: 4;
+  width: 65px;
+  height: 170px;
+  pointer-events: none;
+}
+#table .player-table .token-wrapper .token {
+  position: absolute;
+  pointer-events: all;
+}
+#table .player-table .token-wrapper.poison {
+  left: -15px;
+  bottom: 5px;
+}
+#table .player-table .token-wrapper.poison .token {
+  box-shadow: 0 0 4px 4px #5e8cc2;
+}
+#table .player-table .token-wrapper.shrink-ray {
+  top: 5px;
+  right: -50px;
+}
+#table .player-table .token-wrapper.shrink-ray .token {
+  box-shadow: 0 0 4px 4px #d7e2a1;
+}
+#table .player-table .player-wickedness-tiles.empty {
+  max-height: 0px;
+}
+#table .player-table .player-cards {
+  width: 100%;
+}
+#table .player-table .player-cards.empty {
+  max-height: 20px;
+}
+#table .player-table .player-evolution-cards {
+  width: 100%;
+}
+#table .player-table .player-evolution-cards.empty:not(.hand) {
+  max-height: 0px;
+}
+#table .player-table .player-evolution-cards.hand {
+  background: #FFFFFFCC;
+}
+#table .player-table .player-evolution-cards.hand::before {
+  content: "";
+  width: 48px;
+  height: 48px;
+  background: url("img/hand.svg");
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  margin-top: -24px;
+}
+#table .player-table .player-evolution-cards.hand.empty {
+  max-height: 48px;
+}
+#table .player-table .tokyo-tower-wrapper {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+#table .player-table .berserk-token {
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  width: 52px;
+  height: 80px;
+  background: url("img/berserk-token.png");
+  z-index: 3;
+  border-radius: 5px;
+  display: none;
+}
+#table .player-table .berserk-token[data-visible=true] {
+  display: initial;
+}
+#table .player-table .cultist-tokens {
+  position: absolute;
+  bottom: 0;
+  left: 60px;
+  width: 155px;
+  display: flex;
+  flex-wrap: wrap-reverse;
+}
+#table .player-table .cultist-tokens .cultist-token {
+  background: url("img/cultist-tile.png");
+  background-size: contain;
+  width: 64px;
+  height: 64px;
+  border-radius: 5px;
+  margin: 0 5px;
+  margin-left: -50px;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.7);
+}
+#table .player-table .pick-evolution-cards {
+  position: absolute;
+  top: 42px;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 5px 5px rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+}
+#table .monster-figure {
+  position: relative;
+}
 
+.monster-figure .stand {
+  display: none;
+}
 
+.mode_3d .monster-figure {
+  transform: translateY(-60px) rotateX(-90deg);
+  transform-origin: bottom center;
+}
+.mode_3d .monster-figure .stand {
+  display: inline-block;
+  width: 70px;
+  height: 70px;
+  background: black;
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  margin-left: -35px;
+  border-radius: 50%;
+  transform: rotateX(90deg);
+}
 
+/* make space between buttons on touch devices */
+@media (hover: none) {
+  #page-title .action-button.bgabutton, #page-title .bgabutton {
+    margin-bottom: 8px;
+    margin-top: 8px;
+  }
+}
+html, .mode_3d #game_play_area_background {
+  background: url("img/background.jpg") #102f50;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+}
 
+.whiteblock {
+  background: #FFFFFFAA;
+}
