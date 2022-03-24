@@ -1,0 +1,5 @@
+{OVERALL_GAME_HEADER}
+
+<div>Point Salad!</div>
+
+{OVERALL_GAME_FOOTER}
