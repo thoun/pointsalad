@@ -17,15 +17,6 @@ trait UtilTrait {
         return null;
     }
 
-    function array_find_key(array $array, callable $fn) {
-        foreach ($array as $key => $value) {
-            if($fn($value)) {
-                return $key;
-            }
-        }
-        return null;
-    }
-
     function array_some(array $array, callable $fn) {
         foreach ($array as $value) {
             if($fn($value)) {
@@ -81,9 +72,66 @@ trait UtilTrait {
         
         for ($pile = 1; $pile <= 3; $pile++) {
             $this->cards->pickCardsForLocation($pileCount, 'deck', 'pile'.$pile);
-            
-            $this->cards->pickCardForLocation('pile'.$pile, 'market'.$pile, 1);
-            $this->cards->pickCardForLocation('pile'.$pile, 'market'.$pile, 2);
         }
+
+        $this->refillMarket(true);
+    }
+
+    function applyFlipCard(Card &$card, bool $silent = false) {
+        $card->side = 1;
+        $this->DbQuery("UPDATE `card` SET `card_type_arg` = 1 WHERE `card_id` = $card->id"); 
+
+        if (!$silent) {
+            // TODO notif
+        }
+    }
+
+    function refillMarket(bool $silent = false) {
+        $revealedCards = [];
+        
+        for ($pile = 1; $pile <= 3; $pile++) {
+            // TODO handle empty piles
+            $pileSize = intval($this->cards->countCardInLocation('pile'.$pile));
+            $marketSize = intval($this->cards->countCardInLocation('market'.$pile));
+            $neededCards = min($pileSize, 2 - $marketSize);
+            if ($neededCards > 0) {
+                $cards = $this->cards->pickCardsForLocation('pile'.$pile, 'market'.$pile, $marketSize + 1);
+                foreach($cards as $card) {
+                    $this->applyFlipCard($card, true); 
+                }
+                $revealedCards = array_merge($revealedCards, $cards);
+            }
+        }
+
+        if (!$silent) {
+            // TODO notif $revealedCards & new top cards
+        }
+    }
+
+    function getScore(int $playerId, Card $scoreCard, array $veggieCards) {
+        return 0; // TODO
+    }
+
+    function updateScore(int $playerId) {
+        $cards = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $playerId));
+
+        $pointCards = [];
+        $veggieCards = [];
+        foreach ($cards as $card) {
+            if ($card->side === 1) {
+                $veggieCards[] = $card;
+            } else {
+                $pointCards[] = $card;
+            }
+        }
+
+        $score = 0;
+        foreach ($pointCards as $pointCard) {
+            $score += $this->getScore($playerId, $pointCard, $veggieCards);
+        }
+
+        $this->DbQuery("UPDATE `player` SET `player_score` = $score WHERE `player_id` = $playerId"); 
+        
+        // TODO notif
     }
 }

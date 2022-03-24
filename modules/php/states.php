@@ -14,29 +14,17 @@ trait StateTrait {
     function stNextPlayer() {
         $playerId = $this->getActivePlayerId();
 
-        $this->checkPlayerToEliminate();
-
         $this->giveExtraTime($playerId);
 
         $this->activeNextPlayer();
-        $playerId = intval($this->getActivePlayerId());
 
-        if ($this->isEliminated($playerId)) {
-            return $this->stNextPlayer();
-        }
+        $endScore = intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` LIKE 'pile%' OR `card_location` LIKE 'market%'")) === 0;
 
-        $this->checkPlayerToEliminate();
-
-        $endOfRound = $playerId == intval($this->getGameStateValue(FIRST_PLAYER));
-
-        $this->gamestate->nextState($endOfRound ? 'endScore' : 'nextPlayer');
+        $this->gamestate->nextState($endScore ? 'endScore' : 'nextPlayer');
     }
 
     function stEndScore() {
-        $playersIds = $this->getPlayersIds();
-        foreach ($playersIds as $playerId) {
-            $this->notifUpdateScoreSheet($playerId, true);
-        }
+        // TODO update player_score_aux
 
         $this->gamestate->nextState('endGame');
     }

@@ -1,5 +1,10 @@
 <?php
 
+// waiting for PHP8
+function str_starts_with ( $haystack, $needle ) {
+    return strpos( $haystack , $needle ) === 0;
+}
+
 trait ActionTrait {
 
     //////////////////////////////////////////////////////////////////////////////
@@ -16,27 +21,36 @@ trait ActionTrait {
         
         $playerId = self::getActivePlayerId();
 
-        /*$tickets = $this->getCardsFromDb($this->tickets->getCardsInLocation('hand', $playerId));
+        $cards = $this->getCardsFromDb($this->card->getCards($ids));
 
-        $mapElements = $this->MAP_POSITIONS[$this->getMap()][$position];
-        $ticketNumber = $this->array_find($mapElements, fn($element) => $element >= 1 && $element <= 12);
-
-        if ($ticketNumber === null || !$this->array_some($tickets, fn($ticket) => $ticket->type == $ticketNumber)) {
-            throw new BgaUserException("Invalid departure");
+        if (count($cards) === 2) {
+            if ($this->array_some($cards, fn($card) => !str_starts_with('market', $card->location))) {
+                throw new BgaUserException("If you take two cards, it must be from the market");
+            }
+        } else if (count($cards) === 1) {
+            if (!str_starts_with('pile', $cards[0]->location)) {
+                throw new BgaUserException("If you take one card, it must be from a pile");
+            }
+        } else {
+            throw new BgaUserException("You must take one or two card(s)");
         }
 
-        $position = $this->MAP_DEPARTURE_POSITIONS[$this->getMap()][$ticketNumber]; 
-
-        $this->DbQuery("UPDATE player SET `player_departure_position` = $position WHERE `player_id` = $playerId"); 
-
+        $this->cards->moveCards($ids, 'player', $playerId);
+        /* TODO notif
         self::notifyAllPlayers('placedDeparturePawn', clienttranslate('${player_name} places departure pawn'), [
             'playerId' => $playerId,
             'player_name' => self::getActivePlayerName(),
             'position' => $position,
         ]);
 
-        $this->gamestate->setPlayerNonMultiactive($playerId, 'next');*/
-        $this->gamestate->nextState(/*$hasPointCard ? 'flipCard' : */'nextPlayer');
+        //self::incStat(1, 'placedRoutes');
+        //self::incStat(1, 'placedRoutes', $playerId);*/
+
+        $this->updateScore($playerId);
+
+        $hasPointCard = intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE card_location_id = $playerId AND `card_type_arg` = 1")) > 0;
+
+        $this->gamestate->nextState($hasPointCard ? 'flipCard' : 'nextPlayer');
     }
         
   	
@@ -45,47 +59,15 @@ trait ActionTrait {
         
         $playerId = intval(self::getActivePlayerId());
 
-        /*$allPlacedRoutes = $this->getPlacedRoutes();
-        $playerPlacedRoutes = array_filter($allPlacedRoutes, fn($placedRoute) => $placedRoute->playerId === $playerId);
-        $currentPosition = $this->getCurrentPosition($playerId, $playerPlacedRoutes);
-        $from = $currentPosition == $routeFrom ? $routeFrom : $routeTo;
-        $to = $currentPosition == $routeFrom ? $routeTo : $routeFrom;
-        $turnShape = $this->getPlayerTurnShape($playerId);
-        $possibleRoutes = $this->getPossibleRoutes($playerId, $this->getMap(), $turnShape, $currentPosition, $allPlacedRoutes);
-        $possibleRoute = $this->array_find($possibleRoutes, fn($route) => $this->isSameRoute($route, $from, $to));
+        $card = $this->getCardFromDb($this->card->getCard($id));
 
-        if ($possibleRoute == null) {
-            throw new BgaUserException("Invalid route");
+        if ($card->location !== 'player' || $card->locationArg !== $playerId) {
+            throw new BgaUserException("You can't flip this card");
         }
 
-        $round = $this->getRoundNumber();
-        $useTurnZone = $possibleRoute->useTurnZone ? 1 : 0;
-        $this->DbQuery("INSERT INTO placed_routes(`player_id`, `from`, `to`, `round`, `use_turn_zone`, `traffic_jam`) VALUES ($playerId, $from, $to, $round, $useTurnZone, $possibleRoute->trafficJam)");
+        $this->applyFlipCard($card);
 
-        $mapElements = $this->MAP_POSITIONS[$this->getMap()][$to];
-        $zones = array_map(fn($element) => floor($element / 10), $mapElements);
-        $zones = array_unique(array_filter($zones, fn($zone) => $zone >=2 && $zone <= 5));
-        if ($useTurnZone) {            
-            $zones[] = 6;
-        }
-        if ($possibleRoute->trafficJam > 0) {            
-            $zones[] = 7;
-        }
-        
-        self::notifyAllPlayers('placedRoute', clienttranslate('${player_name} places a route marker'), [
-            'playerId' => $playerId,
-            'player_name' => self::getActivePlayerName(),
-            'marker' => PlacedRoute::forNotif($from, $to, false),
-            'zones' => $zones,
-            'position' => $to,
-        ]);
-
-        if ($possibleRoute->isElimination) {
-            $this->setGameStateValue(ELIMINATE_PLAYER, $playerId);
-            $this->applyConfirmTurn($playerId);
-        }
-
-        $this->notifUpdateScoreSheet($playerId);
+        $this->updateScore($playerId);
 
         //self::incStat(1, 'placedRoutes');
         //self::incStat(1, 'placedRoutes', $playerId);*/
