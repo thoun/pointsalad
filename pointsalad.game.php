@@ -19,8 +19,20 @@
 
 require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
 
+require_once('modules/php/constants.inc.php');
+require_once('modules/php/utils.php');
+require_once('modules/php/actions.php');
+require_once('modules/php/states.php');
+require_once('modules/php/args.php');
+require_once('modules/php/debug-util.php');
 
 class PointSalad extends Table {
+    use UtilTrait;
+    use ActionTrait;
+    use StateTrait;
+    use ArgsTrait;
+    use DebugUtilTrait;
+
 	function __construct() {
         // Your global variables labels:
         //  Here, you can assign labels to global variables you are using for this game.
@@ -30,14 +42,10 @@ class PointSalad extends Table {
         // Note: afterwards, you can get/set the global variables with getGameStateValue/setGameStateInitialValue/setGameStateValue
         parent::__construct();
         
-        self::initGameStateLabels([
-            //    "my_first_global_variable" => 10,
-            //    "my_second_global_variable" => 11,
-            //      ...
-            //    "my_first_game_variant" => 100,
-            //    "my_second_game_variant" => 101,
-            //      ...
-        ]);        
+        self::initGameStateLabels([]);  
+
+        $this->cards = self::getNew("module.common.deck");
+        $this->cards->init("card");     
 	}
 	
     protected function getGameName( )
@@ -83,8 +91,9 @@ class PointSalad extends Table {
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
-        // TODO: setup the initial game situation here
-       
+        $this->setupCards(count($players));
+
+        // TODO set table initial cards
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
@@ -155,7 +164,7 @@ class PointSalad extends Table {
         if ($state['type'] === "activeplayer") {
             switch ($statename) {
                 default:
-                    $this->gamestate->nextState("zombiePass");
+                    $this->gamestate->nextState("nextPlayer");
                 	break;
             }
 
