@@ -4,16 +4,19 @@
 
 interface Card {
     id: number;
-    type: number;
-    subType: number;
+    veggie: number; // 1..6
+    index: number; // 1..18
     side: 0 | 1;
     location: string;
-    location_arg: number;
+    locationArg: number;
 }
+
+type VeggieCounts = { [veggie: number]: number };
 
 interface PointSaladPlayer extends Player {
     playerNo: number;
     cards: Card[];
+    veggieCounts: VeggieCounts;
 }
 
 interface PointSaladGamedatas {
@@ -30,26 +33,45 @@ interface PointSaladGamedatas {
 
     // Add here variables you set up in getAllDatas
     pileTopCard: { [pile: number]: Card };
+    pileCount: { [pile: number]: number };
     market: { [pile: number]: Card[] };
 }
 
 interface PointSaladGame extends Game {
-    
-    cards: Cards;
-    getPlayerId: () => number;
+    createOrMoveCard(card: Card, destinationId: string, init?: boolean): void;
+    getPlayerId(): number;
     getZoom(): number;
 }
 
-/*interface EnteringPickMonsterArgs {
-    availableMonsters: number[];
+interface EnteringTakeCardsArgs {
 }
 
-interface NotifPickMonsterArgs {
-    playerId: number;
-    monster: number;
-}*/
+interface EnteringFlipCardArgs {
+}
 
 interface NotifPointsArgs {
     playerId: number;
     points: number;
+}
+
+interface NotifFlippedCardArgs {
+    playerId: number;
+    card: Card;
+    veggieCounts: VeggieCounts;
+}
+
+interface NotifTakenCardsArgs {
+    playerId: number;
+    cards: Card[];
+    veggieCounts: VeggieCounts;
+    pile: number;
+    pileTop: Card | null;
+    pileCount: number | null;
+}
+
+interface NotifMarketRefillArgs {
+    card: Card;
+    pile: number;
+    pileTop: Card;
+    pileCount: number | null;
 }

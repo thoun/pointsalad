@@ -1,5 +1,6 @@
 @import 'playerboards';
 @import 'cards';
+@import 'player-table';
 @import 'table';
 
 /* make space between buttons on touch devices */
@@ -18,4 +19,21 @@ html, .mode_3d #game_play_area_background {
 
 .whiteblock {
   background: #FFFFFFAA;
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+  background-size: auto 100%;
+  display: inline-block;
+  vertical-align: middle;
+
+  &[data-veggie] {
+    background: url('img/veggie-icons.png');
+  }
+  @for $i from 1 through 6 {
+    &[data-veggie="#{$i}"] {
+      background-position-x: #{($i - 1) * 20%};
+    }
+  }
 }

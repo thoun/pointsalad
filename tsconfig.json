@@ -13,7 +13,6 @@
         "src/pointsalad.d.ts",
         "src/slide-utils.ts",
         "src/text-icons-formatter.ts",
-        "src/cards.ts",
         "src/player-table.ts",
         "src/table-center.ts",
         "src/pointsalad.ts",

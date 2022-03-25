@@ -1,710 +1,150 @@
 .player-board {
-  background-color: #8DC63F;
+  background-color: #e8f3d8;
 }
-
-.stockitem, #deck {
-  border-radius: 10px;
-  margin: 5px;
-  text-align: center;
-  overflow: hidden;
-  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.5);
+.player-board .fa-star {
+  color: #8DC63F;
 }
-.stockitem .bottom, #deck .bottom {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  background: url("img/card-bottom.png");
-  background-position: center top;
-}
-.stockitem .name-wrapper, #deck .name-wrapper {
-  position: absolute;
-  top: 14px;
-  left: 34px;
-  font-size: 10pt;
-  color: white;
-  font-family: "goodgirl";
-  width: 95px;
-  text-align: center;
-}
-.stockitem .name-wrapper .text, #deck .name-wrapper .text {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-}
-.stockitem .type-wrapper, #deck .type-wrapper {
-  position: absolute;
-  left: 0px;
-  font-size: 9pt;
-  color: white;
-  transform: rotate(-5deg);
-  font-family: "goodgirl";
-}
-.stockitem .type-wrapper.keep .outline, #deck .type-wrapper.keep .outline {
-  -webkit-text-stroke: 4px #00aeef;
-}
-.stockitem .type-wrapper.discard .outline, #deck .type-wrapper.discard .outline {
-  -webkit-text-stroke: 4px #ef1923;
-}
-.stockitem .type-wrapper.costume .outline, #deck .type-wrapper.costume .outline {
-  -webkit-text-stroke: 4px #f7941d;
-}
-.stockitem .type-wrapper.transformation .outline, #deck .type-wrapper.transformation .outline {
-  -webkit-text-stroke: 4px #13b48f;
-}
-.stockitem .type-wrapper .outline, #deck .type-wrapper .outline {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 120px;
-}
-.stockitem .type-wrapper .text, #deck .type-wrapper .text {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 120px;
-}
-.stockitem .description-wrapper, #deck .description-wrapper {
-  position: absolute;
-  left: 4px;
-  width: 124px;
-  bottom: 4px;
-  text-overflow: ellipsis;
-  text-align: center;
-  color: black;
-  font-size: 7pt;
-}
-.stockitem .description-wrapper .icon, #deck .description-wrapper .icon {
-  width: 12px;
-  height: 12px;
-  margin-bottom: -2px;
-}
-.stockitem .effect-wrapper, #deck .effect-wrapper {
-  position: absolute;
-  text-overflow: ellipsis;
-  text-align: center;
-  font-size: 7pt;
+.player-board .counters {
   display: flex;
   align-items: center;
+  margin: 5px 0;
 }
-.stockitem .effect-wrapper div, #deck .effect-wrapper div {
+.player-board .counters .counter {
   flex: 1;
+  display: flex;
+  align-items: center;
 }
-.stockitem .effect-wrapper .icon, #deck .effect-wrapper .icon {
-  width: 12px;
-  height: 12px;
-  margin-bottom: -2px;
-}
-.stockitem .effect-wrapper .effect-text.overflow, #deck .effect-wrapper .effect-text.overflow {
-  background: radial-gradient(#fefefe, #fdfaf3, #f8ead0);
-  margin: -5px;
-  padding: 2px;
-  border-radius: 7px;
-}
-.stockitem .effect-wrapper .effect-text.overflow.permanent, #deck .effect-wrapper .effect-text.overflow.permanent {
-  background: radial-gradient(#0db9e9, #0fa2d8, #1265ab);
-  border: 2px solid #42aad1;
-}
-.stockitem .permanent-effect-wrapper, #deck .permanent-effect-wrapper {
-  left: 9px;
-  width: 116px;
-  top: 59px;
-  height: 38px;
-  color: white;
-}
-.stockitem .ankh-effect-wrapper, #deck .ankh-effect-wrapper {
-  left: 6px;
-  width: 58px;
-  top: 124px;
-  height: 52px;
-  color: black;
-}
-.stockitem .snake-effect-wrapper, #deck .snake-effect-wrapper {
-  left: 68px;
-  width: 58px;
-  top: 124px;
-  height: 52px;
-  color: black;
-}
-.stockitem[id$=goldenscarab], #deck[id$=goldenscarab] {
-  pointer-events: none;
-}
-.stockitem.disabled, #deck.disabled {
-  filter: contrast(0.6);
-  cursor: not-allowed;
-}
-.stockitem .card-token, #deck .card-token {
-  position: absolute;
-  z-index: 12;
-}
-.stockitem .card-token.mimic, #deck .card-token.mimic {
-  z-index: 13;
-}
-.stockitem .card-token.mimic-tile, #deck .card-token.mimic-tile {
-  z-index: 11;
-  left: 0;
-  top: 32px;
-  width: 132px;
-  height: 82px;
-  background-image: url("img/green-wickedness-tiles.jpg");
-  background-position: -500% 0%;
-  margin: 0;
+.player-board .counters .counter span {
+  padding: 0 5px 0 5px;
 }
 
-.energy-cube {
-  position: absolute;
-  background: url("img/energy-cube.png") center no-repeat;
-  width: 32px;
-  height: 32px;
-  background-size: contain;
-}
-
-.card-keep-text {
-  position: relative;
-  color: white;
-  font-family: "goodgirl";
-  font-size: 7pt;
-  margin: 2px;
-  text-align: center;
-}
-.card-keep-text .outline {
-  -webkit-text-stroke: 3px #00aeef;
-}
-.card-keep-text .text {
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-.card-inner {
-  position: absolute;
-  transition: transform 0.8s;
-  transform-style: preserve-3d;
-}
-.card-inner[data-side="1"] {
-  transform: rotateY(180deg);
-}
-.card-inner[data-side="0"] .card-back {
-  display: none;
-}
-.card-inner[data-side] {
-  background: unset !important;
-  box-shadow: unset;
-  overflow: visible;
-}
-.card-inner[data-type="301"] .card-side {
-  background-image: url("img/transformation-cards.jpg");
-}
-.card-inner[data-type="301"] .card-side.front {
-  background-position: 0% 0%;
-}
-.card-inner[data-type="301"] .card-side.back {
-  background-position: 100% 0%;
-}
-.card-inner .card-side {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+.card {
   border-radius: 10px;
   box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-  transition: transform 0.8s;
-  transform-style: preserve-3d;
-  -webkit-backface-visibility: hidden;
-  /* Safari */
-  backface-visibility: hidden;
+  width: 100px;
+  height: 140px;
+  margin: 5px;
 }
-.card-inner .card-side.back {
-  transform: rotateY(180deg);
+.card[data-side="0"] {
+  background-image: url("img/point-side.jpg");
+}
+.card[data-side="0"][data-index="1"] {
+  background-position-x: 0%;
+}
+.card[data-side="0"][data-index="2"] {
+  background-position-x: 5.8823529412%;
+}
+.card[data-side="0"][data-index="3"] {
+  background-position-x: 11.7647058824%;
+}
+.card[data-side="0"][data-index="4"] {
+  background-position-x: 17.6470588235%;
+}
+.card[data-side="0"][data-index="5"] {
+  background-position-x: 23.5294117647%;
+}
+.card[data-side="0"][data-index="6"] {
+  background-position-x: 29.4117647059%;
+}
+.card[data-side="0"][data-index="7"] {
+  background-position-x: 35.2941176471%;
+}
+.card[data-side="0"][data-index="8"] {
+  background-position-x: 41.1764705882%;
+}
+.card[data-side="0"][data-index="9"] {
+  background-position-x: 47.0588235294%;
+}
+.card[data-side="0"][data-index="10"] {
+  background-position-x: 52.9411764706%;
+}
+.card[data-side="0"][data-index="11"] {
+  background-position-x: 58.8235294118%;
+}
+.card[data-side="0"][data-index="12"] {
+  background-position-x: 64.7058823529%;
+}
+.card[data-side="0"][data-index="13"] {
+  background-position-x: 70.5882352941%;
+}
+.card[data-side="0"][data-index="14"] {
+  background-position-x: 76.4705882353%;
+}
+.card[data-side="0"][data-index="15"] {
+  background-position-x: 82.3529411765%;
+}
+.card[data-side="0"][data-index="16"] {
+  background-position-x: 88.2352941176%;
+}
+.card[data-side="0"][data-index="17"] {
+  background-position-x: 94.1176470588%;
+}
+.card[data-side="0"][data-index="18"] {
+  background-position-x: 100%;
+}
+.card[data-side="1"] {
+  background-image: url("img/veggie-side.jpg");
+}
+.card[data-veggie="1"] {
+  background-position-y: 0%;
+}
+.card[data-veggie="2"] {
+  background-position-y: 20%;
+}
+.card[data-veggie="3"] {
+  background-position-y: 40%;
+}
+.card[data-veggie="4"] {
+  background-position-y: 60%;
+}
+.card[data-veggie="5"] {
+  background-position-y: 80%;
+}
+.card[data-veggie="6"] {
+  background-position-y: 100%;
 }
 
-#table {
-  position: relative;
-  transform-origin: left top;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-}
-#table .table-column {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 10px;
-}
-#table #table-center {
-  position: relative;
-}
-#table #table-center #deck-wrapper {
-  display: flex;
-  justify-content: center;
-  position: relative;
-  overflow: visible;
-}
-#table #table-center #deck-wrapper #deck {
-  width: 185px;
-  height: 132px;
-  background: url("img/card-back.jpg");
-  box-shadow: 4px 4px 0px 0px #333;
-}
-#table #table-center #deck-wrapper #deck[data-type=costume] {
-  background: url("img/card-back-costume.jpg");
-}
-#table #table-center #deck-wrapper #pick-stock {
-  position: absolute;
-  bottom: -5px;
-  width: 100%;
-  z-index: 5;
-}
-#table #table-center #visible-cards {
-  margin-bottom: 10px;
-  min-width: 420px;
-}
-#table #table-center #curse-wrapper {
-  display: flex;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 10px;
-  margin-bottom: 10px;
-  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.5);
-}
-#table #table-center #curse-wrapper #curse-deck {
-  width: 132px;
-  height: 185px;
-  background: url("img/anubis-cards.jpg");
-  background-position: 50% 50%;
-  box-shadow: 4px 4px 0px 0px #333;
-  border-radius: 10px;
-}
-#table #table-center #curse-wrapper #curse-card {
-  width: 132px;
-}
-#table #table-center #full-board {
-  display: flex;
-  align-items: flex-end;
-}
-#table #table-center #full-board #board {
-  margin-left: 10px;
-  position: relative;
-  width: 400px;
-  height: 400px;
-  background: url("img/tokyo.jpg");
-  background-size: cover;
-  box-shadow: 2px 2px 5px 2px black;
-  display: inline-block;
-}
-#table #table-center #full-board #board.twoPlayersVariant {
-  background: url("img/tokyo-2pvariant.jpg");
-}
-#table #table-center #full-board #board #tokyo-city {
-  position: absolute;
-  top: 72px;
-  left: -14px;
-  width: 200px;
-  height: 150px;
-}
-#table #table-center #full-board #board #tokyo-bay {
-  position: absolute;
-  bottom: 11px;
-  right: -2px;
-  width: 200px;
-  height: 150px;
-}
-#table #table-center #full-board #board #twoPlayersVariant-message {
-  position: absolute;
-  bottom: 50px;
-  left: 19px;
-  right: 19px;
-  background: #FFFFFFCC;
-  box-shadow: 0px 0px 5px 2px #FFFFFFCC;
-  padding: 5px;
-}
-#table #table-center #full-board #board #twoPlayersVariant-message #hide-twoPlayersVariant-message {
-  font-weight: bold;
+[data-selectable-cards=true] .card {
   cursor: pointer;
 }
-#table #table-center #full-board #board #board-corner-highlight {
-  position: absolute;
-  border: 3px solid #ffcf13;
-  margin: -3px;
-  box-shadow: 0px 0px 5px 2px #ffcf13;
-  bottom: 13px;
-  height: 26px;
-  left: 22px;
-  width: 83px;
+[data-selectable-cards=true] .card.selected {
+  box-shadow: 0 0 8px 8px white;
 }
-#table #table-center #full-board #board .tokyo-tower-wrapper {
-  position: relative;
-}
-#table #table-center #full-board #wickedness-board-wrapper {
-  width: 300px;
-  height: 400px;
-  display: inline-block;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board {
-  position: relative;
-  width: 174px;
-  height: 400px;
-  background: url("img/wickedness-board.jpg");
-  background-size: cover;
-  box-shadow: 2px 2px 5px 2px black;
-  display: inline-block;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board #wickedness-tiles-reduced-3 {
-  top: 258px;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board #wickedness-tiles-reduced-6 {
-  top: 141px;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board #wickedness-tiles-reduced-10 {
-  top: 6px;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board #wickedness-tiles-expanded-3 {
-  bottom: 10px;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board #wickedness-tiles-expanded-6 {
-  bottom: 10px;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board #wickedness-tiles-expanded-10 {
-  top: 10px;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-reduced {
-  position: absolute;
-  left: 145px;
-  width: 132px;
-  height: 80px;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-reduced .wickedness-tiles-reduced-tile {
-  position: absolute;
-  margin: 0;
-  width: 132px;
-  height: 80px;
-  background: url("img/green-wickedness-tiles.jpg");
-  border-radius: 10px;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-expanded {
-  position: absolute;
-  left: 145px;
-  width: 142px;
-  background: white;
-  border-radius: 8px;
-  visibility: hidden;
-  padding-bottom: 1px;
-  z-index: 20;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-expanded.visible {
-  visibility: visible;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-expanded .close {
-  cursor: pointer;
-  text-align: right;
-  padding-top: 5px;
-  padding-right: 10px;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-expanded .wickedness-tile-stock {
-  width: 132px;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .wickedness-tiles-expanded:not(.selectable) .wickedness-tile-stock {
-  pointer-events: none;
-}
-#table #table-center #full-board #wickedness-board-wrapper #wickedness-board .monster-icon {
-  position: absolute;
-}
-#table .player-table {
-  width: 440px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px 0;
-  box-sizing: border-box;
-}
-#table .player-table.eliminated {
-  filter: grayscale(1);
-}
-#table .player-table.active {
-  border: 3px solid #ffcf13;
-  box-shadow: 0px 0px 5px 2px #ffcf13;
-}
-#table .player-table .player-name {
-  padding: 5px;
-  position: relative;
-  height: 18px;
-  width: 100%;
-  text-align: center;
-  text-overflow: ellipsis;
-  z-index: 5;
-}
-#table .player-table .player-name .outline {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  display: block;
-  -webkit-text-stroke: 4px black;
-}
-#table .player-table .player-name .outline.white {
-  -webkit-text-stroke: 4px white;
-}
-#table .player-table .player-name .text {
-  position: absolute;
-  left: 0;
-  width: 100%;
-}
-#table .player-table .player-name.standard {
-  font-weight: bold;
-  font-size: 15pt;
-}
-#table .player-table .player-name.goodgirl {
-  font-family: "goodgirl";
-  font-size: 16pt;
-}
-#table .player-table .player-name.goodgirl .outline {
-  top: 2px;
-}
-#table .player-table .player-name.goodgirl .text {
-  top: 2px;
-}
-#table .player-table .monster-board-wrapper {
-  position: relative;
-}
-#table .player-table .monster-board-wrapper .kot-token {
-  z-index: 3;
-  position: absolute;
-  top: -25px;
-  left: -25px;
-}
-#table .player-table .monster-board-wrapper .wheel {
-  position: absolute;
-  z-index: 1;
-  transition: transform 1s;
-}
-#table .player-table .monster-board-wrapper .wheel.blue {
-  background-image: url("img/blue-wheel.png");
-  width: 165px;
-  height: 165px;
-  top: 7px;
-  left: -5px;
-  transform: rotate(25deg);
-}
-#table .player-table .monster-board-wrapper .wheel.red {
-  background-image: url("img/red-wheel.png");
-  width: 122px;
-  height: 122px;
-  right: -5px;
-  bottom: 5px;
-  transform: rotate(98deg);
-}
-#table .player-table .monster-board-wrapper .monster-board {
-  width: 280px;
-  height: 219px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  box-shadow: 2px 2px 5px 2px black;
-  border-radius: 12px;
-  position: relative;
+
+.player-table {
   z-index: 2;
 }
-#table .player-table .monster-board-wrapper .monster-board .monster-board-figure-wrapper {
-  width: 200px;
-  height: 150px;
+.player-table .player-name {
+  text-shadow: 0 0 5px white;
 }
-#table .player-table .monster-board-wrapper .monster-board.monster1 {
-  background-image: url("img/monster-board-1.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster2 {
-  background-image: url("img/monster-board-2.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster3 {
-  background-image: url("img/monster-board-3.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster4 {
-  background-image: url("img/monster-board-4.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster5 {
-  background-image: url("img/monster-board-5.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster6 {
-  background-image: url("img/monster-board-6.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster7 {
-  background-image: url("img/monster-board-7.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster8 {
-  background-image: url("img/monster-board-8.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster9 {
-  background-image: url("img/monster-board-9.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster10 {
-  background-image: url("img/monster-board-10.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster11 {
-  background-image: url("img/monster-board-11.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster12 {
-  background-image: url("img/monster-board-12.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster13 {
-  background-image: url("img/monster-board-13.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster14 {
-  background-image: url("img/monster-board-14.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster15 {
-  background-image: url("img/monster-board-15.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster16 {
-  background-image: url("img/monster-board-16.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster17 {
-  background-image: url("img/monster-board-17.png");
-}
-#table .player-table .monster-board-wrapper .monster-board.monster18 {
-  background-image: url("img/monster-board-18.png");
-}
-#table .player-table .energy-wrapper {
-  position: absolute;
-  z-index: 4;
-  top: 40px;
-  width: 65px;
-  height: 220px;
-}
-#table .player-table .energy-wrapper.left {
-  left: 5px;
-}
-#table .player-table .energy-wrapper.right {
-  right: 5px;
-}
-#table .player-table .token-wrapper {
-  position: absolute;
-  z-index: 4;
-  width: 65px;
-  height: 170px;
-  pointer-events: none;
-}
-#table .player-table .token-wrapper .token {
-  position: absolute;
-  pointer-events: all;
-}
-#table .player-table .token-wrapper.poison {
-  left: -15px;
-  bottom: 5px;
-}
-#table .player-table .token-wrapper.poison .token {
-  box-shadow: 0 0 4px 4px #5e8cc2;
-}
-#table .player-table .token-wrapper.shrink-ray {
-  top: 5px;
-  right: -50px;
-}
-#table .player-table .token-wrapper.shrink-ray .token {
-  box-shadow: 0 0 4px 4px #d7e2a1;
-}
-#table .player-table .player-wickedness-tiles.empty {
-  max-height: 0px;
-}
-#table .player-table .player-cards {
-  width: 100%;
-}
-#table .player-table .player-cards.empty {
-  max-height: 20px;
-}
-#table .player-table .player-evolution-cards {
-  width: 100%;
-}
-#table .player-table .player-evolution-cards.empty:not(.hand) {
-  max-height: 0px;
-}
-#table .player-table .player-evolution-cards.hand {
-  background: #FFFFFFCC;
-}
-#table .player-table .player-evolution-cards.hand::before {
-  content: "";
-  width: 48px;
-  height: 48px;
-  background: url("img/hand.svg");
-  position: absolute;
-  top: 50%;
-  left: -20px;
-  margin-top: -24px;
-}
-#table .player-table .player-evolution-cards.hand.empty {
-  max-height: 48px;
-}
-#table .player-table .tokyo-tower-wrapper {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-}
-#table .player-table .berserk-token {
-  position: absolute;
-  right: -10px;
-  top: -10px;
-  width: 52px;
-  height: 80px;
-  background: url("img/berserk-token.png");
-  z-index: 3;
-  border-radius: 5px;
-  display: none;
-}
-#table .player-table .berserk-token[data-visible=true] {
-  display: initial;
-}
-#table .player-table .cultist-tokens {
-  position: absolute;
-  bottom: 0;
-  left: 60px;
-  width: 155px;
+.player-table .player-points, .player-table .player-veggies {
   display: flex;
-  flex-wrap: wrap-reverse;
+  justify-content: center;
 }
-#table .player-table .cultist-tokens .cultist-token {
-  background: url("img/cultist-tile.png");
-  background-size: contain;
-  width: 64px;
-  height: 64px;
-  border-radius: 5px;
-  margin: 0 5px;
-  margin-left: -50px;
-  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.7);
+.player-table .player-veggie .card:not(:first-child) {
+  margin-top: -120px;
 }
-#table .player-table .pick-evolution-cards {
-  position: absolute;
-  top: 42px;
-  z-index: 100;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 5px 5px rgba(255, 255, 255, 0.8);
-  border-radius: 10px;
+
+#table #piles, #table .market-row {
+  display: flex;
+  justify-content: center;
 }
-#table .monster-figure {
+#table #piles .table-space {
   position: relative;
 }
-
-.monster-figure .stand {
-  display: none;
-}
-
-.mode_3d .monster-figure {
-  transform: translateY(-60px) rotateX(-90deg);
-  transform-origin: bottom center;
-}
-.mode_3d .monster-figure .stand {
-  display: inline-block;
-  width: 70px;
-  height: 70px;
-  background: black;
+#table #piles .table-space .pile-counter {
   position: absolute;
-  bottom: -35px;
-  left: 50%;
-  margin-left: -35px;
-  border-radius: 50%;
-  transform: rotateX(90deg);
+  top: -7px;
+  right: -9px;
+  text-shadow: 0 0 4px white;
+  font-size: 80%;
+  text-align: center;
+  width: 18px;
+}
+#table .table-space {
+  width: 110px;
+  height: 150px;
+  background: #FFFFFF20;
 }
 
 /* make space between buttons on touch devices */
@@ -722,4 +162,33 @@ html, .mode_3d #game_play_area_background {
 
 .whiteblock {
   background: #FFFFFFAA;
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+  background-size: auto 100%;
+  display: inline-block;
+  vertical-align: middle;
+}
+.icon[data-veggie] {
+  background: url("img/veggie-icons.png");
+}
+.icon[data-veggie="1"] {
+  background-position-x: 0%;
+}
+.icon[data-veggie="2"] {
+  background-position-x: 20%;
+}
+.icon[data-veggie="3"] {
+  background-position-x: 40%;
+}
+.icon[data-veggie="4"] {
+  background-position-x: 60%;
+}
+.icon[data-veggie="5"] {
+  background-position-x: 80%;
+}
+.icon[data-veggie="6"] {
+  background-position-x: 100%;
 }

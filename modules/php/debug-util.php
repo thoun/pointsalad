@@ -11,6 +11,11 @@ trait DebugUtilTrait {
             return;
         } 
 
+        //$cards = $this->getCardsFromDb($this->cards->pickCardsForLocation(9, 'pile1', 'player', 2343492));
+
+        /*for ($i=0; $i<7; $i++) {
+            $this->applyFlipCard(0, $cards[$i]);
+        }*/
         //$this->insertSomeRoutes(2343492);
     }
 

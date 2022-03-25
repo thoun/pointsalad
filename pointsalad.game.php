@@ -97,6 +97,9 @@ class PointSalad extends Table {
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
+        // TODO TEMP to test
+        $this->debugSetup();
+
         /************ End of the game initialization *****/
     }
 
@@ -119,17 +122,22 @@ class PointSalad extends Table {
 
         foreach ($result['players'] as $playerId => &$playerDb) {
             $playerDb['playerNo'] = intval($playerDb['playerNo']);
-            $playerDb['cards'] = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $playerId));
+            $cards = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $playerId));
+            $playerDb['cards'] = $cards;
+            $playerDb['veggieCounts'] = $this->getVeggieCounts($cards);
         }
         
         $pileTopCard = [];
+        $pileCount = [];
         $market = [];
         for ($pile = 1; $pile <= 3; $pile++) {
             $pileTopCard[$pile] = $this->getCardFromDb($this->cards->getCardOnTop('pile'.$pile));
+            $pileCount[$pile] = intval($this->cards->countCardInLocation('pile'.$pile));
             $market[$pile] = $this->getCardsFromDb($this->cards->getCardsInLocation('market'.$pile));
         }
 
         $result['pileTopCard'] = $pileTopCard;
+        $result['pileCount'] = $pileCount;
         $result['market'] = $market;
   
         return $result;

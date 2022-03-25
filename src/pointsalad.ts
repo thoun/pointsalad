@@ -11,9 +11,10 @@ const ANIMATION_MS = 500;
 
 class PointSalad implements PointSaladGame {
     private gamedatas: PointSaladGamedatas;
-    public cards: Cards;
     private tableCenter: TableCenter;
     private playersTables: PlayerTable[] = [];
+    private selectedCards: Card[] = [];
+    private veggieCounters: Counter[][] = [];
 
     constructor() {
     }
@@ -38,10 +39,8 @@ class PointSalad implements PointSaladGame {
 
         log('gamedatas', gamedatas);
 
-        this.cards = new Cards(this);
-
         this.createPlayerPanels(gamedatas); 
-        this.tableCenter = new TableCenter(this);
+        this.tableCenter = new TableCenter(this, gamedatas);
         this.createPlayerTables(gamedatas);
 
         this.setupNotifications();
@@ -58,50 +57,54 @@ class PointSalad implements PointSaladGame {
     public onEnteringState(stateName: string, args: any) {
         log('Entering state: ' + stateName, args.args);
         switch (stateName) {
-            /*case 'pickMonster':
-                dojo.addClass('kot-table', 'pickMonsterOrEvolutionDeck');
-                this.onEnteringPickMonster(args.args);
-                break;*/
+            case 'takeCards':
+                this.onEnteringTakeCards(args.args);
+                break;
+            case 'flipCard':
+                this.onEnteringFlipCard(args.args);
+                break;
         }
     }
     
-    /*private onEnteringPickMonster(args: EnteringPickMonsterArgs) {
-        // TODO clean only needed
-        document.getElementById('monster-pick').innerHTML = '';
-        args.availableMonsters.forEach(monster => {
-            let html = `
-            <div id="pick-monster-figure-${monster}-wrapper">
-                <div id="pick-monster-figure-${monster}" class="monster-figure monster${monster}"></div>`;
-            if (this.isPowerUpExpansion()) {
-                html += `<div><button id="see-monster-evolution-${monster}" class="bgabutton bgabutton_blue see-evolutions-button"><div class="player-evolution-card"></div>${('Show Evolutions')}</button></div>`;
-            }
-            html += `</div>`;
-            dojo.place(html, `monster-pick`);
-
-            document.getElementById(`pick-monster-figure-${monster}`).addEventListener('click', () => this.pickMonster(monster));
-            if (this.isPowerUpExpansion()) {
-                document.getElementById(`see-monster-evolution-${monster}`).addEventListener('click', () => this.showMonsterEvolutions(monster));
-            }
-        });
-
-        const isCurrentPlayerActive = (this as any).isCurrentPlayerActive();
-        dojo.toggleClass('monster-pick', 'selectable', isCurrentPlayerActive);
-    }*/
+    private onEnteringTakeCards(args: EnteringTakeCardsArgs) {
+        if ((this as any).isCurrentPlayerActive()) {
+            document.getElementById('table').dataset.selectableCards = 'true';
+        }
+    }
+    
+    private onEnteringFlipCard(args: EnteringFlipCardArgs) {
+        if ((this as any).isCurrentPlayerActive()) {
+            document.getElementById(`player-points-${this.getPlayerId()}`).dataset.selectableCards = 'true';
+        }
+    }
 
     public onLeavingState(stateName: string) {
         log( 'Leaving state: '+stateName );
 
         switch (stateName) {
-            /*case 'beforeStartTurn':
-                this.onLeavingStepEvolution();
-                break;*/
+            case 'takeCards':
+                this.onLeavingTakeCards();
+                break;
+            case 'flipCard':
+                this.onLeavingFlipCard();
+                break;
         }
     }
     
-    /*private onLeavingStepEvolution() {
-            const playerId = this.getPlayerId();
-            this.getPlayerTable(playerId)?.unhighlightHiddenEvolutions();
-    }*/
+    private onLeavingTakeCards() {
+        this.selectedCards = [];
+        Array.from(document.getElementsByClassName('card selected')).forEach(card => card.classList.remove('selected'));
+        document.getElementById('table').dataset.selectableCards = 'false';
+    }
+    
+    private onLeavingFlipCard() {
+        this.selectedCards = [];
+        Array.from(document.getElementsByClassName('card selected')).forEach(card => card.classList.remove('selected'));
+        const playerPoints = document.getElementById(`player-points-${this.getPlayerId()}`);
+        if (playerPoints) {
+            playerPoints.dataset.selectableCards = 'false';
+        }
+    }
 
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
     //                        action status bar (ie: the HTML links in the status bar).
@@ -110,12 +113,16 @@ class PointSalad implements PointSaladGame {
 
         if((this as any).isCurrentPlayerActive()) {
             switch (stateName) {
-                /*case 'beforeStartTurn':
-                    (this as any).addActionButton('skipBeforeStartTurn_button', _("Skip"), () => this.skipBeforeStartTurn());
-                    break;*/
-                
+                case 'takeCards':
+                    (this as any).addActionButton('takeCards_button', _("Take selected card(s)"), () => this.takeCards(this.selectedCards.map(card => card.id)));
+                    this.checkSelection();
+                    break;
+                case 'flipCard':
+                    (this as any).addActionButton('flipCard_button', _("Flip selected card"), () => this.flipCard(this.selectedCards[0].id));
+                    (this as any).addActionButton('skipFlipCard_button', _("Skip"), () => this.skipFlipCard());
+                    this.checkSelection();
+                    break;
             }
-
         }
     }
     
@@ -133,100 +140,35 @@ class PointSalad implements PointSaladGame {
     private createPlayerPanels(gamedatas: PointSaladGamedatas) {
 
         Object.values(gamedatas.players).forEach(player => {
-   /*         const playerId = Number(player.id);  
+            const playerId = Number(player.id);
+            this.veggieCounters[playerId] = [];
 
-            // health & energy counters
-            let html = `<div class="counters">
-                <div id="health-counter-wrapper-${player.id}" class="counter">
-                    <div class="icon health"></div> 
-                    <span id="health-counter-${player.id}"></span>
-                </div>
-                <div id="energy-counter-wrapper-${player.id}" class="counter">
-                    <div class="icon energy"></div> 
-                    <span id="energy-counter-${player.id}"></span>
-                </div>`;
-            if (gamedatas.wickednessExpansion) {
-                html += `
-                <div id="wickedness-counter-wrapper-${player.id}" class="counter">
-                    <div class="icon wickedness"></div> 
-                    <span id="wickedness-counter-${player.id}"></span>
-                </div>`; // TODOWI
-            }
-            html += `</div>`;
-            dojo.place(html, `player_board_${player.id}`);
-
-            if (gamedatas.kingkongExpansion || gamedatas.cybertoothExpansion || gamedatas.cthulhuExpansion) {
-                let html = `<div class="counters">`;
-
-                if (gamedatas.cthulhuExpansion) {
-                    html += `
-                    <div id="cultist-counter-wrapper-${player.id}" class="counter cultist-tooltip">
-                        <div class="icon cultist"></div>
-                        <span id="cultist-counter-${player.id}"></span>
-                    </div>`;
+            let html = ``;
+            for (let veggie = 1; veggie <= 6; veggie++) {
+                if (veggie === 1 || veggie === 4) {
+                    html += `<div class="counters">`;
                 }
 
-                if (gamedatas.kingkongExpansion) {
-                    html += `<div id="tokyo-tower-counter-wrapper-${player.id}" class="counter tokyo-tower-tooltip">`;
-                    for (let level = 1; level <= 3 ; level++) {
-                        html += `<div id="tokyo-tower-icon-${player.id}-level-${level}" class="tokyo-tower-icon level${level}" data-owned="${player.tokyoTowerLevels.includes(level).toString()}"></div>`;
-                    }
+                html += `
+                    <div id="veggie${veggie}-counter-wrapper-${player.id}" class="counter">
+                        <div class="icon" data-veggie="${veggie}"></div> 
+                        <span id="veggie${veggie}-counter-${player.id}"></span>
+                    </div>`;
+
+                if (veggie === 3 || veggie === 6) {
                     html += `</div>`;
                 }
+            }
+            
+            dojo.place(html, `player_board_${player.id}`);
 
-                if (gamedatas.cybertoothExpansion) {
-                    html += `
-                    <div id="berserk-counter-wrapper-${player.id}" class="counter berserk-tooltip">
-                        <div class="berserk-icon-wrapper">
-                            <div id="player-panel-berserk-${player.id}" class="berserk icon ${player.berserk ? 'active' : ''}"></div>
-                        </div>
-                    </div>`;
-                }
-
-                html += `</div>`;
-                dojo.place(html, `player_board_${player.id}`);
-
-                if (gamedatas.cthulhuExpansion) {
-                    const cultistCounter = new ebg.counter();
-                    cultistCounter.create(`cultist-counter-${player.id}`);
-                    cultistCounter.setValue(player.cultists);
-                    this.cultistCounters[playerId] = cultistCounter;
-                }
+            for (let veggie = 1; veggie <= 6; veggie++) {
+                const veggieCounter = new ebg.counter();
+                veggieCounter.create(`veggie${veggie}-counter-${player.id}`);
+                veggieCounter.setValue(player.veggieCounts[veggie]);
+                this.veggieCounters[playerId][veggie] = veggieCounter;
             }
 
-            const healthCounter = new ebg.counter();
-            healthCounter.create(`health-counter-${player.id}`);
-            healthCounter.setValue(player.health);
-            this.healthCounters[playerId] = healthCounter;
-
-            const energyCounter = new ebg.counter();
-            energyCounter.create(`energy-counter-${player.id}`);
-            energyCounter.setValue(player.energy);
-            this.energyCounters[playerId] = energyCounter;
-
-            if (gamedatas.wickednessExpansion) {
-                const wickednessCounter = new ebg.counter();
-                wickednessCounter.create(`wickedness-counter-${player.id}`);
-                wickednessCounter.setValue(player.wickedness);
-                this.wickednessCounters[playerId] = wickednessCounter;
-            }
-
-            if (gamedatas.powerUpExpansion) {
-                // hand cards counter
-                dojo.place(`<div class="counters">
-                    <div id="playerhand-counter-wrapper-${player.id}" class="playerhand-counter">
-                        <div class="player-evolution-card"></div>
-                        <div class="player-hand-card"></div> 
-                        <span id="playerhand-counter-${player.id}"></span>
-                    </div>
-                </div>`, `player_board_${player.id}`);
-
-                const handCounter = new ebg.counter();
-                handCounter.create(`playerhand-counter-${playerId}`);
-                handCounter.setValue(player.hiddenEvolutions.length);
-                this.handCounters[playerId] = handCounter;
-            }
-*/
         });
     }
 
@@ -243,22 +185,90 @@ class PointSalad implements PointSaladGame {
         this.playersTables.push(playerTable);
     }
 
-    private getPlayerTable(playerId: number): PlayerTable {
-        return this.playersTables.find(playerTable => playerTable.playerId === Number(playerId));
-    }
-
     public getZoom() {
         return 1;
     }
 
-    public pickMonster(monster: number) {
-        if(!(this as any).checkAction('pickMonster')) {
+    public createOrMoveCard(card: Card, destinationId: string, init: boolean = false) {
+        const existingDiv = document.getElementById(`card-${card.id}`);
+        if (existingDiv) {
+            existingDiv.dataset.side = ''+card.side;
+            if (init) {
+                document.getElementById(destinationId).appendChild(existingDiv);
+            } else {
+                slideToObjectAndAttach(this, existingDiv, destinationId);
+            }
+        } else {
+            const div = document.createElement('div');
+            div.id = `card-${card.id}`;
+            div.classList.add('card');
+            div.dataset.side = ''+card.side;
+            div.dataset.veggie = ''+card.veggie;
+            div.dataset.index = ''+card.index;
+            document.getElementById(destinationId).appendChild(div);
+            div.addEventListener('click', () => this.onCardClick(card));
+        }
+    }
+
+    private updateVeggieCount(playerId: number, veggieCounts: VeggieCounts) {
+        for (let veggie = 1; veggie <= 6; veggie++) {
+            this.veggieCounters[playerId][veggie].toValue(veggieCounts[veggie]);
+        }
+    }
+
+    private checkSelection() {
+        const canTakeCards = 
+            (this.selectedCards.length === 1 && this.selectedCards[0].side === 0) ||
+            (this.selectedCards.length === 2 && this.selectedCards[0].side === 1); // TODO handle only 1 remaining market card
+        document.getElementById('takeCards_button')?.classList.toggle('disabled', !canTakeCards);
+        document.getElementById('flipCard_button')?.classList.toggle('disabled', this.selectedCards.length !== 1);
+    }
+
+    private onCardClick(card: Card) {
+        const div = document.getElementById(`card-${card.id}`);
+
+        if(!(this as any).isCurrentPlayerActive() || !div.closest('[data-selectable-cards="true"]')) {
             return;
         }
 
-        this.takeAction('pickMonster', {
-            monster
+        const index = this.selectedCards.indexOf(card);
+        if (index !== -1) {
+            this.selectedCards.splice(index, 1);
+        } else {
+            this.selectedCards.push(card);
+        }
+
+        div.classList.toggle('selected');
+
+        this.checkSelection();
+    }
+
+    public takeCards(ids: number[]) {
+        if(!(this as any).checkAction('takeCards')) {
+            return;
+        }
+
+        this.takeAction('takeCards', {
+            ids: ids.join(','),
         });
+    }
+
+    public flipCard(id: number) {
+        if(!(this as any).checkAction('flipCard')) {
+            return;
+        }
+
+        this.takeAction('flipCard', {
+            id
+        });
+    }
+
+    public skipFlipCard() {
+        if(!(this as any).checkAction('skipFlipCard')) {
+            return;
+        }
+
+        this.takeAction('skipFlipCard');
     }
 
     public takeAction(action: string, data?: any) {
@@ -283,8 +293,10 @@ class PointSalad implements PointSaladGame {
         //log( 'notifications subscriptions setup' );
 
         const notifs = [
-            ['pickMonster', ANIMATION_MS],
             ['points', 1],
+            ['takenCards', ANIMATION_MS],
+            ['flippedCard', ANIMATION_MS],
+            ['marketRefill', ANIMATION_MS],
         ];
     
         notifs.forEach((notif) => {
@@ -293,23 +305,42 @@ class PointSalad implements PointSaladGame {
         });
     }
 
-    notif_pickMonster(notif: Notif<any/*NotifPickMonsterArgs*/>) {
-       const monsterDiv = document.getElementById(`pick-monster-figure-${notif.args.monster}`); 
-       const destinationId = `player-board-monster-figure-${notif.args.playerId}`;
-       const animation = (this as any).slideToObject(monsterDiv, destinationId);
-
-        dojo.connect(animation, 'onEnd', dojo.hitch(this, () => {
-            (this as any).fadeOutAndDestroy(monsterDiv);
-            dojo.removeClass(destinationId, 'monster0');
-            dojo.addClass(destinationId, `monster${notif.args.monster}`);
-        }));
-        animation.play();
-
-        this.getPlayerTable(notif.args.playerId).setMonster(notif.args.monster);
-    }
-
     notif_points(notif: Notif<NotifPointsArgs>) {
         (this as any).scoreCtrl[notif.args.playerId]?.toValue(notif.args.points);
+    }
+
+    notif_takenCards(notif: Notif<NotifTakenCardsArgs>) {
+        const playerId = notif.args.playerId;
+        notif.args.cards.forEach(card => 
+            this.createOrMoveCard(card, card.side === 0 ? `player-points-${playerId}` : `player-veggies-${playerId}-${card.veggie}`)
+        );
+        this.updateVeggieCount(playerId, notif.args.veggieCounts);
+
+        const pile = notif.args.pile;
+        const pileTop = notif.args.pileTop;
+        const pileCount = notif.args.pileCount;
+        if (pileTop) {
+            this.createOrMoveCard(pileTop, `pile${pile}`);
+        }
+        if (pileCount !== null) {
+            this.tableCenter.pileCounters[pile].setValue(pileCount);
+        }
+    }
+
+    notif_flippedCard(notif: Notif<NotifFlippedCardArgs>) {
+        const playerId = notif.args.playerId;
+        const card = notif.args.card;
+        this.createOrMoveCard(card, `player-veggies-${playerId}-${card.veggie}`);
+        this.updateVeggieCount(playerId, notif.args.veggieCounts);
+    }
+
+    notif_marketRefill(notif: Notif<NotifMarketRefillArgs>) {
+        const pile = notif.args.pile;
+        const card = notif.args.card;
+        this.createOrMoveCard(card, `market-row${card.locationArg}-card${pile}`);
+        const pileTop = notif.args.pileTop;
+        this.createOrMoveCard(pileTop, `pile${pile}`);
+        this.tableCenter.pileCounters[pile].setValue(notif.args.pileCount);
     }
 
     /* This enable to inject translatable styled things to logs or action bar */
@@ -318,6 +349,11 @@ class PointSalad implements PointSaladGame {
         try {
             if (log && args && !args.processed) {
                 // Representation of the color of a card
+
+                if (args.veggies && typeof args.veggies == 'object') {
+                    args.veggies = args.veggies.map(veggie => `<div class="icon" data-veggie="${veggie}"></div>`).join('');
+                }
+
                 /*['card_name', 'card_name2'].forEach(cardArg => {
                     if (args[cardArg]) {
                         let types: number[] = null;

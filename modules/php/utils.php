@@ -43,7 +43,7 @@ trait UtilTrait {
         return self::getUniqueValueFromDB("SELECT player_name FROM player WHERE player_id = $playerId");
     }
 
-    function getCardFromDb(array $dbCard) {
+    function getCardFromDb(/*array|null*/ $dbCard) {
         if ($dbCard == null) {
             return null;
         }
@@ -64,13 +64,14 @@ trait UtilTrait {
         for ($type = 1; $type <= 6; $type++) {
             $cards = [];
             for ($subType = 1; $subType <= 18; $subType++) {
-                $cards[] = [ 'type' => $type, 'type_arg' => $subType, 'nbr' => 1 ];
+                $cards[] = [ 'type' => $type * 100 + $subType, 'type_arg' => 0, 'nbr' => 1 ];
             }
 
             $this->cards->createCards($cards, 'veggie'.$type);
             $this->cards->shuffle('veggie'.$type);
             $this->cards->pickCardsForLocation(3 * $playerNumber, 'veggie'.$type, 'deck');
         }
+        $this->cards->shuffle('deck');
 
         $cardCount = intval($this->cards->countCardInLocation('deck'));
         $pileCount = $cardCount / 3;
@@ -80,38 +81,70 @@ trait UtilTrait {
         }
     }
 
-    function applyFlipCard(Card &$card, bool $silent = false) {
+    function applyFlipCard(int $playerId, Card &$card) {
         $card->side = 1;
         $this->DbQuery("UPDATE `card` SET `card_type_arg` = 1 WHERE `card_id` = $card->id"); 
 
-        if (!$silent) {
-            // TODO notif
+        if ($playerId > 0) {
+            self::notifyAllPlayers('flippedCard', clienttranslate('${player_name} flips a point card to get a veggie card'), [
+                'playerId' => $playerId,
+                'player_name' => $this->getPlayerName($playerId),
+                'card' => $card,
+                'veggieCounts' => $this->getVeggieCountsByPlayer($playerId),
+            ]);
         }
     }
 
-    function refillMarket(bool $silent = false) {
-        $revealedCards = [];
-        
+    function refillMarket(bool $silent = false) {        
         for ($pile = 1; $pile <= 3; $pile++) {
             // TODO handle empty piles
             $pileSize = intval($this->cards->countCardInLocation('pile'.$pile));
-            $marketSize = intval($this->cards->countCardInLocation('market'.$pile));
-            $neededCards = min($pileSize, 2 - $marketSize);
-            if ($neededCards > 0) {
-                $cards = $this->getCardsFromDb($this->cards->pickCardsForLocation($neededCards, 'pile'.$pile, 'market'.$pile, $marketSize + 1));
-                foreach($cards as $card) {
-                    $this->applyFlipCard($card, true); 
-                }
-                $revealedCards = array_merge($revealedCards, $cards);
-            }
-        }
+            for ($i = 1; $i <= 2; $i++) {                
+                if ($pileSize > 0 && intval($this->cards->countCardInLocation('market'.$pile, $i)) == 0) {
+                    $card = $this->getCardFromDb($this->cards->pickCardForLocation('pile'.$pile, 'market'.$pile, $i));
+                    $card->location = 'market'.$pile;
+                    $card->locationArg = $i;
 
-        if (!$silent) {
-            // TODO notif $revealedCards & new top cards
+                    $this->applyFlipCard(0, $card); 
+
+                    if (!$silent) {
+                        self::notifyAllPlayers('marketRefill', '', [
+                            'pile' => $pile,
+                            'card' => $card,
+                            'pileTop' => $this->getCardFromDb($this->cards->getCardOnTop('pile'.$pile)),
+                            'pileCount' => intval($this->cards->countCardInLocation('pile'.$pile)),
+                        ]);
+                    }
+                }
+            }
         }
     }
 
-    function getScore(int $playerId, Card $scoreCard, array $veggieCards) {
+    function getVeggieCountsByPlayer(int $playerId) {
+        $cards = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $playerId));
+        return $this->getVeggieCounts($cards);
+    }
+
+    function getVeggieCounts(array $cards) {
+        $counts = [
+            1 => 0,
+            2 => 0,
+            3 => 0,
+            4 => 0,
+            5 => 0,
+            6 => 0,
+        ];
+
+        foreach ($cards as $card) {
+            if ($card->side === 1) {
+                $counts[$card->veggie] += 1;
+            }
+        }
+
+        return $counts;
+    }
+
+    function getScore(int $playerId, Card $scoreCard, array $veggieCounts) {
         return 0; // TODO
     }
 
@@ -128,9 +161,10 @@ trait UtilTrait {
             }
         }
 
+        $veggieCounts = $this->getVeggieCounts($veggieCards);
         $score = 0;
         foreach ($pointCards as $pointCard) {
-            $score += $this->getScore($playerId, $pointCard, $veggieCards);
+            $score += $this->getScore($playerId, $pointCard, $veggieCounts);
         }
 
         $this->DbQuery("UPDATE `player` SET `player_score` = $score WHERE `player_id` = $playerId"); 

@@ -1,10 +1,5 @@
 <?php
 
-// waiting for PHP8
-function str_starts_with ( $haystack, $needle ) {
-    return strpos( $haystack , $needle ) === 0;
-}
-
 trait ActionTrait {
 
     //////////////////////////////////////////////////////////////////////////////
@@ -21,14 +16,16 @@ trait ActionTrait {
         
         $playerId = self::getActivePlayerId();
 
-        $cards = $this->getCardsFromDb($this->card->getCards($ids));
+        $cards = $this->getCardsFromDb($this->cards->getCards($ids));
 
-        if (count($cards) === 2) {
-            if ($this->array_some($cards, fn($card) => !str_starts_with('market', $card->location))) {
+        $tookVeggie = false;
+        if (count($cards) === 2) { // TODO handle one remaining veggie case
+            if ($this->array_some($cards, fn($card) => strpos($card->location, 'market') !== 0)) { // str_starts_with is PHP8+, using strpos( $haystack , $needle ) === 0 instead
                 throw new BgaUserException("If you take two cards, it must be from the market");
             }
+            $tookVeggie = true;
         } else if (count($cards) === 1) {
-            if (!str_starts_with('pile', $cards[0]->location)) {
+            if (strpos($cards[0]->location, 'pile') !== 0) { // str_starts_with is PHP8+, using strpos( $haystack , $needle ) === 0 instead
                 throw new BgaUserException("If you take one card, it must be from a pile");
             }
         } else {
@@ -36,19 +33,31 @@ trait ActionTrait {
         }
 
         $this->cards->moveCards($ids, 'player', $playerId);
-        /* TODO notif
-        self::notifyAllPlayers('placedDeparturePawn', clienttranslate('${player_name} places departure pawn'), [
+
+        $message = $tookVeggie ? clienttranslate('${player_name} took veggies ${veggies}') // TODO add icon
+                               : clienttranslate('${player_name} took a point card');
+        
+        self::notifyAllPlayers('takenCards', $message, [
             'playerId' => $playerId,
-            'player_name' => self::getActivePlayerName(),
-            'position' => $position,
+            'player_name' => $this->getPlayerName($playerId),
+            'cards' => $cards,
+            'veggies' => array_map(fn($card) => $card->veggie, $cards),
+            'veggieCounts' => $this->getVeggieCountsByPlayer($playerId),
+            'pile' => $tookVeggie ? null : intval(substr($cards[0]->location, 4)),
+            'pileTop' => $tookVeggie ? null : $this->getCardFromDb($this->cards->getCardOnTop($cards[0]->location)),
+            'pileCount' => $tookVeggie ? null : intval($this->cards->countCardInLocation($cards[0]->location)),
         ]);
+
+        if ($tookVeggie) {
+            $this->refillMarket();
+        }
 
         //self::incStat(1, 'placedRoutes');
         //self::incStat(1, 'placedRoutes', $playerId);*/
 
         $this->updateScore($playerId);
 
-        $hasPointCard = intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE card_location_id = $playerId AND `card_type_arg` = 1")) > 0;
+        $hasPointCard = intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` = 'player' AND `card_location_arg` = $playerId AND `card_type_arg` = 0")) > 0;
 
         $this->gamestate->nextState($hasPointCard ? 'flipCard' : 'nextPlayer');
     }
@@ -59,13 +68,13 @@ trait ActionTrait {
         
         $playerId = intval(self::getActivePlayerId());
 
-        $card = $this->getCardFromDb($this->card->getCard($id));
+        $card = $this->getCardFromDb($this->cards->getCard($id));
 
         if ($card->location !== 'player' || $card->locationArg !== $playerId) {
             throw new BgaUserException("You can't flip this card");
         }
 
-        $this->applyFlipCard($card);
+        $this->applyFlipCard($playerId, $card);
 
         $this->updateScore($playerId);
 
