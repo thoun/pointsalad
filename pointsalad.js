@@ -751,377 +751,13 @@ var Cards = /** @class */ (function () {
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 ;
 var log = isDebug ? console.log.bind(window.console) : function () { };
-var POINTS_DEG = [25, 40, 56, 73, 89, 105, 122, 138, 154, 170, 187, 204, 221, 237, 254, 271, 288, 305, 322, 339, 359];
-var HEALTH_DEG = [360, 326, 301, 274, 249, 226, 201, 174, 149, 122, 98, 64, 39];
-var SPLIT_ENERGY_CUBES = 6;
 var PlayerTable = /** @class */ (function () {
     function PlayerTable(game, player) {
         this.game = game;
-        this.player = player;
-        this.showHand = false;
-        /*this.playerId = Number(player.id);
-        this.playerNo = Number(player.player_no);
-        this.monster = Number(player.monster);
-
-        const eliminated = Number(player.eliminated) > 0;
-
-        let html = `
-        <div id="player-table-${player.id}" class="player-table whiteblock ${eliminated ? 'eliminated' : ''}">
-            <div id="player-name-${player.id}" class="player-name ${game.isDefaultFont() ? 'standard' : 'goodgirl'}" style="color: #${player.color}">
-                <div class="outline${player.color === '000000' ? ' white' : ''}">${player.name}</div>
-                <div class="text">${player.name}</div>
-            </div>
-            <div id="monster-board-wrapper-${player.id}" class="monster-board-wrapper ${player.location > 0 ? 'intokyo' : ''}">
-                <div class="blue wheel" id="blue-wheel-${player.id}"></div>
-                <div class="red wheel" id="red-wheel-${player.id}"></div>
-                <div class="kot-token"></div>
-                <div id="monster-board-${player.id}" class="monster-board monster${this.monster}">
-                    <div id="monster-board-${player.id}-figure-wrapper" class="monster-board-figure-wrapper">
-                        <div id="monster-figure-${player.id}" class="monster-figure monster${this.monster}"><div class="stand"></div></div>
-                    </div>
-                </div>
-                <div id="token-wrapper-${this.playerId}-poison" class="token-wrapper poison"></div>
-                <div id="token-wrapper-${this.playerId}-shrink-ray" class="token-wrapper shrink-ray"></div>
-            </div>
-            <div id="energy-wrapper-${player.id}-left" class="energy-wrapper left"></div>
-            <div id="energy-wrapper-${player.id}-right" class="energy-wrapper right"></div>`;
-        if (game.isWickednessExpansion()) {
-            html += `<div id="wickedness-tiles-${player.id}" class="wickedness-tile-stock player-wickedness-tiles ${player.wickednessTiles?.length ? '' : 'empty'}"></div>   `;
-        }
-        if (game.isPowerUpExpansion()) {
-            html += `
-            <div id="hidden-evolution-cards-${player.id}" class="evolution-card-stock player-evolution-cards hand ${player.hiddenEvolutions?.length ? '' : 'empty'}"></div>
-            <div id="visible-evolution-cards-${player.id}" class="evolution-card-stock player-evolution-cards ${player.visibleEvolutions?.length ? '' : 'empty'}"></div>
-            `;
-        }
-        html += `    <div id="cards-${player.id}" class="card-stock player-cards ${player.cards.length ? '' : 'empty'}"></div>
-        </div>
-        `;
-        dojo.place(html, 'table');
-
-        this.setMonsterFigureBeastMode(player.cards.find(card => card.type === 301)?.side === 1);
-
-        this.cards = new ebg.stock() as Stock;
-        this.cards.setSelectionAppearance('class');
-        this.cards.selectionClass = 'no-visible-selection';
-        this.cards.create(this.game, $(`cards-${this.player.id}`), CARD_WIDTH, CARD_HEIGHT);
-        this.cards.setSelectionMode(0);
-        this.cards.onItemCreate = (card_div, card_type_id) => this.game.cards.setupNewCard(card_div, card_type_id);
-        this.cards.image_items_per_row = 10;
-        this.cards.centerItems = true;
-        dojo.connect(this.cards, 'onChangeSelection', this, (_, itemId: string) => this.game.onVisibleCardClick(this.cards, Number(itemId), this.playerId));
-
-        this.game.cards.setupCards([this.cards]);
-        this.game.cards.addCardsToStock(this.cards, player.cards);
-        if (playerWithGoldenScarab) {
-            this.cards.addToStockWithId(999, 'goldenscarab');
-        }
-
-        this.initialLocation = Number(player.location);
-
-        this.setPoints(Number(player.score));
-        this.setHealth(Number(player.health));
-        if (!eliminated) {
-            this.setEnergy(Number(player.energy));
-            this.setPoisonTokens(Number(player.poisonTokens));
-            this.setShrinkRayTokens(Number(player.shrinkRayTokens));
-        }
-
-        if (this.game.isKingkongExpansion()) {
-            dojo.place(`<div id="tokyo-tower-${player.id}" class="tokyo-tower-wrapper"></div>`, `player-table-${player.id}`);
-            this.tokyoTower = new TokyoTower(`tokyo-tower-${player.id}`, player.tokyoTowerLevels);
-        }
-
-        if (this.game.isCybertoothExpansion()) {
-            dojo.place(`<div id="berserk-token-${player.id}" class="berserk-token berserk-tooltip" data-visible="${player.berserk ? 'true' : 'false'}"></div>`, `monster-board-${player.id}`);
-        }
-
-        if (this.game.isCthulhuExpansion()) {
-            dojo.place(`<div id="player-table-cultist-tokens-${player.id}" class="cultist-tokens"></div>`, `monster-board-${player.id}`);
-            if (!eliminated) {
-                this.setCultistTokens(player.cultists);
-            }
-        }
-
-        if (this.game.isWickednessExpansion()) {
-            this.wickednessTiles = new ebg.stock() as Stock;
-            this.wickednessTiles.setSelectionAppearance('class');
-            this.wickednessTiles.selectionClass = 'no-visible-selection';
-            this.wickednessTiles.create(this.game, $(`wickedness-tiles-${player.id}`), WICKEDNESS_TILES_WIDTH, WICKEDNESS_TILES_HEIGHT);
-            this.wickednessTiles.setSelectionMode(0);
-            this.wickednessTiles.centerItems = true;
-            this.wickednessTiles.onItemCreate = (card_div, card_type_id) => this.game.wickednessTiles.setupNewCard(card_div, card_type_id);
-    
-            this.game.wickednessTiles.setupCards([this.wickednessTiles]);
-            player.wickednessTiles?.forEach(tile => this.wickednessTiles.addToStockWithId(tile.type, '' + tile.id));
-        }
-
-        if (game.isPowerUpExpansion()) {
-            this.showHand = this.playerId == this.game.getPlayerId();
-
-            this.hiddenEvolutionCards = new ebg.stock() as Stock;
-            this.hiddenEvolutionCards.setSelectionAppearance('class');
-            this.hiddenEvolutionCards.selectionClass = 'no-visible-selection';
-            this.hiddenEvolutionCards.create(this.game, $(`hidden-evolution-cards-${player.id}`), CARD_WIDTH, CARD_WIDTH);
-            this.hiddenEvolutionCards.setSelectionMode(2);
-            this.hiddenEvolutionCards.centerItems = true;
-            this.hiddenEvolutionCards.onItemCreate = (card_div, card_type_id) => this.game.evolutionCards.setupNewCard(card_div, card_type_id);
-            dojo.connect(this.hiddenEvolutionCards, 'onChangeSelection', this, (_, item_id: string) => this.game.onHiddenEvolutionClick(Number(item_id)));
-
-            this.visibleEvolutionCards = new ebg.stock() as Stock;
-            this.visibleEvolutionCards.setSelectionAppearance('class');
-            this.visibleEvolutionCards.selectionClass = 'no-visible-selection';
-            this.visibleEvolutionCards.create(this.game, $(`visible-evolution-cards-${player.id}`), CARD_WIDTH, CARD_WIDTH);
-            this.visibleEvolutionCards.setSelectionMode(0);
-            this.visibleEvolutionCards.centerItems = true;
-            this.visibleEvolutionCards.onItemCreate = (card_div, card_type_id) => this.game.evolutionCards.setupNewCard(card_div, card_type_id);
-            dojo.connect(this.visibleEvolutionCards, 'onChangeSelection', this, (_, item_id: string) => this.game.onVisibleEvolutionClick(Number(item_id)));
-    
-            this.game.evolutionCards.setupCards([this.hiddenEvolutionCards, this.visibleEvolutionCards]);
-            player.hiddenEvolutions?.forEach(card => this.hiddenEvolutionCards.addToStockWithId(this.showHand ? card.type : 0, '' + card.id));
-            if (player.visibleEvolutions) {
-                this.game.evolutionCards.addCardsToStock(this.visibleEvolutionCards, player.visibleEvolutions);
-            }
-        }*/
+        this.playerId = Number(player.id);
+        var html = "\n        <div id=\"player-table-".concat(player.id, "\" class=\"player-table whiteblock\">\n            <div id=\"player-name-").concat(player.id, "\" class=\"player-name\" style=\"color: #").concat(player.color, "\">").concat(player.name, "</div> \n        </div>\n        ");
+        dojo.place(html, this.playerId === this.game.getPlayerId() ? 'currentplayertable' : 'playerstables');
     }
-    PlayerTable.prototype.initPlacement = function () {
-        if (this.initialLocation > 0) {
-            this.enterTokyo(this.initialLocation);
-        }
-    };
-    PlayerTable.prototype.enterTokyo = function (location) {
-        transitionToObjectAndAttach(this.game, document.getElementById("monster-figure-".concat(this.playerId)), "tokyo-".concat(location == 2 ? 'bay' : 'city'), this.game.getZoom());
-    };
-    PlayerTable.prototype.leaveTokyo = function () {
-        transitionToObjectAndAttach(this.game, document.getElementById("monster-figure-".concat(this.playerId)), "monster-board-".concat(this.playerId, "-figure-wrapper"), this.game.getZoom());
-    };
-    PlayerTable.prototype.setVisibleCardsSelectionClass = function (visible) {
-        document.getElementById("player-table-".concat(this.playerId)).classList.toggle('double-selection', visible);
-    };
-    PlayerTable.prototype.removeCards = function (cards) {
-        var _this = this;
-        var cardsIds = cards.map(function (card) { return card.id; });
-        cardsIds.forEach(function (id) { return _this.cards.removeFromStockById('' + id); });
-    };
-    PlayerTable.prototype.removeWickednessTiles = function (tiles) {
-        var _this = this;
-        var tilesIds = tiles.map(function (tile) { return tile.id; });
-        tilesIds.forEach(function (id) { return _this.wickednessTiles.removeFromStockById('' + id); });
-    };
-    PlayerTable.prototype.removeEvolutions = function (cards) {
-        var _this = this;
-        var cardsIds = cards.map(function (card) { return card.id; });
-        cardsIds.forEach(function (id) {
-            _this.hiddenEvolutionCards.removeFromStockById('' + id);
-            _this.visibleEvolutionCards.removeFromStockById('' + id);
-        });
-    };
-    PlayerTable.prototype.setPoints = function (points, delay) {
-        var _this = this;
-        if (delay === void 0) { delay = 0; }
-        setTimeout(function () { return document.getElementById("blue-wheel-".concat(_this.playerId)).style.transform = "rotate(".concat(POINTS_DEG[Math.min(20, points)], "deg)"); }, delay);
-    };
-    PlayerTable.prototype.setHealth = function (health, delay) {
-        var _this = this;
-        if (delay === void 0) { delay = 0; }
-        setTimeout(function () { return document.getElementById("red-wheel-".concat(_this.playerId)).style.transform = "rotate(".concat(health > 12 ? 22 : HEALTH_DEG[health], "deg)"); }, delay);
-    };
-    PlayerTable.prototype.setEnergy = function (energy, delay) {
-        var _this = this;
-        if (delay === void 0) { delay = 0; }
-        setTimeout(function () {
-            if (_this.game.isKingkongExpansion()) {
-                _this.setEnergyOnSide('left', energy);
-            }
-            else {
-                _this.setEnergyOnSide('left', Math.min(energy, SPLIT_ENERGY_CUBES));
-                _this.setEnergyOnSide('right', Math.max(energy - SPLIT_ENERGY_CUBES, 0));
-            }
-        }, delay);
-    };
-    PlayerTable.prototype.eliminatePlayer = function () {
-        var _this = this;
-        this.setEnergy(0);
-        this.cards.items.filter(function (item) { return item.id !== 'goldenscarab'; }).forEach(function (item) { return _this.cards.removeFromStockById(item.id); });
-        if (document.getElementById("monster-figure-".concat(this.playerId))) {
-            this.game.fadeOutAndDestroy("monster-figure-".concat(this.playerId));
-        }
-        dojo.addClass("player-table-".concat(this.playerId), 'eliminated');
-    };
-    PlayerTable.prototype.setActivePlayer = function (active) {
-        dojo.toggleClass("player-table-".concat(this.playerId), 'active', active);
-        dojo.toggleClass("overall_player_board_".concat(this.playerId), 'active', active);
-    };
-    PlayerTable.prototype.setFont = function (prefValue) {
-        var defaultFont = prefValue === 1;
-        dojo.toggleClass("player-name-".concat(this.playerId), 'standard', defaultFont);
-        dojo.toggleClass("player-name-".concat(this.playerId), 'goodgirl', !defaultFont);
-    };
-    PlayerTable.prototype.getDistance = function (p1, p2) {
-        return Math.sqrt(Math.pow((p1.x - p2.x), 2) + Math.pow((p1.y - p2.y), 2));
-    };
-    PlayerTable.prototype.getPlaceEnergySide = function (placed) {
-        var _this = this;
-        var newPlace = {
-            x: Math.random() * 33 + 16,
-            y: Math.random() * 188 + 16,
-        };
-        var protection = 0;
-        while (protection < 1000 && placed.some(function (place) { return _this.getDistance(newPlace, place) < 32; })) {
-            newPlace.x = Math.random() * 33 + 16;
-            newPlace.y = Math.random() * 188 + 16;
-            protection++;
-        }
-        return newPlace;
-    };
-    PlayerTable.prototype.setEnergyOnSide = function (side, energy) {
-        var divId = "energy-wrapper-".concat(this.playerId, "-").concat(side);
-        var div = document.getElementById(divId);
-        if (!div) {
-            return;
-        }
-        var placed = div.dataset.placed ? JSON.parse(div.dataset.placed) : [];
-        // remove tokens
-        for (var i = energy; i < placed.length; i++) {
-            this.game.fadeOutAndDestroy("".concat(divId, "-token").concat(i));
-        }
-        placed.splice(energy, placed.length - energy);
-        // add tokens
-        for (var i = placed.length; i < energy; i++) {
-            var newPlace = this.getPlaceEnergySide(placed);
-            placed.push(newPlace);
-            var html = "<div id=\"".concat(divId, "-token").concat(i, "\" style=\"left: ").concat(newPlace.x - 16, "px; top: ").concat(newPlace.y - 16, "px;\" class=\"energy-cube\"></div>");
-            dojo.place(html, divId);
-        }
-        div.dataset.placed = JSON.stringify(placed);
-    };
-    PlayerTable.prototype.setMonster = function (monster) {
-        var newMonsterClass = "monster".concat(monster);
-        dojo.removeClass("monster-figure-".concat(this.playerId), 'monster0');
-        dojo.addClass("monster-figure-".concat(this.playerId), newMonsterClass);
-        dojo.removeClass("monster-board-".concat(this.playerId), 'monster0');
-        dojo.addClass("monster-board-".concat(this.playerId), newMonsterClass);
-    };
-    PlayerTable.prototype.getPlaceToken = function (placed) {
-        var _this = this;
-        var newPlace = {
-            x: 16,
-            y: Math.random() * 138 + 16,
-        };
-        var protection = 0;
-        while (protection < 1000 && placed.some(function (place) { return _this.getDistance(newPlace, place) < 32; })) {
-            newPlace.y = Math.random() * 138 + 16;
-            protection++;
-        }
-        return newPlace;
-    };
-    PlayerTable.prototype.setTokens = function (type, tokens) {
-        var divId = "token-wrapper-".concat(this.playerId, "-").concat(type);
-        var div = document.getElementById(divId);
-        if (!div) {
-            return;
-        }
-        var placed = div.dataset.placed ? JSON.parse(div.dataset.placed) : [];
-        // remove tokens
-        for (var i = tokens; i < placed.length; i++) {
-            this.game.fadeOutAndDestroy("".concat(divId, "-token").concat(i));
-        }
-        placed.splice(tokens, placed.length - tokens);
-        // add tokens
-        for (var i = placed.length; i < tokens; i++) {
-            var newPlace = this.getPlaceToken(placed);
-            placed.push(newPlace);
-            var html = "<div id=\"".concat(divId, "-token").concat(i, "\" style=\"left: ").concat(newPlace.x - 16, "px; top: ").concat(newPlace.y - 16, "px;\" class=\"").concat(type, " token\"></div>");
-            dojo.place(html, divId);
-            this.game.addTooltipHtml("".concat(divId, "-token").concat(i), type === 'poison' ? this.game.POISON_TOKEN_TOOLTIP : this.game.SHINK_RAY_TOKEN_TOOLTIP);
-        }
-        div.dataset.placed = JSON.stringify(placed);
-    };
-    PlayerTable.prototype.setPoisonTokens = function (tokens) {
-        this.setTokens('poison', tokens);
-    };
-    PlayerTable.prototype.setShrinkRayTokens = function (tokens) {
-        this.setTokens('shrink-ray', tokens);
-    };
-    PlayerTable.prototype.getTokyoTower = function () {
-        return this.tokyoTower;
-    };
-    PlayerTable.prototype.setBerserk = function (berserk) {
-        document.getElementById("berserk-token-".concat(this.playerId)).dataset.visible = berserk ? 'true' : 'false';
-    };
-    PlayerTable.prototype.changeForm = function (card) {
-        var cardDiv = document.getElementById("".concat(this.cards.container_div.id, "_item_").concat(card.id));
-        cardDiv.dataset.side = '' + card.side;
-        this.game.addTooltipHtml(cardDiv.id, this.game.cards.updateFlippableCardTooltip(cardDiv));
-        this.setMonsterFigureBeastMode(card.side === 1);
-    };
-    PlayerTable.prototype.setMonsterFigureBeastMode = function (beastMode) {
-        if (this.monster === 12) {
-            document.getElementById("monster-figure-".concat(this.playerId)).classList.toggle('beast-mode', beastMode);
-        }
-    };
-    PlayerTable.prototype.setCultistTokens = function (tokens) {
-        var containerId = "player-table-cultist-tokens-".concat(this.playerId);
-        var container = document.getElementById(containerId);
-        while (container.childElementCount > tokens) {
-            container.removeChild(container.lastChild);
-        }
-        for (var i = container.childElementCount; i < tokens; i++) {
-            dojo.place("<div id=\"".concat(containerId, "-").concat(i, "\" class=\"cultist-token cultist-tooltip\"></div>"), containerId);
-            this.game.addTooltipHtml("".concat(containerId, "-").concat(i), this.game.CULTIST_TOOLTIP);
-        }
-    };
-    PlayerTable.prototype.takeGoldenScarab = function (previousOwnerStock) {
-        var sourceStockItemId = "".concat(previousOwnerStock.container_div.id, "_item_goldenscarab");
-        this.cards.addToStockWithId(999, 'goldenscarab', sourceStockItemId);
-        previousOwnerStock.removeFromStockById("goldenscarab");
-    };
-    PlayerTable.prototype.showEvolutionPickStock = function (cards) {
-        var _this = this;
-        if (!this.pickEvolutionCards) {
-            dojo.place("<div id=\"pick-evolution".concat(this.playerId, "\" class=\"evolution-card-stock player-evolution-cards pick-evolution-cards\"></div>"), "monster-board-wrapper-".concat(this.playerId));
-            this.pickEvolutionCards = new ebg.stock();
-            this.pickEvolutionCards.setSelectionAppearance('class');
-            this.pickEvolutionCards.selectionClass = 'no-visible-selection-except-double-selection';
-            this.pickEvolutionCards.create(this.game, $("pick-evolution".concat(this.playerId)), CARD_WIDTH, CARD_WIDTH);
-            this.pickEvolutionCards.setSelectionMode(1);
-            this.pickEvolutionCards.onItemCreate = function (card_div, card_type_id) { return _this.game.evolutionCards.setupNewCard(card_div, card_type_id); };
-            this.pickEvolutionCards.image_items_per_row = 10;
-            this.pickEvolutionCards.centerItems = true;
-            dojo.connect(this.pickEvolutionCards, 'onChangeSelection', this, function (_, item_id) { return _this.game.chooseEvolutionCardClick(Number(item_id)); });
-        }
-        else {
-            document.getElementById("pick-evolution".concat(this.playerId)).style.display = 'block';
-        }
-        this.game.evolutionCards.setupCards([this.pickEvolutionCards]);
-        //this.game.evolutionCards.addCardsToStock(this.pickEvolutionCards, cards);
-        cards.forEach(function (card) { return _this.pickEvolutionCards.addToStockWithId(card.type, '' + card.id); });
-    };
-    PlayerTable.prototype.hideEvolutionPickStock = function () {
-        var div = document.getElementById("pick-evolution".concat(this.playerId));
-        if (div) {
-            document.getElementById("pick-evolution".concat(this.playerId)).style.display = 'none';
-            this.pickEvolutionCards.removeAll();
-        }
-    };
-    PlayerTable.prototype.playEvolution = function (card) {
-        this.game.evolutionCards.moveToAnotherStock(this.hiddenEvolutionCards, this.visibleEvolutionCards, card);
-    };
-    PlayerTable.prototype.highlightHiddenEvolutions = function (cards) {
-        var _this = this;
-        cards.forEach(function (card) {
-            var cardDiv = document.getElementById("".concat(_this.hiddenEvolutionCards.container_div.id, "_item_").concat(card.id));
-            cardDiv === null || cardDiv === void 0 ? void 0 : cardDiv.classList.add('highlight-evolution');
-        });
-    };
-    PlayerTable.prototype.unhighlightHiddenEvolutions = function () {
-        var _this = this;
-        var _a;
-        (_a = this.hiddenEvolutionCards) === null || _a === void 0 ? void 0 : _a.items.forEach(function (card) {
-            var cardDiv = document.getElementById("".concat(_this.hiddenEvolutionCards.container_div.id, "_item_").concat(card.id));
-            cardDiv.classList.remove('highlight-evolution');
-        });
-    };
     return PlayerTable;
 }());
 var WICKEDNESS_MONSTER_ICON_POSITION = [
@@ -1563,9 +1199,11 @@ var PointSalad = /** @class */ (function () {
         var players = Object.values(gamedatas.players).sort(function (a, b) { return a.playerNo - b.playerNo; });
         var playerIndex = players.findIndex(function (player) { return Number(player.id) === Number(_this.player_id); });
         var orderedPlayers = playerIndex > 0 ? __spreadArray(__spreadArray([], players.slice(playerIndex), true), players.slice(0, playerIndex), true) : players;
-        orderedPlayers.forEach(function (player) {
-            return _this.playersTables.push(new PlayerTable(_this, gamedatas.players[Number(player.id)]));
-        });
+        orderedPlayers.forEach(function (player) { return _this.createPlayerTable(gamedatas, Number(player.id)); });
+    };
+    PointSalad.prototype.createPlayerTable = function (gamedatas, playerId) {
+        var playerTable = new PlayerTable(this, gamedatas.players[playerId]);
+        this.playersTables.push(playerTable);
     };
     PointSalad.prototype.getPlayerTable = function (playerId) {
         return this.playersTables.find(function (playerTable) { return playerTable.playerId === Number(playerId); });
@@ -1602,6 +1240,7 @@ var PointSalad = /** @class */ (function () {
         var _this = this;
         var notifs = [
             ['pickMonster', ANIMATION_MS],
+            ['points', 1],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, "notif_".concat(notif[0]));
@@ -1620,6 +1259,10 @@ var PointSalad = /** @class */ (function () {
         }));
         animation.play();
         this.getPlayerTable(notif.args.playerId).setMonster(notif.args.monster);
+    };
+    PointSalad.prototype.notif_points = function (notif) {
+        var _a;
+        (_a = this.scoreCtrl[notif.args.playerId]) === null || _a === void 0 ? void 0 : _a.toValue(notif.args.points);
     };
     /* This enable to inject translatable styled things to logs or action bar */
     /* @Override */

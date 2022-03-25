@@ -235,9 +235,12 @@ class PointSalad implements PointSaladGame {
         const playerIndex = players.findIndex(player => Number(player.id) === Number((this as any).player_id));
         const orderedPlayers = playerIndex > 0 ? [...players.slice(playerIndex), ...players.slice(0, playerIndex)] : players;
 
-        orderedPlayers.forEach(player => 
-            this.playersTables.push(new PlayerTable(this, gamedatas.players[Number(player.id)]))
-        );
+        orderedPlayers.forEach(player => this.createPlayerTable(gamedatas, Number(player.id)) );
+    }
+
+    private createPlayerTable(gamedatas: PointSaladGamedatas, playerId: number) {
+        const playerTable = new PlayerTable(this, gamedatas.players[playerId]);
+        this.playersTables.push(playerTable);
     }
 
     private getPlayerTable(playerId: number): PlayerTable {
@@ -281,6 +284,7 @@ class PointSalad implements PointSaladGame {
 
         const notifs = [
             ['pickMonster', ANIMATION_MS],
+            ['points', 1],
         ];
     
         notifs.forEach((notif) => {
@@ -302,6 +306,10 @@ class PointSalad implements PointSaladGame {
         animation.play();
 
         this.getPlayerTable(notif.args.playerId).setMonster(notif.args.monster);
+    }
+
+    notif_points(notif: Notif<NotifPointsArgs>) {
+        (this as any).scoreCtrl[notif.args.playerId]?.toValue(notif.args.points);
     }
 
     /* This enable to inject translatable styled things to logs or action bar */

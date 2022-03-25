@@ -44,6 +44,9 @@ trait UtilTrait {
     }
 
     function getCardFromDb(array $dbCard) {
+        if ($dbCard == null) {
+            return null;
+        }
         if (!$dbCard || !array_key_exists('id', $dbCard)) {
             throw new \Error('card doesn\'t exists '.json_encode($dbCard));
         }
@@ -63,18 +66,18 @@ trait UtilTrait {
             for ($subType = 1; $subType <= 18; $subType++) {
                 $cards[] = [ 'type' => $type, 'type_arg' => $subType, 'nbr' => 1 ];
             }
+
             $this->cards->createCards($cards, 'veggie'.$type);
             $this->cards->shuffle('veggie'.$type);
             $this->cards->pickCardsForLocation(3 * $playerNumber, 'veggie'.$type, 'deck');
         }
+
         $cardCount = intval($this->cards->countCardInLocation('deck'));
         $pileCount = $cardCount / 3;
         
         for ($pile = 1; $pile <= 3; $pile++) {
             $this->cards->pickCardsForLocation($pileCount, 'deck', 'pile'.$pile);
         }
-
-        $this->refillMarket(true);
     }
 
     function applyFlipCard(Card &$card, bool $silent = false) {
@@ -95,7 +98,7 @@ trait UtilTrait {
             $marketSize = intval($this->cards->countCardInLocation('market'.$pile));
             $neededCards = min($pileSize, 2 - $marketSize);
             if ($neededCards > 0) {
-                $cards = $this->cards->pickCardsForLocation('pile'.$pile, 'market'.$pile, $marketSize + 1);
+                $cards = $this->getCardsFromDb($this->cards->pickCardsForLocation($neededCards, 'pile'.$pile, 'market'.$pile, $marketSize + 1));
                 foreach($cards as $card) {
                     $this->applyFlipCard($card, true); 
                 }
@@ -132,6 +135,14 @@ trait UtilTrait {
 
         $this->DbQuery("UPDATE `player` SET `player_score` = $score WHERE `player_id` = $playerId"); 
         
-        // TODO notif
+        $this->notifyAllPlayers('points', '', [
+            'playerId' => $playerId,
+            'player_name' => $this->getPlayerName($playerId),
+            'points' => $score,
+        ]);
+    }
+
+    function getRemainingCardCountOnTable() {
+        return intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` LIKE 'pile%' OR `card_location` LIKE 'market%'"));
     }
 }

@@ -92,8 +92,7 @@ class PointSalad extends Table {
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
         $this->setupCards(count($players));
-
-        // TODO set table initial cards
+        $this->refillMarket(true);
 
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
@@ -113,14 +112,25 @@ class PointSalad extends Table {
     protected function getAllDatas() {
         $result = [];
     
-        $currentPlayerId = self::getCurrentPlayerId();    // !! We must only return informations visible by this player !!
-    
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score FROM player ";
+        $sql = "SELECT player_id id, player_score score, player_no playerNo FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
-  
-        // TODO: Gather all information about current game situation (visible by player $current_player_id).
+
+        foreach ($result['players'] as $playerId => &$playerDb) {
+            $playerDb['playerNo'] = intval($playerDb['playerNo']);
+            $playerDb['cards'] = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $playerId));
+        }
+        
+        $pileTopCard = [];
+        $market = [];
+        for ($pile = 1; $pile <= 3; $pile++) {
+            $pileTopCard[$pile] = $this->getCardFromDb($this->cards->getCardOnTop('pile'.$pile));
+            $market[$pile] = $this->getCardsFromDb($this->cards->getCardsInLocation('market'.$pile));
+        }
+
+        $result['pileTopCard'] = $pileTopCard;
+        $result['market'] = $market;
   
         return $result;
     }
@@ -136,9 +146,10 @@ class PointSalad extends Table {
         (see states.inc.php)
     */
     function getGameProgression() {
-        // TODO: compute and return the game progression
+        $totalCards = 18 * count($this->getPlayersIds());
+        $remainingCards = $this->getRemainingCardCountOnTable();
 
-        return 0;
+        return 100 * ($totalCards - $remainingCards) / $totalCards;
     }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -4,7 +4,7 @@
 
         <div id="currentplayertable"></div>
 
-        <div id="table">
+        <div id="table" class="whiteblock">
             <div id="piles">
                 <div id="pile1"></div>
                 <div id="pile2"></div>

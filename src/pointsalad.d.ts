@@ -29,7 +29,8 @@ interface PointSaladGamedatas {
     tablespeed: string;
 
     // Add here variables you set up in getAllDatas
-    // TODO
+    pileTopCard: { [pile: number]: Card };
+    market: { [pile: number]: Card[] };
 }
 
 interface PointSaladGame extends Game {
@@ -47,3 +48,8 @@ interface NotifPickMonsterArgs {
     playerId: number;
     monster: number;
 }*/
+
+interface NotifPointsArgs {
+    playerId: number;
+    points: number;
+}

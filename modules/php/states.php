@@ -18,7 +18,7 @@ trait StateTrait {
 
         $this->activeNextPlayer();
 
-        $endScore = intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` LIKE 'pile%' OR `card_location` LIKE 'market%'")) === 0;
+        $endScore = $this->getRemainingCardCountOnTable() === 0;
 
         $this->gamestate->nextState($endScore ? 'endScore' : 'nextPlayer');
     }
