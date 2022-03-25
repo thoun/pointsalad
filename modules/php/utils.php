@@ -145,7 +145,17 @@ trait UtilTrait {
     }
 
     function getScore(int $playerId, Card $scoreCard, array $veggieCounts) {
-        return 0; // TODO
+        $fn = $this->CARDS_EFFECTS[$scoreCard->veggie][$scoreCard->index];
+        $otherPlayersVeggieCounts = [];
+        if ($scoreCard->index == 3 || $scoreCard->index == 4) {
+            $otherPlayersIds = $this->getPlayersIds();
+            foreach ($otherPlayersIds as $otherPlayerId) {
+                if ($otherPlayerId != $playerId) {
+                    $otherPlayersVeggieCounts[$otherPlayerId] = $this->getVeggieCountsByPlayer($otherPlayerId);
+                }
+            }
+        }
+        return $fn($veggieCounts, $otherPlayersVeggieCounts);
     }
 
     function updateScore(int $playerId) {

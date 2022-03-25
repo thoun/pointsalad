@@ -193,6 +193,9 @@ class PointSalad implements PointSaladGame {
         const existingDiv = document.getElementById(`card-${card.id}`);
         if (existingDiv) {
             existingDiv.dataset.side = ''+card.side;
+            if (card.side === 1) {
+                existingDiv.innerHTML = '';
+            }
             if (init) {
                 document.getElementById(destinationId).appendChild(existingDiv);
             } else {
@@ -207,6 +210,9 @@ class PointSalad implements PointSaladGame {
             div.dataset.index = ''+card.index;
             document.getElementById(destinationId).appendChild(div);
             div.addEventListener('click', () => this.onCardClick(card));
+            if (card.side === 0) {
+                div.innerHTML = `<span>${CARDS_EFFECTS[card.veggie]?.[card.index] || ''}</span>`;
+            }
         }
     }
 

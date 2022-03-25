@@ -90,6 +90,45 @@ var TableCenter = /** @class */ (function () {
     }
     return TableCenter;
 }());
+var CARDS_EFFECTS = [
+    [],
+    // VEGGIE 1
+    [
+        null,
+        // special
+        '5 / missing veggie type',
+        // odd/even
+        'odd/even 7/3',
+        // most
+        'most 10',
+        // least
+        'least 10',
+        // 2/V
+        '2/carrot',
+        // 1/V 1/V (x3)
+        '1/carrot 1/pepper',
+        '1/carrot 1/lettuce',
+        '1/carrot 1/onion',
+        // 3/V -2/V
+        '3/carrot -2/onion',
+        // 2/V 1/V -2/V
+        '2/carrot 1/pepper -2/onion',
+        // 2/V 2/V -4/V
+        '2/carrot 2/onion -4/pepper',
+        // 3/V -1/V -1/V
+        '3/carrot -1/pepper -1/cabbage',
+        // 4/V -2/V -2/V
+        '4/carrot -2/lettuce -2/tomato',
+        // V+V = 5 (x3)
+        'CARROT, CARROT = 5',
+        'LETTUCE, ONION = 5',
+        'TOMATO, PEPPER = 5',
+        // V+V+V = 8 (x3)
+        'CARROT, CARROT, CARROT = 8',
+        'CABBAGE, CARROT, TOMATO = 8',
+        'LETTUCE, CARROT, ONION = 8',
+    ],
+];
 var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
         if (ar || !(i in from)) {
@@ -243,10 +282,14 @@ var PointSalad = /** @class */ (function () {
     };
     PointSalad.prototype.createOrMoveCard = function (card, destinationId, init) {
         var _this = this;
+        var _a;
         if (init === void 0) { init = false; }
         var existingDiv = document.getElementById("card-".concat(card.id));
         if (existingDiv) {
             existingDiv.dataset.side = '' + card.side;
+            if (card.side === 1) {
+                existingDiv.innerHTML = '';
+            }
             if (init) {
                 document.getElementById(destinationId).appendChild(existingDiv);
             }
@@ -263,6 +306,9 @@ var PointSalad = /** @class */ (function () {
             div.dataset.index = '' + card.index;
             document.getElementById(destinationId).appendChild(div);
             div.addEventListener('click', function () { return _this.onCardClick(card); });
+            if (card.side === 0) {
+                div.innerHTML = "<span>".concat(((_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index]) || '', "</span>");
+            }
         }
     };
     PointSalad.prototype.updateVeggieCount = function (playerId, veggieCounts) {

@@ -4,6 +4,9 @@
     width: 100px;
     height: 140px;
     margin: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     &[data-side="0"] {
         background-image: url('img/point-side.jpg');
