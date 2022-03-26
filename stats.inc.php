@@ -47,49 +47,50 @@
     
 */
 
-$stats_type = array(
+$commonStats = [
+    "turnNumber" => [
+        "id" => 10,
+        "name" => totranslate("Number of turns"),
+        "type" => "int"
+    ],
+    "veggieFromMarket" => [
+        "id" => 12,
+        "name" => totranslate("Veggie cards collected from market"),
+        "type" => "int"
+    ],
+    "pointsFromMarket" => [
+        "id" => 13,
+        "name" => totranslate("Point cards collected from market"),
+        "type" => "int"
+    ],
+    "flippedCards" => [
+        "id" => 14,
+        "name" => totranslate("Point cards flipped to veggie card"),
+        "type" => "int"
+    ],
+    // end stats    
+    "totalPointCards" => [
+        "id" => 15,
+        "name" => totranslate("Final point cards count"),
+        "type" => "int"
+    ],
+    "totalVeggieCards" => [
+        "id" => 16,
+        "name" => totranslate("Final veggie cards count"),
+        "type" => "int"
+    ],
+    "avgScoreByCard" => [
+        "id" => 17,
+        "name" => totranslate("Average score by veggie card"),
+        "type" => "float"
+    ],
+];
+
+$stats_type = [
 
     // Statistics global to table
-    "table" => array(
-
-        "turns_number" => array("id"=> 10,
-                    "name" => totranslate("Number of turns"),
-                    "type" => "int" ),
-
-/*
-        Examples:
-
-
-        "table_teststat1" => array(   "id"=> 10,
-                                "name" => totranslate("table test stat 1"), 
-                                "type" => "int" ),
-                                
-        "table_teststat2" => array(   "id"=> 11,
-                                "name" => totranslate("table test stat 2"), 
-                                "type" => "float" )
-*/  
-    ),
+    "table" => $commonStats,
     
     // Statistics existing for each player
-    "player" => array(
-
-        "turns_number" => array("id"=> 10,
-                    "name" => totranslate("Number of turns"),
-                    "type" => "int" ),
-    
-/*
-        Examples:    
-        
-        
-        "player_teststat1" => array(   "id"=> 10,
-                                "name" => totranslate("player test stat 1"), 
-                                "type" => "int" ),
-                                
-        "player_teststat2" => array(   "id"=> 11,
-                                "name" => totranslate("player test stat 2"), 
-                                "type" => "float" )
-
-*/    
-    )
-
-);
+    "player" => $commonStats,
+];

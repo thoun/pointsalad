@@ -17,14 +17,15 @@ trait ActionTrait {
         $playerId = self::getActivePlayerId();
 
         $cards = $this->getCardsFromDb($this->cards->getCards($ids));
+        $cardsCount = count($cards);
 
         $tookVeggie = false;
-        if (count($cards) === 2) {
+        if ($cardsCount === 2) {
             if ($this->array_some($cards, fn($card) => strpos($card->location, 'market') !== 0)) { // str_starts_with is PHP8+, using strpos( $haystack , $needle ) === 0 instead
                 throw new BgaUserException("If you take two cards, it must be from the market");
             }
             $tookVeggie = true;
-        } else if (count($cards) === 1) {
+        } else if ($cardsCount === 1) {
             if (strpos($cards[0]->location, 'pile') !== 0) { // str_starts_with is PHP8+, using strpos( $haystack , $needle ) === 0 instead
                 if ($this->getRemainingCardCountOnMarket() === 1 && strpos($cards[0]->location, 'market') !== 0) { // in case only 1 veggie remains
                     $tookVeggie = true;
@@ -55,10 +56,16 @@ trait ActionTrait {
 
         if ($tookVeggie) {
             $this->refillMarket();
+            
+            self::incStat($cardsCount, 'veggieFromMarket');
+            self::incStat($cardsCount, 'veggieFromMarket', $playerId);
         } else {
             if (intval($this->cards->countCardInLocation('pile'.$pointCardFromPile)) == 0) {
                 $this->refillPile($pointCardFromPile);
             }
+
+            self::incStat($cardsCount, 'pointsFromMarket');
+            self::incStat($cardsCount, 'pointsFromMarket', $playerId);
         }
 
         //self::incStat(1, 'placedRoutes');
@@ -87,8 +94,8 @@ trait ActionTrait {
 
         $this->updateScore($playerId);
 
-        //self::incStat(1, 'placedRoutes');
-        //self::incStat(1, 'placedRoutes', $playerId);*/
+        self::incStat(1, 'flippedCards');
+        self::incStat(1, 'flippedCards', $playerId);
 
         $this->gamestate->nextState('nextPlayer');
     }

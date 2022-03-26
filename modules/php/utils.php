@@ -43,6 +43,10 @@ trait UtilTrait {
         return self::getUniqueValueFromDB("SELECT player_name FROM player WHERE player_id = $playerId");
     }
 
+    function getPlayerScore(int $playerId) {
+        return intval(self::getUniqueValueFromDB("SELECT player_score FROM player WHERE player_id = $playerId"));
+    }
+
     function getCardFromDb(/*array|null*/ $dbCard) {
         if ($dbCard == null) {
             return null;
