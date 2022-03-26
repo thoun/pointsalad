@@ -26,25 +26,8 @@ function formatTextIcons(rawText) {
         return '';
     }
     return rawText
-        .replace(/\[Star\]/ig, '<span class="icon points"></span>')
-        .replace(/\[Heart\]/ig, '<span class="icon health"></span>')
-        .replace(/\[Energy\]/ig, '<span class="icon energy"></span>')
-        .replace(/\[dice1\]/ig, '<span class="dice-icon dice1"></span>')
-        .replace(/\[dice2\]/ig, '<span class="dice-icon dice2"></span>')
-        .replace(/\[dice3\]/ig, '<span class="dice-icon dice3"></span>')
-        .replace(/\[diceHeart\]/ig, '<span class="dice-icon dice4"></span>')
-        .replace(/\[diceEnergy\]/ig, '<span class="dice-icon dice5"></span>')
-        .replace(/\[diceSmash\]/ig, '<span class="dice-icon dice6"></span>')
-        .replace(/\[dieFateEye\]/ig, '<span class="dice-icon die-of-fate eye"></span>')
-        .replace(/\[dieFateRiver\]/ig, '<span class="dice-icon die-of-fate river"></span>')
-        .replace(/\[dieFateSnake\]/ig, '<span class="dice-icon die-of-fate snake"></span>')
-        .replace(/\[dieFateAnkh\]/ig, '<span class="dice-icon die-of-fate ankh"></span>')
-        .replace(/\[berserkDieEnergy\]/ig, '<span class="dice-icon berserk dice1"></span>')
-        .replace(/\[berserkDieDoubleEnergy\]/ig, '<span class="dice-icon berserk dice2"></span>')
-        .replace(/\[berserkDieSmash\]/ig, '<span class="dice-icon berserk dice3"></span>')
-        .replace(/\[berserkDieDoubleSmash\]/ig, '<span class="dice-icon berserk dice5"></span>')
-        .replace(/\[berserkDieSkull\]/ig, '<span class="dice-icon berserk dice6"></span>')
-        .replace(/\[keep\]/ig, "<span class=\"card-keep-text\"><span class=\"outline\">".concat(_('Keep'), "</span><span class=\"text\">").concat(_('Keep'), "</span></span>"));
+        .replace(/\[veggie(\d)\]/ig, function (_, veggie) { return "<div class=\"icon\" data-veggie=\"".concat(veggie, "\"></div>"); })
+        .replace(/\[(\d+)\]/ig, function (_, points) { return "<div class=\"icon points\">".concat(points, "</div>"); });
 }
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 ;
@@ -90,45 +73,137 @@ var TableCenter = /** @class */ (function () {
     }
     return TableCenter;
 }());
-var CARDS_EFFECTS = [
-    [],
-    // VEGGIE 1
-    [
-        null,
-        // special
-        '5 / missing veggie type',
-        // odd/even
-        'odd/even 7/3',
-        // most
-        'most 10',
-        // least
-        'least 10',
-        // 2/V
-        '2/carrot',
-        // 1/V 1/V (x3)
-        '1/carrot 1/pepper',
-        '1/carrot 1/lettuce',
-        '1/carrot 1/onion',
-        // 3/V -2/V
-        '3/carrot -2/onion',
-        // 2/V 1/V -2/V
-        '2/carrot 1/pepper -2/onion',
-        // 2/V 2/V -4/V
-        '2/carrot 2/onion -4/pepper',
-        // 3/V -1/V -1/V
-        '3/carrot -1/pepper -1/cabbage',
-        // 4/V -2/V -2/V
-        '4/carrot -2/lettuce -2/tomato',
-        // V+V = 5 (x3)
-        'CARROT, CARROT = 5',
-        'LETTUCE, ONION = 5',
-        'TOMATO, PEPPER = 5',
-        // V+V+V = 8 (x3)
-        'CARROT, CARROT, CARROT = 8',
-        'CABBAGE, CARROT, TOMATO = 8',
-        'LETTUCE, CARROT, ONION = 8',
-    ],
+var CABBAGE = 1;
+var CARROT = 2;
+var LETTUCE = 3;
+var ONION = 4;
+var PEPPER = 5;
+var TOMATO = 6;
+function evenOdd(veggie) {
+    return formatTextIcons("\n        <div class=\"flex\">[veggie".concat(veggie, "]</div>\n        <div class=\"flex\">\n            <span class=\"flex wrap\">").concat(_('Even total'), "<span>\n            <span> = </span>\n            <span>[7]</span>\n        </div>\n        <div class=\"flex\">\n            <span class=\"flex wrap\">").concat(_('Odd total'), "<span>\n            <span> = </span>\n            <span>[3]</span>\n        </div>\n    "));
+}
+function mostLeast(word, veggie) {
+    return formatTextIcons("\n        <div class=\"flex\">\n            <span>".concat(word, " [veggie").concat(veggie, "]</span>\n            <span> = </span>\n            <span>[10]</span>\n        </div>\n    "));
+}
+function most(veggie) {
+    return mostLeast(_('Most'), veggie);
+}
+function least(veggie) {
+    return mostLeast(_('Least'), veggie);
+}
+function sets(sets) {
+    return formatTextIcons(sets.map(function (set) { return "<div>[".concat(set[0], "] / [veggie").concat(set[1], "]</div>"); }).join(''));
+}
+function pairSet(veggies) {
+    return formatTextIcons("\n    <div class=\"multiple-set\">\n        ".concat(veggies.map(function (veggie, index) { return "<span data-index=\"".concat(index, "\">[veggie").concat(veggie, "]</span>"); }).join('<span class="plus">+</span>'), "\n         = [5]</div>\n    "));
+}
+function tripletSet(veggies) {
+    return formatTextIcons("\n    <div class=\"multiple-set\">\n        ".concat(veggies.map(function (veggie, index) { return "<span data-index=\"".concat(index, "\">[veggie").concat(veggie, "]</span>"); }).join('<span class="plus">+</span>'), "\n    </div>\n    <div class=\"flex\"> = [8]</div>\n    "));
+}
+var CARDS_EFFECTS = [];
+CARDS_EFFECTS[CABBAGE] = [
+    null,
+    // special
+    function () { return formatTextIcons("\n        <div class=\"flex\">\n            <span>[5]</span>\n            <span>/</span>\n            <span>".concat(_('Missing veggie type'), "</span>\n        </div>\n    ")); },
+    // odd/even
+    function () { return evenOdd(CARROT); },
+    // most
+    function () { return most(CARROT); },
+    // least
+    function () { return least(CARROT); },
+    // 2/V
+    function () { return sets([[2, CARROT]]); },
+    // 1/V 1/V (x1)
+    function () { return sets([[1, CARROT], [1, PEPPER]]); },
+    function () { return sets([[1, CARROT], [1, LETTUCE]]); },
+    // 3/V -2/V
+    function () { return sets([[3, CARROT], [-2, ONION]]); },
+    // 2/V 1/V -2/V
+    function () { return sets([[2, CARROT], [1, PEPPER], [-2, ONION]]); },
+    // 2/V 2/V -4/V
+    function () { return sets([[2, CARROT], [2, ONION], [-4, PEPPER]]); },
+    // 3/V -1/V -1/V
+    function () { return sets([[3, CARROT], [-1, PEPPER], [-1, CABBAGE]]); },
+    // 4/V -2/V -2/V
+    function () { return sets([[4, CARROT], [-2, LETTUCE], [-2, TOMATO]]); },
+    // V+V = 5 (x3)
+    function () { return pairSet([CARROT, CARROT]); },
+    function () { return pairSet([LETTUCE, ONION]); },
+    function () { return pairSet([TOMATO, PEPPER]); },
+    // V+V+V = 8 (x3)
+    function () { return tripletSet([CARROT, CARROT, CARROT]); },
+    function () { return tripletSet([CABBAGE, CARROT, TOMATO]); },
+    function () { return tripletSet([LETTUCE, CARROT, ONION]); },
 ];
+CARDS_EFFECTS[CARROT] = [
+    null,
+    // special
+    function () { return formatTextIcons("<div class=\"flex\">[5]<span>/</span><span>".concat(_('Veggie type with at least 3'), "</span></div>")); },
+    // odd/even
+    function () { return evenOdd(CABBAGE); },
+    // most
+    function () { return most(CABBAGE); },
+    // least
+    function () { return least(CABBAGE); },
+    // 2/V
+    function () { return sets([[2, CABBAGE]]); },
+    // 1/V 1/V (x2)
+    function () { return sets([[1, CABBAGE], [1, LETTUCE]]); },
+    function () { return sets([[1, CABBAGE], [1, PEPPER]]); },
+    // 3/V -2/V
+    function () { return sets([[3, CABBAGE], [-2, TOMATO]]); },
+    // 2/V 1/V -2/V
+    function () { return sets([[2, CABBAGE], [1, LETTUCE], [-2, CARROT]]); },
+    // 2/V 2/V -4/V
+    function () { return sets([[2, CABBAGE], [2, TOMATO], [-4, LETTUCE]]); },
+    // 3/V -1/V -1/V
+    function () { return sets([[3, CABBAGE], [-1, LETTUCE], [-1, CARROT]]); },
+    // 4/V -2/V -2/V
+    function () { return sets([[4, CABBAGE], [-2, PEPPER], [-2, ONION]]); },
+    // V+V = 5 (x3)
+    function () { return pairSet([CABBAGE, CABBAGE]); },
+    function () { return pairSet([TOMATO, LETTUCE]); },
+    function () { return pairSet([ONION, PEPPER]); },
+    // V+V+V = 8 (x3)
+    function () { return tripletSet([CABBAGE, CABBAGE, CABBAGE]); },
+    function () { return tripletSet([PEPPER, CABBAGE, TOMATO]); },
+    function () { return tripletSet([CARROT, CABBAGE, ONION]); },
+];
+CARDS_EFFECTS[LETTUCE] = [
+    null,
+    // special
+    function () { return formatTextIcons("<div class=\"flex\"><span>".concat(_('Lowest veggie total'), "</span> = [7]</div>")); },
+    // odd/even
+    function () { return evenOdd(PEPPER); },
+    // most
+    function () { return most(PEPPER); },
+    // least
+    function () { return least(PEPPER); },
+    // 2/V
+    function () { return sets([[2, PEPPER]]); },
+    // 1/V 1/V (x2)
+    function () { return sets([[1, PEPPER], [1, ONION]]); },
+    function () { return sets([[1, PEPPER], [1, TOMATO]]); },
+    // 3/V -2/V
+    function () { return sets([[3, PEPPER], [-2, CABBAGE]]); },
+    // 2/V 1/V -2/V
+    function () { return sets([[2, PEPPER], [1, TOMATO], [-2, LETTUCE]]); },
+    // 2/V 2/V -4/V
+    function () { return sets([[2, PEPPER], [2, CABBAGE], [-4, TOMATO]]); },
+    // 3/V -1/V -1/V
+    function () { return sets([[3, PEPPER], [-1, TOMATO], [-1, LETTUCE]]); },
+    // 4/V -2/V -2/V
+    function () { return sets([[4, PEPPER], [-2, ONION], [-2, CARROT]]); },
+    // V+V = 5 (x3)
+    function () { return pairSet([PEPPER, PEPPER]); },
+    function () { return pairSet([CARROT, TOMATO]); },
+    function () { return pairSet([CABBAGE, ONION]); },
+    // V+V+V = 8 (x3)
+    function () { return tripletSet([PEPPER, PEPPER, PEPPER]); },
+    function () { return tripletSet([LETTUCE, PEPPER, CARROT]); },
+    function () { return tripletSet([ONION, PEPPER, CABBAGE]); },
+];
+// checked : 12 / Complete set
 var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
         if (ar || !(i in from)) {
@@ -282,7 +357,7 @@ var PointSalad = /** @class */ (function () {
     };
     PointSalad.prototype.createOrMoveCard = function (card, destinationId, init) {
         var _this = this;
-        var _a;
+        var _a, _b;
         if (init === void 0) { init = false; }
         var existingDiv = document.getElementById("card-".concat(card.id));
         if (existingDiv) {
@@ -307,7 +382,7 @@ var PointSalad = /** @class */ (function () {
             document.getElementById(destinationId).appendChild(div);
             div.addEventListener('click', function () { return _this.onCardClick(card); });
             if (card.side === 0) {
-                div.innerHTML = "<span>".concat(((_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index]) || '', "</span>");
+                div.innerHTML = "<span>".concat(((_b = (_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index]) === null || _b === void 0 ? void 0 : _b.call(_a)) || '', "</span>");
             }
         }
     };

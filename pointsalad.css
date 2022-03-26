@@ -24,12 +24,27 @@
   width: 100px;
   height: 140px;
   margin: 5px;
+  text-transform: uppercase;
+}
+.card[data-side="0"] {
+  color: #8dc63f;
+  text-shadow: -1px 1px 1px white;
+  font-weight: bold;
+  font-size: 80%;
+  background-image: url("img/point-side.jpg");
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.card[data-side="0"] .flex {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.card[data-side="0"] {
-  background-image: url("img/point-side.jpg");
+.card[data-side="0"] .flex.wrap {
+  flex-wrap: wrap;
 }
 .card[data-side="0"][data-index="1"] {
   background-position-x: 0%;
@@ -84,6 +99,34 @@
 }
 .card[data-side="0"][data-index="18"] {
   background-position-x: 100%;
+}
+.card[data-side="0"] .icon {
+  width: 24px;
+  height: 24px;
+}
+.card[data-side="0"] .icon.points {
+  color: white;
+  text-shadow: 2px 2px 1px #6d9d31;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 90%;
+}
+.card[data-side="0"] .multiple-set {
+  position: relative;
+  margin-top: 12px;
+}
+.card[data-side="0"] .multiple-set .plus {
+  position: relative;
+  top: -8px;
+  margin: -2px;
+}
+.card[data-side="0"] .multiple-set [data-index="1"] {
+  position: relative;
+  top: -18px;
+}
+.card[data-side="0"] .multiple-set [data-index="1"]:last-of-type {
+  margin-right: -10px;
 }
 .card[data-side="1"] {
   background-image: url("img/veggie-side.jpg");
@@ -173,24 +216,26 @@ html, .mode_3d #game_play_area_background {
   background-size: auto 100%;
   display: inline-block;
   vertical-align: middle;
+  background-image: url("img/icons.png");
+  background-size: auto 100%;
 }
-.icon[data-veggie] {
-  background: url("img/veggie-icons.png");
+.icon.points {
+  background-position-x: 0;
 }
 .icon[data-veggie="1"] {
-  background-position-x: 0%;
+  background-position-x: 16.6666666667%;
 }
 .icon[data-veggie="2"] {
-  background-position-x: 20%;
+  background-position-x: 33.3333333333%;
 }
 .icon[data-veggie="3"] {
-  background-position-x: 40%;
+  background-position-x: 50%;
 }
 .icon[data-veggie="4"] {
-  background-position-x: 60%;
+  background-position-x: 66.6666666667%;
 }
 .icon[data-veggie="5"] {
-  background-position-x: 80%;
+  background-position-x: 83.3333333333%;
 }
 .icon[data-veggie="6"] {
   background-position-x: 100%;

@@ -147,7 +147,10 @@ trait UtilTrait {
     function getScore(int $playerId, Card $scoreCard, array $veggieCounts) {
         $fn = $this->CARDS_EFFECTS[$scoreCard->veggie][$scoreCard->index];
         $otherPlayersVeggieCounts = [];
-        if ($scoreCard->index == 3 || $scoreCard->index == 4) {
+        if (($scoreCard->index == 1 && in_array($scoreCard->veggie, [LETTUCE, PEPPER]))
+             || $scoreCard->index == 3 
+             || $scoreCard->index == 4
+        ) {
             $otherPlayersIds = $this->getPlayersIds();
             foreach ($otherPlayersIds as $otherPlayerId) {
                 if ($otherPlayerId != $playerId) {

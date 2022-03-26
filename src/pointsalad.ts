@@ -211,7 +211,7 @@ class PointSalad implements PointSaladGame {
             document.getElementById(destinationId).appendChild(div);
             div.addEventListener('click', () => this.onCardClick(card));
             if (card.side === 0) {
-                div.innerHTML = `<span>${CARDS_EFFECTS[card.veggie]?.[card.index] || ''}</span>`;
+                div.innerHTML = `<span>${CARDS_EFFECTS[card.veggie]?.[card.index]?.() || ''}</span>`;
             }
         }
     }
