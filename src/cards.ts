@@ -9,12 +9,12 @@ function evenOdd(veggie: number): string {
     return formatTextIcons(`
         <div class="flex">[veggie${veggie}]</div>
         <div class="flex">
-            <span class="flex wrap">${_('Even total')}<span>
+            <span class="flex wrap">${_('Even total')}</span>
             <span> = </span>
             <span>[7]</span>
         </div>
         <div class="flex">
-            <span class="flex wrap">${_('Odd total')}<span>
+            <span class="flex wrap">${_('Odd total')}</span>
             <span> = </span>
             <span>[3]</span>
         </div>
@@ -24,7 +24,7 @@ function evenOdd(veggie: number): string {
 function mostLeast(word: string, veggie: number): string {
     return formatTextIcons(`
         <div class="flex">
-            <span>${word} [veggie${veggie}]</span>
+            <span class="flex wrap">${word} [veggie${veggie}]</span>
             <span> = </span>
             <span>[10]</span>
         </div>
@@ -245,10 +245,10 @@ CARDS_EFFECTS[TOMATO] = [
     null,
     // special
     () => formatTextIcons(`
-    <div class="complete-set-top">[veggie6][veggie3][veggie2]</div>
+    <div class="flex complete-set top">[veggie6][veggie3][veggie2]</div>
     <div class="flex"><span>[12]</span><span>/</span><span>${_('Complete set')}</span></div>
-    <div class="complete-set-bottom">[veggie1][veggie5][veggie4]</div>
-    `), // TODO check text
+    <div class="flex complete-set bottom">[veggie1][veggie5][veggie4]</div>
+    `),
     // odd/even
     () => evenOdd(ONION),
     // most

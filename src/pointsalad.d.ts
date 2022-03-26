@@ -44,6 +44,7 @@ interface PointSaladGame extends Game {
 }
 
 interface EnteringTakeCardsArgs {
+    canTakeOnlyOneVeggie: boolean;
 }
 
 interface EnteringFlipCardArgs {
@@ -72,6 +73,13 @@ interface NotifTakenCardsArgs {
 interface NotifMarketRefillArgs {
     card: Card;
     pile: number;
-    pileTop: Card;
+    pileTop: Card | null;
     pileCount: number | null;
+}
+
+interface NotifPileRefillArgs {
+    pile: number;
+    pileTop: Card | null;
+    pileCounts: number[];
+    fromPile: number;
 }

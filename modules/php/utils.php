@@ -78,6 +78,7 @@ trait UtilTrait {
         
         for ($pile = 1; $pile <= 3; $pile++) {
             $this->cards->pickCardsForLocation($pileCount, 'deck', 'pile'.$pile);
+            $this->cards->shuffle('pile'.$pile);
         }
     }
 
@@ -95,27 +96,66 @@ trait UtilTrait {
         }
     }
 
+    function refillPile(int $pile) {
+        $pileCounts = $this->getPileCounts();
+
+        $maxPile = null;
+        $maxPileCount = 0;
+        foreach($pileCounts as $pileId => $count) {
+            if ($count > $maxPileCount) {
+                $maxPile = $pileId;
+                $maxPileCount = $count;
+            }
+        }
+
+        if ($maxPile != null && $maxPileCount > 1) {
+            $cardsToMove = $this->getCardsFromDb($this->cards->getCardsInLocation('pile'.$maxPile, null, 'location_arg'));
+            $cardsIds = array_map(fn($card) => $card->id, $cardsToMove);
+            $cardsIds = array_slice($cardsIds, 0, ceil(count($cardsIds) / 2));
+            $this->cards->moveCards($cardsIds, 'pile'.$pile);
+
+            self::notifyAllPlayers('pileRefill', '', [
+                'pile' => $pile,
+                'pileTop' => $this->getCardFromDb($this->cards->getCardOnTop('pile'.$pile)),
+                'pileCounts' => $this->getPileCounts(),
+                'fromPile' => $maxPile,
+            ]);
+        }
+    }
+
+    function refillMarketSpot(int $pile, int $row, bool $silent) {        
+        if (intval($this->cards->countCardInLocation('market'.$pile, $row)) == 0) {
+            $pileSize = intval($this->cards->countCardInLocation('pile'.$pile));
+
+            if ($pileSize == 0) {
+                $this->refillPile($pile);
+                $pileSize = intval($this->cards->countCardInLocation('pile'.$pile));
+            }
+
+            if ($pileSize > 0) {
+                $card = $this->getCardFromDb($this->cards->pickCardForLocation('pile'.$pile, 'market'.$pile, $row));
+                $card->location = 'market'.$pile;
+                $card->locationArg = $row;
+
+                $this->applyFlipCard(0, $card); 
+
+                if (!$silent) {
+                    self::notifyAllPlayers('marketRefill', '', [
+                        'pile' => $pile,
+                        'card' => $card,
+                        'pileTop' => $this->getCardFromDb($this->cards->getCardOnTop('pile'.$pile)),
+                        'pileCount' => intval($this->cards->countCardInLocation('pile'.$pile)),
+                    ]);
+                }
+
+            }
+        }
+    }
+
     function refillMarket(bool $silent = false) {        
         for ($pile = 1; $pile <= 3; $pile++) {
-            // TODO handle empty piles
-            $pileSize = intval($this->cards->countCardInLocation('pile'.$pile));
-            for ($i = 1; $i <= 2; $i++) {                
-                if ($pileSize > 0 && intval($this->cards->countCardInLocation('market'.$pile, $i)) == 0) {
-                    $card = $this->getCardFromDb($this->cards->pickCardForLocation('pile'.$pile, 'market'.$pile, $i));
-                    $card->location = 'market'.$pile;
-                    $card->locationArg = $i;
-
-                    $this->applyFlipCard(0, $card); 
-
-                    if (!$silent) {
-                        self::notifyAllPlayers('marketRefill', '', [
-                            'pile' => $pile,
-                            'card' => $card,
-                            'pileTop' => $this->getCardFromDb($this->cards->getCardOnTop('pile'.$pile)),
-                            'pileCount' => intval($this->cards->countCardInLocation('pile'.$pile)),
-                        ]);
-                    }
-                }
+            for ($row = 1; $row <= 2; $row++) {    
+                $this->refillMarketSpot($pile, $row, $silent);  
             }
         }
     }
@@ -191,5 +231,19 @@ trait UtilTrait {
 
     function getRemainingCardCountOnTable() {
         return intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` LIKE 'pile%' OR `card_location` LIKE 'market%'"));
+    }
+
+    function getRemainingCardCountOnMarket() {
+        return intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` LIKE 'market%'"));
+    }
+    
+    function getPileCounts() {
+        $pileCount = [];
+
+        for ($pile = 1; $pile <= 3; $pile++) {
+            $pileCount[$pile] = intval($this->cards->countCardInLocation('pile'.$pile));
+        }
+
+        return $pileCount;
     }
 }

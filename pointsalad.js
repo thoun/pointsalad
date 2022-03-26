@@ -21,13 +21,32 @@ function slideToObjectAndAttach(game, object, destinationId) {
         }, 600);
     }
 }
+function slideFromObject(game, object, fromId) {
+    var from = document.getElementById(fromId);
+    var originBR = from.getBoundingClientRect();
+    if (document.visibilityState !== 'hidden' && !game.instantaneousMode) {
+        var destinationBR = object.getBoundingClientRect();
+        var deltaX = destinationBR.left - originBR.left;
+        var deltaY = destinationBR.top - originBR.top;
+        object.style.zIndex = '10';
+        object.style.transform = "translate(".concat(-deltaX, "px, ").concat(-deltaY, "px)");
+        setTimeout(function () {
+            object.style.transition = "transform 0.5s linear";
+            object.style.transform = null;
+        });
+        setTimeout(function () {
+            object.style.zIndex = null;
+            object.style.transition = null;
+        }, 600);
+    }
+}
 function formatTextIcons(rawText) {
     if (!rawText) {
         return '';
     }
     return rawText
         .replace(/\[veggie(\d)\]/ig, function (_, veggie) { return "<div class=\"icon\" data-veggie=\"".concat(veggie, "\"></div>"); })
-        .replace(/\[(\d+)\]/ig, function (_, points) { return "<div class=\"icon points\">".concat(points, "</div>"); });
+        .replace(/\[(\-?\d+)\]/ig, function (_, points) { return "<div class=\"icon points\">".concat(points, "</div>"); });
 }
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 ;
@@ -71,6 +90,11 @@ var TableCenter = /** @class */ (function () {
             _loop_1(pile);
         }
     }
+    TableCenter.prototype.setPileCounts = function (pileCounts) {
+        for (var pile = 1; pile <= 3; pile++) {
+            this.pileCounters[pile].setValue(pileCounts[pile]);
+        }
+    };
     return TableCenter;
 }());
 var CABBAGE = 1;
@@ -80,10 +104,10 @@ var ONION = 4;
 var PEPPER = 5;
 var TOMATO = 6;
 function evenOdd(veggie) {
-    return formatTextIcons("\n        <div class=\"flex\">[veggie".concat(veggie, "]</div>\n        <div class=\"flex\">\n            <span class=\"flex wrap\">").concat(_('Even total'), "<span>\n            <span> = </span>\n            <span>[7]</span>\n        </div>\n        <div class=\"flex\">\n            <span class=\"flex wrap\">").concat(_('Odd total'), "<span>\n            <span> = </span>\n            <span>[3]</span>\n        </div>\n    "));
+    return formatTextIcons("\n        <div class=\"flex\">[veggie".concat(veggie, "]</div>\n        <div class=\"flex\">\n            <span class=\"flex wrap\">").concat(_('Even total'), "</span>\n            <span> = </span>\n            <span>[7]</span>\n        </div>\n        <div class=\"flex\">\n            <span class=\"flex wrap\">").concat(_('Odd total'), "</span>\n            <span> = </span>\n            <span>[3]</span>\n        </div>\n    "));
 }
 function mostLeast(word, veggie) {
-    return formatTextIcons("\n        <div class=\"flex\">\n            <span>".concat(word, " [veggie").concat(veggie, "]</span>\n            <span> = </span>\n            <span>[10]</span>\n        </div>\n    "));
+    return formatTextIcons("\n        <div class=\"flex\">\n            <span class=\"flex wrap\">".concat(word, " [veggie").concat(veggie, "]</span>\n            <span> = </span>\n            <span>[10]</span>\n        </div>\n    "));
 }
 function most(veggie) {
     return mostLeast(_('Most'), veggie);
@@ -274,7 +298,7 @@ CARDS_EFFECTS[PEPPER] = [
 CARDS_EFFECTS[TOMATO] = [
     null,
     // special
-    function () { return formatTextIcons("\n    <div class=\"complete-set-top\">[veggie6][veggie3][veggie2]</div>\n    <div class=\"flex\"><span>[12]</span><span>/</span><span>".concat(_('Complete set'), "</span></div>\n    <div class=\"complete-set-bottom\">[veggie1][veggie5][veggie4]</div>\n    ")); },
+    function () { return formatTextIcons("\n    <div class=\"flex complete-set top\">[veggie6][veggie3][veggie2]</div>\n    <div class=\"flex\"><span>[12]</span><span>/</span><span>".concat(_('Complete set'), "</span></div>\n    <div class=\"flex complete-set bottom\">[veggie1][veggie5][veggie4]</div>\n    ")); },
     // odd/even
     function () { return evenOdd(ONION); },
     // most
@@ -320,6 +344,7 @@ var PointSalad = /** @class */ (function () {
         this.playersTables = [];
         this.selectedCards = [];
         this.veggieCounters = [];
+        this.canTakeOnlyOneVeggie = false;
     }
     /*
         setup:
@@ -362,6 +387,7 @@ var PointSalad = /** @class */ (function () {
     PointSalad.prototype.onEnteringTakeCards = function (args) {
         if (this.isCurrentPlayerActive()) {
             document.getElementById('table').dataset.selectableCards = 'true';
+            this.canTakeOnlyOneVeggie = args.canTakeOnlyOneVeggie;
         }
     };
     PointSalad.prototype.onEnteringFlipCard = function (args) {
@@ -456,10 +482,11 @@ var PointSalad = /** @class */ (function () {
     PointSalad.prototype.getZoom = function () {
         return 1;
     };
-    PointSalad.prototype.createOrMoveCard = function (card, destinationId, init) {
+    PointSalad.prototype.createOrMoveCard = function (card, destinationId, init, from) {
         var _this = this;
         var _a, _b;
         if (init === void 0) { init = false; }
+        if (from === void 0) { from = null; }
         var existingDiv = document.getElementById("card-".concat(card.id));
         if (existingDiv) {
             existingDiv.dataset.side = '' + card.side;
@@ -485,6 +512,10 @@ var PointSalad = /** @class */ (function () {
             if (card.side === 0) {
                 div.innerHTML = "<span>".concat(((_b = (_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index]) === null || _b === void 0 ? void 0 : _b.call(_a)) || '', "</span>");
             }
+            if (from) {
+                var fromCardId = document.getElementById(from).children[0].id;
+                slideFromObject(this, div, fromCardId);
+            }
         }
     };
     PointSalad.prototype.updateVeggieCount = function (playerId, veggieCounts) {
@@ -495,7 +526,7 @@ var PointSalad = /** @class */ (function () {
     PointSalad.prototype.checkSelection = function () {
         var _a, _b;
         var canTakeCards = (this.selectedCards.length === 1 && this.selectedCards[0].side === 0) ||
-            (this.selectedCards.length === 2 && this.selectedCards[0].side === 1); // TODO handle only 1 remaining market card
+            (this.selectedCards.length === (this.canTakeOnlyOneVeggie ? 1 : 2) && this.selectedCards.every(function (card) { return card.side === 1; }));
         (_a = document.getElementById('takeCards_button')) === null || _a === void 0 ? void 0 : _a.classList.toggle('disabled', !canTakeCards);
         (_b = document.getElementById('flipCard_button')) === null || _b === void 0 ? void 0 : _b.classList.toggle('disabled', this.selectedCards.length !== 1);
     };
@@ -560,6 +591,7 @@ var PointSalad = /** @class */ (function () {
             ['takenCards', ANIMATION_MS],
             ['flippedCard', ANIMATION_MS],
             ['marketRefill', ANIMATION_MS],
+            ['pileRefill', ANIMATION_MS],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, "notif_".concat(notif[0]));
@@ -598,8 +630,18 @@ var PointSalad = /** @class */ (function () {
         var card = notif.args.card;
         this.createOrMoveCard(card, "market-row".concat(card.locationArg, "-card").concat(pile));
         var pileTop = notif.args.pileTop;
-        this.createOrMoveCard(pileTop, "pile".concat(pile));
+        if (pileTop) {
+            this.createOrMoveCard(pileTop, "pile".concat(pile));
+        }
         this.tableCenter.pileCounters[pile].setValue(notif.args.pileCount);
+    };
+    PointSalad.prototype.notif_pileRefill = function (notif) {
+        var pile = notif.args.pile;
+        var pileTop = notif.args.pileTop;
+        if (pileTop) {
+            this.createOrMoveCard(pileTop, "pile".concat(pile), false, "pile".concat(notif.args.fromPile));
+        }
+        this.tableCenter.setPileCounts(notif.args.pileCounts);
     };
     /* This enable to inject translatable styled things to logs or action bar */
     /* @Override */

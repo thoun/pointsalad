@@ -15,4 +15,10 @@ class TableCenter {
             this.pileCounters[pile] = pileCounter;
         }
     }
+    
+    public setPileCounts(pileCounts: number[]) {
+        for (let pile = 1; pile <= 3; pile++) {
+            this.pileCounters[pile].setValue(pileCounts[pile]);
+        }
+    }
 }

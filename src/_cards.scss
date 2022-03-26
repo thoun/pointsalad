@@ -68,6 +68,29 @@
             }
             
         }
+
+        .complete-set {
+            position: relative;
+
+            &.top {
+                margin-top: 6px;
+
+                div:nth-child(2) {
+                    position: relative;
+                    top: -6px;
+                }    
+            }
+
+            &.bottom {
+                margin-bottom: 6px;
+
+                div:nth-child(2) {
+                    position: relative;
+                    top: 6px;
+                }    
+            }
+
+        }
     } 
     &[data-side="1"] {
         background-image: url('img/veggie-side.jpg');

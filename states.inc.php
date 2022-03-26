@@ -81,6 +81,7 @@ $playerActionsGameStates = [
         "description" => clienttranslate('${actplayer} must take one point card or two veggie cards'),
         "descriptionmyturn" => clienttranslate('${you} must take one point card or two veggie cards'),
         "type" => "activeplayer",
+        "args" => "argTakeCards",
         "possibleactions" => [ 
             "takeCards",
         ],
@@ -95,7 +96,6 @@ $playerActionsGameStates = [
         "description" => clienttranslate('${actplayer} can flip a point card'),
         "descriptionmyturn" => clienttranslate('${you} can flip a point card'),
         "type" => "activeplayer",
-        "args" => "argFlipCard",
         "possibleactions" => [ 
             "flipCard",
             "skipFlipCard",

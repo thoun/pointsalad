@@ -19,14 +19,18 @@ trait ActionTrait {
         $cards = $this->getCardsFromDb($this->cards->getCards($ids));
 
         $tookVeggie = false;
-        if (count($cards) === 2) { // TODO handle one remaining veggie case
+        if (count($cards) === 2) {
             if ($this->array_some($cards, fn($card) => strpos($card->location, 'market') !== 0)) { // str_starts_with is PHP8+, using strpos( $haystack , $needle ) === 0 instead
                 throw new BgaUserException("If you take two cards, it must be from the market");
             }
             $tookVeggie = true;
         } else if (count($cards) === 1) {
             if (strpos($cards[0]->location, 'pile') !== 0) { // str_starts_with is PHP8+, using strpos( $haystack , $needle ) === 0 instead
-                throw new BgaUserException("If you take one card, it must be from a pile");
+                if ($this->getRemainingCardCountOnMarket() === 1 && strpos($cards[0]->location, 'market') !== 0) { // in case only 1 veggie remains
+                    $tookVeggie = true;
+                } else {
+                    throw new BgaUserException("If you take one card, it must be from a pile");
+                }
             }
         } else {
             throw new BgaUserException("You must take one or two card(s)");
@@ -34,7 +38,7 @@ trait ActionTrait {
 
         $this->cards->moveCards($ids, 'player', $playerId);
 
-        $message = $tookVeggie ? clienttranslate('${player_name} took veggies ${veggies}') // TODO add icon
+        $message = $tookVeggie ? clienttranslate('${player_name} took veggies ${veggies}')
                                : clienttranslate('${player_name} took a point card');
         
         self::notifyAllPlayers('takenCards', $message, [

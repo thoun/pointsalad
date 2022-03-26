@@ -4,5 +4,5 @@ function formatTextIcons(rawText: string) {
     }
     return rawText
         .replace(/\[veggie(\d)\]/ig, (_, veggie) => `<div class="icon" data-veggie="${veggie}"></div>`)
-        .replace(/\[(\d+)\]/ig, (_, points) => `<div class="icon points">${points}</div>`)
+        .replace(/\[(\-?\d+)\]/ig, (_, points) => `<div class="icon points">${points}</div>`)
 }

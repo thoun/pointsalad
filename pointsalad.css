@@ -128,6 +128,23 @@
 .card[data-side="0"] .multiple-set [data-index="1"]:last-of-type {
   margin-right: -10px;
 }
+.card[data-side="0"] .complete-set {
+  position: relative;
+}
+.card[data-side="0"] .complete-set.top {
+  margin-top: 6px;
+}
+.card[data-side="0"] .complete-set.top div:nth-child(2) {
+  position: relative;
+  top: -6px;
+}
+.card[data-side="0"] .complete-set.bottom {
+  margin-bottom: 6px;
+}
+.card[data-side="0"] .complete-set.bottom div:nth-child(2) {
+  position: relative;
+  top: 6px;
+}
 .card[data-side="1"] {
   background-image: url("img/veggie-side.jpg");
 }

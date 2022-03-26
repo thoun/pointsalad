@@ -128,11 +128,10 @@ class PointSalad extends Table {
         }
         
         $pileTopCard = [];
-        $pileCount = [];
+        $pileCount = $this->getPileCounts();
         $market = [];
         for ($pile = 1; $pile <= 3; $pile++) {
             $pileTopCard[$pile] = $this->getCardFromDb($this->cards->getCardOnTop('pile'.$pile));
-            $pileCount[$pile] = intval($this->cards->countCardInLocation('pile'.$pile));
             $market[$pile] = $this->getCardsFromDb($this->cards->getCardsInLocation('market'.$pile));
         }
 

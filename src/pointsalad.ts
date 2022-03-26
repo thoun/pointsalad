@@ -15,6 +15,7 @@ class PointSalad implements PointSaladGame {
     private playersTables: PlayerTable[] = [];
     private selectedCards: Card[] = [];
     private veggieCounters: Counter[][] = [];
+    private canTakeOnlyOneVeggie: boolean = false;
 
     constructor() {
     }
@@ -69,6 +70,7 @@ class PointSalad implements PointSaladGame {
     private onEnteringTakeCards(args: EnteringTakeCardsArgs) {
         if ((this as any).isCurrentPlayerActive()) {
             document.getElementById('table').dataset.selectableCards = 'true';
+            this.canTakeOnlyOneVeggie = args.canTakeOnlyOneVeggie;
         }
     }
     
@@ -189,7 +191,7 @@ class PointSalad implements PointSaladGame {
         return 1;
     }
 
-    public createOrMoveCard(card: Card, destinationId: string, init: boolean = false) {
+    public createOrMoveCard(card: Card, destinationId: string, init: boolean = false, from: string = null) {
         const existingDiv = document.getElementById(`card-${card.id}`);
         if (existingDiv) {
             existingDiv.dataset.side = ''+card.side;
@@ -213,6 +215,11 @@ class PointSalad implements PointSaladGame {
             if (card.side === 0) {
                 div.innerHTML = `<span>${CARDS_EFFECTS[card.veggie]?.[card.index]?.() || ''}</span>`;
             }
+
+            if (from) {
+                const fromCardId = document.getElementById(from).children[0].id;
+                slideFromObject(this, div, fromCardId);
+            }
         }
     }
 
@@ -225,7 +232,7 @@ class PointSalad implements PointSaladGame {
     private checkSelection() {
         const canTakeCards = 
             (this.selectedCards.length === 1 && this.selectedCards[0].side === 0) ||
-            (this.selectedCards.length === 2 && this.selectedCards[0].side === 1); // TODO handle only 1 remaining market card
+            (this.selectedCards.length === (this.canTakeOnlyOneVeggie ? 1 : 2) && this.selectedCards.every(card => card.side === 1));
         document.getElementById('takeCards_button')?.classList.toggle('disabled', !canTakeCards);
         document.getElementById('flipCard_button')?.classList.toggle('disabled', this.selectedCards.length !== 1);
     }
@@ -303,6 +310,7 @@ class PointSalad implements PointSaladGame {
             ['takenCards', ANIMATION_MS],
             ['flippedCard', ANIMATION_MS],
             ['marketRefill', ANIMATION_MS],
+            ['pileRefill', ANIMATION_MS],
         ];
     
         notifs.forEach((notif) => {
@@ -345,8 +353,19 @@ class PointSalad implements PointSaladGame {
         const card = notif.args.card;
         this.createOrMoveCard(card, `market-row${card.locationArg}-card${pile}`);
         const pileTop = notif.args.pileTop;
-        this.createOrMoveCard(pileTop, `pile${pile}`);
+        if (pileTop) {
+            this.createOrMoveCard(pileTop, `pile${pile}`);
+        }
         this.tableCenter.pileCounters[pile].setValue(notif.args.pileCount);
+    }
+
+    notif_pileRefill(notif: Notif<NotifPileRefillArgs>) {
+        const pile = notif.args.pile;
+        const pileTop = notif.args.pileTop;
+        if (pileTop) {
+            this.createOrMoveCard(pileTop, `pile${pile}`, false, `pile${notif.args.fromPile}`);
+        }
+        this.tableCenter.setPileCounts(notif.args.pileCounts);
     }
 
     /* This enable to inject translatable styled things to logs or action bar */

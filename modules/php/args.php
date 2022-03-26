@@ -11,10 +11,12 @@ trait ArgsTrait {
         These methods function is to return some additional information that is specific to the current
         game state.
     */
-   
-    function argFlipCard() {    
+
+    function argTakeCards() {
+        $canTakeOnlyOneVeggie = $this->getRemainingCardCountOnMarket() === 1;
+
         return [
-            // TODO
+            'canTakeOnlyOneVeggie' => $canTakeOnlyOneVeggie,
         ];
     }
     
