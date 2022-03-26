@@ -152,11 +152,7 @@
   height: 24px;
 }
 .card .card-sides .card-side.front .icon.points {
-  color: white;
-  text-shadow: 2px 2px 1px #6d9d31;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
+  text-shadow: 1px 1px 1px #6d9d31;
   font-size: 90%;
 }
 .card .card-sides .card-side.front .multiple-set {
@@ -196,7 +192,28 @@
   background-image: url("img/veggie-side.jpg");
   transform: rotateX(180deg);
 }
+.card .final-score {
+  position: absolute;
+  top: -19px;
+  left: 34px;
+  box-shadow: 0 0 5px 2px white;
+  border-radius: 50%;
+  background-color: white;
+  animation: card-final-score-animation 1s 1 forwards ease-in-out;
+  transform-origin: center center;
+}
 
+@keyframes card-final-score-animation {
+  0% {
+    transform: scale(0);
+  }
+  66% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 [data-selectable-cards=true] .card {
   cursor: pointer;
 }
@@ -268,6 +285,11 @@ html, .mode_3d #game_play_area_background {
   vertical-align: middle;
   background-image: url("img/icons.png");
   background-size: auto 100%;
+  color: white;
+  text-shadow: 2px 2px 1px #6d9d31;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 .icon.points {
   background-position-x: 0;

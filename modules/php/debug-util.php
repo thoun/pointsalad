@@ -16,7 +16,7 @@ trait DebugUtilTrait {
         $this->cards->pickCardsForLocation(9, 'pile2', 'discard');
         $this->cards->moveAllCardsInLocation('pile3', 'discard');
 
-        //$this->cards->pickCardsForLocation(9, 'veggie6', 'player', 2343492);
+        $this->cards->pickCardsForLocation(3, 'veggie6', 'player', 2343492);
 
         //$cards = $this->getCardsFromDb($this->cards->pickCardsForLocation(9, 'pile1', 'player', 2343492));
 

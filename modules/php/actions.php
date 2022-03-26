@@ -68,9 +68,6 @@ trait ActionTrait {
             self::incStat($cardsCount, 'pointsFromMarket', $playerId);
         }
 
-        //self::incStat(1, 'placedRoutes');
-        //self::incStat(1, 'placedRoutes', $playerId);*/
-
         $this->updateScore($playerId);
 
         $hasPointCard = intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` = 'player' AND `card_location_arg` = $playerId AND `card_type_arg` = 0")) > 0;

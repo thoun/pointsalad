@@ -117,7 +117,7 @@ function least(veggie) {
     return mostLeast(_('Least'), veggie);
 }
 function sets(sets) {
-    return formatTextIcons("\n        <div>\n        ".concat(sets.map(function (set) { return "<div>[".concat(set[0], "] / [veggie").concat(set[1], "]</div>"); }).join(''), "\n        </div>\n    "));
+    return formatTextIcons(sets.map(function (set) { return "<div>[".concat(set[0], "] / [veggie").concat(set[1], "]</div>"); }).join(''));
 }
 function pairSet(veggies) {
     return formatTextIcons("\n    <div class=\"multiple-set\">\n        ".concat(veggies.map(function (veggie, index) { return "<span data-index=\"".concat(index, "\">[veggie").concat(veggie, "]</span>"); }).join('<span class="plus">+</span>'), "\n         = [5]</div>\n    "));
@@ -360,12 +360,16 @@ var PointSalad = /** @class */ (function () {
         "gamedatas" argument contains all datas retrieved by your "getAllDatas" PHP method.
     */
     PointSalad.prototype.setup = function (gamedatas) {
+        var _this = this;
         log("Starting game setup");
         this.gamedatas = gamedatas;
         log('gamedatas', gamedatas);
         this.createPlayerPanels(gamedatas);
         this.tableCenter = new TableCenter(this, gamedatas);
         this.createPlayerTables(gamedatas);
+        if (gamedatas.cardScores) {
+            Object.keys(gamedatas.cardScores).forEach(function (key) { return _this.setCardScore(Number(key), gamedatas.cardScores[key]); });
+        }
         this.setupNotifications();
         log("Ending game setup");
     };
@@ -505,7 +509,7 @@ var PointSalad = /** @class */ (function () {
             div.dataset.side = '' + card.side;
             div.dataset.veggie = '' + card.veggie;
             div.dataset.index = '' + card.index;
-            div.innerHTML = "\n                <div class=\"card-sides\">\n                    <div class=\"card-side front\">\n                        ".concat(((_b = (_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index]) === null || _b === void 0 ? void 0 : _b.call(_a)) || '', "</span>\n                    </div>\n                    <div class=\"card-side back\"></div>\n                </div>\n            ");
+            div.innerHTML = "\n                <div class=\"card-sides\">\n                    <div class=\"card-side front\">\n                        <div>".concat(((_b = (_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index]) === null || _b === void 0 ? void 0 : _b.call(_a)) || '', "</div>\n                    </div>\n                    <div class=\"card-side back\"></div>\n                </div>\n            ");
             document.getElementById(destinationId).appendChild(div);
             div.addEventListener('click', function () { return _this.onCardClick(card); });
             if (from) {
@@ -522,6 +526,9 @@ var PointSalad = /** @class */ (function () {
     PointSalad.prototype.getSide = function (cardId) {
         var div = document.getElementById("card-".concat(cardId));
         return Number(div.dataset.side);
+    };
+    PointSalad.prototype.setCardScore = function (cardId, cardScore) {
+        dojo.place(formatTextIcons("<div class=\"final-score\">[".concat(cardScore, "]</div>")), "card-".concat(cardId));
     };
     PointSalad.prototype.checkSelection = function () {
         var _this = this;
@@ -593,6 +600,7 @@ var PointSalad = /** @class */ (function () {
             ['flippedCard', ANIMATION_MS],
             ['marketRefill', ANIMATION_MS],
             ['pileRefill', ANIMATION_MS],
+            ['cardScore', 1000],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, "notif_".concat(notif[0]));
@@ -643,6 +651,9 @@ var PointSalad = /** @class */ (function () {
             this.createOrMoveCard(pileTop, "pile".concat(pile), false, "pile".concat(notif.args.fromPile));
         }
         this.tableCenter.setPileCounts(notif.args.pileCounts);
+    };
+    PointSalad.prototype.notif_cardScore = function (notif) {
+        this.setCardScore(notif.args.card.id, notif.args.cardScore);
     };
     /* This enable to inject translatable styled things to logs or action bar */
     /* @Override */

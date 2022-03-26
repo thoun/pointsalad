@@ -104,7 +104,7 @@ class PointSalad extends Table {
         $this->activeNextPlayer();
 
         // TODO TEMP to test
-        $this->debugSetup();
+        //$this->debugSetup();
 
         /************ End of the game initialization *****/
     }
@@ -144,6 +144,23 @@ class PointSalad extends Table {
         $result['pileTopCard'] = $pileTopCard;
         $result['pileCount'] = $pileCount;
         $result['market'] = $market;
+        
+        if (intval($this->gamestate->state_id()) >= ST_END_SCORE) {
+            $cardScores = [];
+
+            foreach ($result['players'] as $playerId => $playerDb) {
+                $cards = $playerDb['cards'];
+                $pointCards = array_values(array_filter($cards, fn($card) => $card->side === 0));
+                $veggieCards = array_values(array_filter($cards, fn($card) => $card->side === 1));
+                $veggieCounts = $this->getVeggieCounts($veggieCards);
+                
+                foreach ($pointCards as $pointCard) {
+                    $cardScores[$pointCard->id] = $this->getScore($playerId, $pointCard, $veggieCounts);
+                }
+            }
+
+            $result['cardScores'] = $cardScores;
+        }
   
         return $result;
     }

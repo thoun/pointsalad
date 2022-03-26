@@ -208,15 +208,8 @@ trait UtilTrait {
     function updateScore(int $playerId) {
         $cards = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $playerId));
 
-        $pointCards = [];
-        $veggieCards = [];
-        foreach ($cards as $card) {
-            if ($card->side === 1) {
-                $veggieCards[] = $card;
-            } else {
-                $pointCards[] = $card;
-            }
-        }
+        $pointCards = array_values(array_filter($cards, fn($card) => $card->side === 0));
+        $veggieCards = array_values(array_filter($cards, fn($card) => $card->side === 1));
 
         $veggieCounts = $this->getVeggieCounts($veggieCards);
         $score = 0;

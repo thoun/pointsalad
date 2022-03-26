@@ -35,6 +35,8 @@ interface PointSaladGamedatas {
     pileTopCard: { [pile: number]: Card };
     pileCount: { [pile: number]: number };
     market: { [pile: number]: Card[] };
+
+    cardScores?: { [cardId: number]: number };
 }
 
 interface PointSaladGame extends Game {
@@ -82,4 +84,10 @@ interface NotifPileRefillArgs {
     pileTop: Card | null;
     pileCounts: number[];
     fromPile: number;
+}
+
+interface NotifCardScoreArgs {
+    playerId: number;
+    card: Card;
+    cardScore: number;
 }

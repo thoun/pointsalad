@@ -53,6 +53,25 @@ trait StateTrait {
             $this->DbQuery("UPDATE `player` SET `player_score_aux` = $scoreAux WHERE `player_id` = $player->id"); 
         }
     }
+    
+    function notifIndividualCardScores(array $players) {
+        foreach ($players as $player) {
+            $cards = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $player->id));
+            $pointCards = array_values(array_filter($cards, fn($card) => $card->side === 0));
+            $veggieCards = array_values(array_filter($cards, fn($card) => $card->side === 1));
+            $veggieCounts = $this->getVeggieCounts($veggieCards);
+            
+            foreach ($pointCards as $pointCard) {
+                $cardScore = $this->getScore($player->id, $pointCard, $veggieCounts);
+
+                $this->notifyAllPlayers('cardScore', '', [
+                    'playerId' => $player->id,
+                    'card' => $pointCard,
+                    'cardScore' => $cardScore,
+                ]);
+            }
+        }
+    }
 
     function setEndStats(array $players) {
         $tableTotalPointCards = 0;
@@ -86,7 +105,8 @@ trait StateTrait {
         // update player_score_aux
         $this->setScoreAux($players);
 
-        // TODO notif individualCardScore
+        // notif individual card score
+        $this->notifIndividualCardScores($players);
 
         // end stats        
         $this->setEndStats($players);

@@ -44,6 +44,10 @@ class PointSalad implements PointSaladGame {
         this.tableCenter = new TableCenter(this, gamedatas);
         this.createPlayerTables(gamedatas);
 
+        if (gamedatas.cardScores) {
+            Object.keys(gamedatas.cardScores).forEach(key => this.setCardScore(Number(key), gamedatas.cardScores[key]))
+        }
+
         this.setupNotifications();
 
         log( "Ending game setup" );
@@ -210,7 +214,7 @@ class PointSalad implements PointSaladGame {
             div.innerHTML = `
                 <div class="card-sides">
                     <div class="card-side front">
-                        ${CARDS_EFFECTS[card.veggie]?.[card.index]?.() || ''}</span>
+                        <div>${CARDS_EFFECTS[card.veggie]?.[card.index]?.() || ''}</div>
                     </div>
                     <div class="card-side back"></div>
                 </div>
@@ -234,6 +238,10 @@ class PointSalad implements PointSaladGame {
     private getSide(cardId: number): number {        
         const div = document.getElementById(`card-${cardId}`);
         return Number(div.dataset.side);
+    }
+
+    private setCardScore(cardId: number, cardScore: number) {
+        dojo.place(formatTextIcons(`<div class="final-score">[${cardScore}]</div>`), `card-${cardId}`);
     }
 
     private checkSelection() {
@@ -318,6 +326,7 @@ class PointSalad implements PointSaladGame {
             ['flippedCard', ANIMATION_MS],
             ['marketRefill', ANIMATION_MS],
             ['pileRefill', ANIMATION_MS],
+            ['cardScore', 1000],
         ];
     
         notifs.forEach((notif) => {
@@ -373,6 +382,10 @@ class PointSalad implements PointSaladGame {
             this.createOrMoveCard(pileTop, `pile${pile}`, false, `pile${notif.args.fromPile}`);
         }
         this.tableCenter.setPileCounts(notif.args.pileCounts);
+    }
+
+    notif_cardScore(notif: Notif<NotifCardScoreArgs>) {
+        this.setCardScore(notif.args.card.id, notif.args.cardScore);
     }
 
     /* This enable to inject translatable styled things to logs or action bar */
