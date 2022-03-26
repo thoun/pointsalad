@@ -194,15 +194,12 @@ class PointSalad implements PointSaladGame {
     public createOrMoveCard(card: Card, destinationId: string, init: boolean = false, from: string = null) {
         const existingDiv = document.getElementById(`card-${card.id}`);
         if (existingDiv) {
-            existingDiv.dataset.side = ''+card.side;
-            if (card.side === 1) {
-                existingDiv.innerHTML = '';
-            }
             if (init) {
                 document.getElementById(destinationId).appendChild(existingDiv);
             } else {
                 slideToObjectAndAttach(this, existingDiv, destinationId);
             }
+            existingDiv.dataset.side = ''+card.side;
         } else {
             const div = document.createElement('div');
             div.id = `card-${card.id}`;
@@ -210,11 +207,16 @@ class PointSalad implements PointSaladGame {
             div.dataset.side = ''+card.side;
             div.dataset.veggie = ''+card.veggie;
             div.dataset.index = ''+card.index;
+            div.innerHTML = `
+                <div class="card-sides">
+                    <div class="card-side front">
+                        ${CARDS_EFFECTS[card.veggie]?.[card.index]?.() || ''}</span>
+                    </div>
+                    <div class="card-side back"></div>
+                </div>
+            `;
             document.getElementById(destinationId).appendChild(div);
             div.addEventListener('click', () => this.onCardClick(card));
-            if (card.side === 0) {
-                div.innerHTML = `<span>${CARDS_EFFECTS[card.veggie]?.[card.index]?.() || ''}</span>`;
-            }
 
             if (from) {
                 const fromCardId = document.getElementById(from).children[0].id;

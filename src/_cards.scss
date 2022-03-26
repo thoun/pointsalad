@@ -1,104 +1,142 @@
 .card {
-    border-radius: 10px;
-    box-shadow: 1px 1px 2px 1px rgba(0,0,0,0.5);
+    position: relative;
     width: 100px;
     height: 140px;
     margin: 5px;
-    text-transform: uppercase;
-
-    &[data-side="0"] {
-        color: #8dc63f;
-        text-shadow: -1px 1px 1px white;
-        font-weight: bold;
-        font-size: 80%;
-        background-image: url('img/point-side.jpg');
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 10px;
-        box-sizing: border-box;
-
-        .flex {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            &.wrap {
-                flex-wrap: wrap;
-            }
-        }
-
-        @for $i from 1 through 18 {
-            &[data-index="#{$i}"] {
-              background-position-x: #{($i - 1) * 100% / 17};
-            }
-        }
-
-        .icon {
-            width: 24px;
-            height: 24px;
-
-            &.points {
-                color: white;
-                text-shadow: 2px 2px 1px #6d9d31;
-                display: inline-flex;
-                justify-content: center;
-                align-items: center;
-                font-size: 90%;
-            }
-        }
-
-        .multiple-set {
-            position: relative;
-            margin-top: 12px;
-
-            .plus {
-                position: relative;
-                top: -8px;
-                margin: -2px;
-            }
-
-            [data-index="1"] {
-                position: relative;
-                top: -18px;
-                
-                &:last-of-type {
-                    margin-right: -10px;
-                }
-            }
-            
-        }
-
-        .complete-set {
-            position: relative;
-
-            &.top {
-                margin-top: 6px;
-
-                div:nth-child(2) {
-                    position: relative;
-                    top: -6px;
-                }    
-            }
-
-            &.bottom {
-                margin-bottom: 6px;
-
-                div:nth-child(2) {
-                    position: relative;
-                    top: 6px;
-                }    
-            }
-
-        }
-    } 
-    &[data-side="1"] {
-        background-image: url('img/veggie-side.jpg');
-    }
+    border-radius: 10px;
 
     @for $i from 1 through 6 {
         &[data-veggie="#{$i}"] {
-          background-position-y: #{($i - 1) * 20%};
+            .card-side {
+                background-position-y: #{($i - 1) * 20%};
+            }
+        }
+    }
+
+    &[data-side="1"] {
+        .card-sides { 
+            transform: rotateX(180deg);
+        }
+    }
+
+    .card-sides {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transform-style: preserve-3d;
+        transition: transform 0.5s;
+
+        .card-side {
+            border-radius: 10px;
+            box-shadow: 1px 1px 2px 1px rgba(0,0,0,0.5);
+            text-transform: uppercase;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transform-style: preserve-3d;      
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+
+            &.front {
+                color: #8dc63f;
+                text-shadow: -1px 1px 1px white;
+                font-weight: bold;
+                font-size: 80%;
+                background-image: url('img/point-side.jpg');
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 10px;
+                box-sizing: border-box;
+
+                &>* {
+                    pointer-events: none;
+                    user-select: none;
+                }
+
+                .flex {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+
+                    &.wrap {
+                        flex-wrap: wrap;
+                    }
+                }
+
+                @for $i from 1 through 18 {
+                    &[data-index="#{$i}"] {
+                    background-position-x: #{($i - 1) * 100% / 17};
+                    }
+                }
+
+                .icon {
+                    width: 24px;
+                    height: 24px;
+
+                    &.points {
+                        color: white;
+                        text-shadow: 2px 2px 1px #6d9d31;
+                        display: inline-flex;
+                        justify-content: center;
+                        align-items: center;
+                        font-size: 90%;
+                    }
+                }
+
+                .multiple-set {
+                    position: relative;
+                    margin-top: 12px;
+
+                    .plus {
+                        position: relative;
+                        top: -8px;
+                        margin: -2px;
+                    }
+
+                    [data-index="1"] {
+                        position: relative;
+                        top: -18px;
+                        
+                        &:last-of-type {
+                            margin-right: -10px;
+                        }
+                    }
+                    
+                }
+
+                .complete-set {
+                    position: relative;
+
+                    &.top {
+                        margin-top: 6px;
+
+                        div:nth-child(2) {
+                            position: relative;
+                            top: -6px;
+                        }    
+                    }
+
+                    &.bottom {
+                        margin-bottom: 6px;
+
+                        div:nth-child(2) {
+                            position: relative;
+                            top: 6px;
+                        }    
+                    }
+
+                }
+            } 
+            
+            &.back {
+                background-image: url('img/veggie-side.jpg');
+                transform: rotateX(180deg);
+            }
         }
     }
 }
@@ -109,6 +147,10 @@
 
         &.selected {
             box-shadow: 0 0 8px 8px white;
+
+            .card-side {
+                box-shadow: unset;
+            }
         }
     }
 }

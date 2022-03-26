@@ -38,7 +38,11 @@ function least(veggie: number): string {
 }
 
 function sets(sets: number[][]) {
-    return formatTextIcons(sets.map(set => `<div>[${set[0]}] / [veggie${set[1]}]</div>`).join(''));
+    return formatTextIcons(`
+        <div>
+        ${sets.map(set => `<div>[${set[0]}] / [veggie${set[1]}]</div>`).join('')}
+        </div>
+    `);
 }
 
 function pairSet(veggies: number[]) {

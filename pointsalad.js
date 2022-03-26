@@ -1,4 +1,5 @@
-function slideToObjectAndAttach(game, object, destinationId) {
+function slideToObjectAndAttach(game, object, destinationId, changeSide) {
+    if (changeSide === void 0) { changeSide = false; }
     var destination = document.getElementById(destinationId);
     if (destination.contains(object)) {
         return;
@@ -116,7 +117,7 @@ function least(veggie) {
     return mostLeast(_('Least'), veggie);
 }
 function sets(sets) {
-    return formatTextIcons(sets.map(function (set) { return "<div>[".concat(set[0], "] / [veggie").concat(set[1], "]</div>"); }).join(''));
+    return formatTextIcons("\n        <div>\n        ".concat(sets.map(function (set) { return "<div>[".concat(set[0], "] / [veggie").concat(set[1], "]</div>"); }).join(''), "\n        </div>\n    "));
 }
 function pairSet(veggies) {
     return formatTextIcons("\n    <div class=\"multiple-set\">\n        ".concat(veggies.map(function (veggie, index) { return "<span data-index=\"".concat(index, "\">[veggie").concat(veggie, "]</span>"); }).join('<span class="plus">+</span>'), "\n         = [5]</div>\n    "));
@@ -489,16 +490,13 @@ var PointSalad = /** @class */ (function () {
         if (from === void 0) { from = null; }
         var existingDiv = document.getElementById("card-".concat(card.id));
         if (existingDiv) {
-            existingDiv.dataset.side = '' + card.side;
-            if (card.side === 1) {
-                existingDiv.innerHTML = '';
-            }
             if (init) {
                 document.getElementById(destinationId).appendChild(existingDiv);
             }
             else {
                 slideToObjectAndAttach(this, existingDiv, destinationId);
             }
+            existingDiv.dataset.side = '' + card.side;
         }
         else {
             var div = document.createElement('div');
@@ -507,11 +505,9 @@ var PointSalad = /** @class */ (function () {
             div.dataset.side = '' + card.side;
             div.dataset.veggie = '' + card.veggie;
             div.dataset.index = '' + card.index;
+            div.innerHTML = "\n                <div class=\"card-sides\">\n                    <div class=\"card-side front\">\n                        ".concat(((_b = (_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index]) === null || _b === void 0 ? void 0 : _b.call(_a)) || '', "</span>\n                    </div>\n                    <div class=\"card-side back\"></div>\n                </div>\n            ");
             document.getElementById(destinationId).appendChild(div);
             div.addEventListener('click', function () { return _this.onCardClick(card); });
-            if (card.side === 0) {
-                div.innerHTML = "<span>".concat(((_b = (_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index]) === null || _b === void 0 ? void 0 : _b.call(_a)) || '', "</span>");
-            }
             if (from) {
                 var fromCardId = document.getElementById(from).children[0].id;
                 slideFromObject(this, div, fromCardId);

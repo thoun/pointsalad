@@ -19,14 +19,57 @@
 }
 
 .card {
-  border-radius: 10px;
-  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.5);
+  position: relative;
   width: 100px;
   height: 140px;
   margin: 5px;
-  text-transform: uppercase;
+  border-radius: 10px;
 }
-.card[data-side="0"] {
+.card[data-veggie="1"] .card-side {
+  background-position-y: 0%;
+}
+.card[data-veggie="2"] .card-side {
+  background-position-y: 20%;
+}
+.card[data-veggie="3"] .card-side {
+  background-position-y: 40%;
+}
+.card[data-veggie="4"] .card-side {
+  background-position-y: 60%;
+}
+.card[data-veggie="5"] .card-side {
+  background-position-y: 80%;
+}
+.card[data-veggie="6"] .card-side {
+  background-position-y: 100%;
+}
+.card[data-side="1"] .card-sides {
+  transform: rotateX(180deg);
+}
+.card .card-sides {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+}
+.card .card-sides .card-side {
+  border-radius: 10px;
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform-style: preserve-3d;
+  -webkit-backface-visibility: hidden;
+  /* Safari */
+  backface-visibility: hidden;
+}
+.card .card-sides .card-side.front {
   color: #8dc63f;
   text-shadow: -1px 1px 1px white;
   font-weight: bold;
@@ -38,73 +81,77 @@
   padding: 10px;
   box-sizing: border-box;
 }
-.card[data-side="0"] .flex {
+.card .card-sides .card-side.front > * {
+  pointer-events: none;
+  user-select: none;
+}
+.card .card-sides .card-side.front .flex {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.card[data-side="0"] .flex.wrap {
+.card .card-sides .card-side.front .flex.wrap {
   flex-wrap: wrap;
 }
-.card[data-side="0"][data-index="1"] {
+.card .card-sides .card-side.front[data-index="1"] {
   background-position-x: 0%;
 }
-.card[data-side="0"][data-index="2"] {
+.card .card-sides .card-side.front[data-index="2"] {
   background-position-x: 5.8823529412%;
 }
-.card[data-side="0"][data-index="3"] {
+.card .card-sides .card-side.front[data-index="3"] {
   background-position-x: 11.7647058824%;
 }
-.card[data-side="0"][data-index="4"] {
+.card .card-sides .card-side.front[data-index="4"] {
   background-position-x: 17.6470588235%;
 }
-.card[data-side="0"][data-index="5"] {
+.card .card-sides .card-side.front[data-index="5"] {
   background-position-x: 23.5294117647%;
 }
-.card[data-side="0"][data-index="6"] {
+.card .card-sides .card-side.front[data-index="6"] {
   background-position-x: 29.4117647059%;
 }
-.card[data-side="0"][data-index="7"] {
+.card .card-sides .card-side.front[data-index="7"] {
   background-position-x: 35.2941176471%;
 }
-.card[data-side="0"][data-index="8"] {
+.card .card-sides .card-side.front[data-index="8"] {
   background-position-x: 41.1764705882%;
 }
-.card[data-side="0"][data-index="9"] {
+.card .card-sides .card-side.front[data-index="9"] {
   background-position-x: 47.0588235294%;
 }
-.card[data-side="0"][data-index="10"] {
+.card .card-sides .card-side.front[data-index="10"] {
   background-position-x: 52.9411764706%;
 }
-.card[data-side="0"][data-index="11"] {
+.card .card-sides .card-side.front[data-index="11"] {
   background-position-x: 58.8235294118%;
 }
-.card[data-side="0"][data-index="12"] {
+.card .card-sides .card-side.front[data-index="12"] {
   background-position-x: 64.7058823529%;
 }
-.card[data-side="0"][data-index="13"] {
+.card .card-sides .card-side.front[data-index="13"] {
   background-position-x: 70.5882352941%;
 }
-.card[data-side="0"][data-index="14"] {
+.card .card-sides .card-side.front[data-index="14"] {
   background-position-x: 76.4705882353%;
 }
-.card[data-side="0"][data-index="15"] {
+.card .card-sides .card-side.front[data-index="15"] {
   background-position-x: 82.3529411765%;
 }
-.card[data-side="0"][data-index="16"] {
+.card .card-sides .card-side.front[data-index="16"] {
   background-position-x: 88.2352941176%;
 }
-.card[data-side="0"][data-index="17"] {
+.card .card-sides .card-side.front[data-index="17"] {
   background-position-x: 94.1176470588%;
 }
-.card[data-side="0"][data-index="18"] {
+.card .card-sides .card-side.front[data-index="18"] {
   background-position-x: 100%;
 }
-.card[data-side="0"] .icon {
+.card .card-sides .card-side.front .icon {
   width: 24px;
   height: 24px;
 }
-.card[data-side="0"] .icon.points {
+.card .card-sides .card-side.front .icon.points {
   color: white;
   text-shadow: 2px 2px 1px #6d9d31;
   display: inline-flex;
@@ -112,59 +159,42 @@
   align-items: center;
   font-size: 90%;
 }
-.card[data-side="0"] .multiple-set {
+.card .card-sides .card-side.front .multiple-set {
   position: relative;
   margin-top: 12px;
 }
-.card[data-side="0"] .multiple-set .plus {
+.card .card-sides .card-side.front .multiple-set .plus {
   position: relative;
   top: -8px;
   margin: -2px;
 }
-.card[data-side="0"] .multiple-set [data-index="1"] {
+.card .card-sides .card-side.front .multiple-set [data-index="1"] {
   position: relative;
   top: -18px;
 }
-.card[data-side="0"] .multiple-set [data-index="1"]:last-of-type {
+.card .card-sides .card-side.front .multiple-set [data-index="1"]:last-of-type {
   margin-right: -10px;
 }
-.card[data-side="0"] .complete-set {
+.card .card-sides .card-side.front .complete-set {
   position: relative;
 }
-.card[data-side="0"] .complete-set.top {
+.card .card-sides .card-side.front .complete-set.top {
   margin-top: 6px;
 }
-.card[data-side="0"] .complete-set.top div:nth-child(2) {
+.card .card-sides .card-side.front .complete-set.top div:nth-child(2) {
   position: relative;
   top: -6px;
 }
-.card[data-side="0"] .complete-set.bottom {
+.card .card-sides .card-side.front .complete-set.bottom {
   margin-bottom: 6px;
 }
-.card[data-side="0"] .complete-set.bottom div:nth-child(2) {
+.card .card-sides .card-side.front .complete-set.bottom div:nth-child(2) {
   position: relative;
   top: 6px;
 }
-.card[data-side="1"] {
+.card .card-sides .card-side.back {
   background-image: url("img/veggie-side.jpg");
-}
-.card[data-veggie="1"] {
-  background-position-y: 0%;
-}
-.card[data-veggie="2"] {
-  background-position-y: 20%;
-}
-.card[data-veggie="3"] {
-  background-position-y: 40%;
-}
-.card[data-veggie="4"] {
-  background-position-y: 60%;
-}
-.card[data-veggie="5"] {
-  background-position-y: 80%;
-}
-.card[data-veggie="6"] {
-  background-position-y: 100%;
+  transform: rotateX(180deg);
 }
 
 [data-selectable-cards=true] .card {
@@ -172,6 +202,9 @@
 }
 [data-selectable-cards=true] .card.selected {
   box-shadow: 0 0 8px 8px white;
+}
+[data-selectable-cards=true] .card.selected .card-side {
+  box-shadow: unset;
 }
 
 .player-table {

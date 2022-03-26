@@ -35,6 +35,7 @@ trait ActionTrait {
         } else {
             throw new BgaUserException("You must take one or two card(s)");
         }
+        $pointCardFromPile = $tookVeggie ? null : intval(substr($cards[0]->location, 4));
 
         $this->cards->moveCards($ids, 'player', $playerId);
 
@@ -47,13 +48,17 @@ trait ActionTrait {
             'cards' => $cards,
             'veggies' => array_map(fn($card) => $card->veggie, $cards),
             'veggieCounts' => $this->getVeggieCountsByPlayer($playerId),
-            'pile' => $tookVeggie ? null : intval(substr($cards[0]->location, 4)),
+            'pile' => $tookVeggie ? null : $pointCardFromPile,
             'pileTop' => $tookVeggie ? null : $this->getCardFromDb($this->cards->getCardOnTop($cards[0]->location)),
             'pileCount' => $tookVeggie ? null : intval($this->cards->countCardInLocation($cards[0]->location)),
         ]);
 
         if ($tookVeggie) {
             $this->refillMarket();
+        } else {
+            if (intval($this->cards->countCardInLocation('pile'.$pointCardFromPile)) == 0) {
+                $this->refillPile($pointCardFromPile);
+            }
         }
 
         //self::incStat(1, 'placedRoutes');

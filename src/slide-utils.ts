@@ -1,4 +1,4 @@
-function slideToObjectAndAttach(game: Game, object: HTMLElement, destinationId: string) {
+function slideToObjectAndAttach(game: Game, object: HTMLElement, destinationId: string, changeSide: boolean = false) {
     const destination = document.getElementById(destinationId);
     if (destination.contains(object)) {
         return;
@@ -12,7 +12,7 @@ function slideToObjectAndAttach(game: Game, object: HTMLElement, destinationId: 
 
         const deltaX = destinationBR.left - originBR.left;
         const deltaY = destinationBR.top - originBR.top;
-
+        
         object.style.zIndex = '10';
         object.style.transform = `translate(${-deltaX}px, ${-deltaY}px)`;
 
