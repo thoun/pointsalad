@@ -519,10 +519,15 @@ var PointSalad = /** @class */ (function () {
             this.veggieCounters[playerId][veggie].toValue(veggieCounts[veggie]);
         }
     };
+    PointSalad.prototype.getSide = function (cardId) {
+        var div = document.getElementById("card-".concat(cardId));
+        return Number(div.dataset.side);
+    };
     PointSalad.prototype.checkSelection = function () {
+        var _this = this;
         var _a, _b;
-        var canTakeCards = (this.selectedCards.length === 1 && this.selectedCards[0].side === 0) ||
-            (this.selectedCards.length === (this.canTakeOnlyOneVeggie ? 1 : 2) && this.selectedCards.every(function (card) { return card.side === 1; }));
+        var canTakeCards = (this.selectedCards.length === 1 && this.getSide(this.selectedCards[0].id) === 0) ||
+            (this.selectedCards.length === (this.canTakeOnlyOneVeggie ? 1 : 2) && this.selectedCards.every(function (card) { return _this.getSide(card.id) === 1; }));
         (_a = document.getElementById('takeCards_button')) === null || _a === void 0 ? void 0 : _a.classList.toggle('disabled', !canTakeCards);
         (_b = document.getElementById('flipCard_button')) === null || _b === void 0 ? void 0 : _b.classList.toggle('disabled', this.selectedCards.length !== 1);
     };

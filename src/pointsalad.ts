@@ -231,10 +231,15 @@ class PointSalad implements PointSaladGame {
         }
     }
 
+    private getSide(cardId: number): number {        
+        const div = document.getElementById(`card-${cardId}`);
+        return Number(div.dataset.side);
+    }
+
     private checkSelection() {
         const canTakeCards = 
-            (this.selectedCards.length === 1 && this.selectedCards[0].side === 0) ||
-            (this.selectedCards.length === (this.canTakeOnlyOneVeggie ? 1 : 2) && this.selectedCards.every(card => card.side === 1));
+            (this.selectedCards.length === 1 && this.getSide(this.selectedCards[0].id) === 0) ||
+            (this.selectedCards.length === (this.canTakeOnlyOneVeggie ? 1 : 2) && this.selectedCards.every(card => this.getSide(card.id) === 1));
         document.getElementById('takeCards_button')?.classList.toggle('disabled', !canTakeCards);
         document.getElementById('flipCard_button')?.classList.toggle('disabled', this.selectedCards.length !== 1);
     }
