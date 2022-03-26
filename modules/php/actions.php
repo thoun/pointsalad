@@ -27,7 +27,7 @@ trait ActionTrait {
             $tookVeggie = true;
         } else if ($cardsCount === 1) {
             if (strpos($cards[0]->location, 'pile') !== 0) { // str_starts_with is PHP8+, using strpos( $haystack , $needle ) === 0 instead
-                if ($this->getRemainingCardCountOnMarket() === 1 && strpos($cards[0]->location, 'market') !== 0) { // in case only 1 veggie remains
+                if ($this->getRemainingCardCountOnMarket() === 1 && strpos($cards[0]->location, 'market') === 0) { // in case only 1 veggie remains
                     $tookVeggie = true;
                 } else {
                     throw new BgaUserException("If you take one card, it must be from a pile");

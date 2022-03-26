@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__.'/objects/player.php');
+
 trait StateTrait {
 
 //////////////////////////////////////////////////////////////////////////////
@@ -28,29 +30,44 @@ trait StateTrait {
         $this->gamestate->nextState($endScore ? 'endScore' : 'nextPlayer');
     }
 
-    function stEndScore() {
-        $playerId = $this->getActivePlayerId();
+    function setScoreAux(array $players) {
+        $activePlayerId = intval($this->getActivePlayerId());
 
-        // TODO update player_score_aux
+        $playerIndex = 0; 
+        foreach($players as $player) {
+            if ($player->id == $activePlayerId) {
+                break;
+            }
+            $playerIndex++;
+        }
 
-        // TODO notif individualCardScore
+        $orderedPlayers = $players;
+        if ($playerIndex > 0) { // we start from $activePlayerId and then follow order
+            $orderedPlayers = array_merge(array_slice($players, $playerIndex), array_slice($players, 0, $playerIndex));
+        }
 
-        // end stats
-        $playersIds = $this->getPlayersIds();
-        
+        $playerCount = count($players);
+
+        foreach ($orderedPlayers as $index => $player) {
+            $scoreAux = $index == 0 ? $playerCount : $index;
+            $this->DbQuery("UPDATE `player` SET `player_score_aux` = $scoreAux WHERE `player_id` = $player->id"); 
+        }
+    }
+
+    function setEndStats(array $players) {
         $tableTotalPointCards = 0;
         $tableTotalVeggieCards = 0;
         $tableTotalScore = 0;
 
-        foreach ($playersIds as $playerId) {
-            $cards = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $playerId));
+        foreach ($players as $player) {
+            $cards = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $player->id));
             $totalPointCards = count(array_filter($cards, fn($card) => $card->side === 0));
             $totalVeggieCards = count(array_filter($cards, fn($card) => $card->side === 1));
-            $playerScore = $this->getPlayerScore($playerId);
+            $playerScore = $this->getPlayerScore($player->id);
 
-            self::setStat($totalPointCards, 'totalPointCards', $playerId);
-            self::setStat($totalVeggieCards, 'totalVeggieCards', $playerId);
-            self::setStat($playerScore / $totalVeggieCards, 'avgScoreByCard', $playerId);
+            self::setStat($totalPointCards, 'totalPointCards', $player->id);
+            self::setStat($totalVeggieCards, 'totalVeggieCards', $player->id);
+            self::setStat($playerScore / $totalVeggieCards, 'avgScoreByCard', $player->id);
         
             $tableTotalPointCards += $totalPointCards;
             $tableTotalVeggieCards += $totalVeggieCards;
@@ -60,6 +77,19 @@ trait StateTrait {
         self::setStat($tableTotalPointCards, 'totalPointCards');
         self::setStat($tableTotalVeggieCards, 'totalVeggieCards');
         self::setStat($tableTotalScore / $tableTotalVeggieCards, 'avgScoreByCard');
+    }
+
+    function stEndScore() {
+        $dbResults = $this->getCollectionFromDb("SELECT * FROM player ORDER BY player_no");
+        $players = array_map(fn($dbResult) => new PointSaladPlayer($dbResult), array_values($dbResults));
+
+        // update player_score_aux
+        $this->setScoreAux($players);
+
+        // TODO notif individualCardScore
+
+        // end stats        
+        $this->setEndStats($players);
 
         $this->gamestate->nextState('endGame');
     }
