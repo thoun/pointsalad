@@ -235,18 +235,107 @@ $this->CARDS_EFFECTS = [
     16 => fn($veggieCounts) => tripletSet($veggieCounts, [PEPPER, PEPPER, PEPPER]),
     17 => fn($veggieCounts) => tripletSet($veggieCounts, [LETTUCE, PEPPER, CARROT]),
     18 => fn($veggieCounts) => tripletSet($veggieCounts, [ONION, PEPPER, CABBAGE]),
-
   ],
   
   ONION => [
-
+    // special
+    1 => fn($veggieCounts) => anyPairSet($veggieCounts),
+    // odd/even
+    2 => fn($veggieCounts) => evenOdd($veggieCounts, TOMATO),
+    // most
+    3 => fn($veggieCounts, $otherPlayersVeggieCounts) => most($veggieCounts, TOMATO, $otherPlayersVeggieCounts),
+    // least
+    4 => fn($veggieCounts, $otherPlayersVeggieCounts) => least($veggieCounts, TOMATO, $otherPlayersVeggieCounts),
+    // 2/V
+    5 => fn($veggieCounts) => set($veggieCounts, TOMATO, 2),
+    // 1/V 1/V (x2)
+    6 => fn($veggieCounts) => set($veggieCounts, TOMATO, 1) + set($veggieCounts, CARROT, 1),
+    7 => fn($veggieCounts) => set($veggieCounts, TOMATO, 1) + set($veggieCounts, CABBAGE, 1),
+    // 3/V -2/V
+    8 => fn($veggieCounts) => set($veggieCounts, TOMATO, 3) + set($veggieCounts, LETTUCE, -2),
+    // 2/V 1/V -2/V
+    9 => fn($veggieCounts) => set($veggieCounts, TOMATO, 2) + set($veggieCounts, CARROT, 1) + set($veggieCounts, ONION, -2),
+    // 2/V 2/V -4/V
+    10 => fn($veggieCounts) => set($veggieCounts, TOMATO, 2) + set($veggieCounts, LETTUCE, 2) + set($veggieCounts, CARROT, -4),
+    // 3/V -1/V -1/V
+    11 => fn($veggieCounts) => set($veggieCounts, TOMATO, 3) + set($veggieCounts, CARROT, -1) + set($veggieCounts, ONION, -1),
+    // 4/V -2/V -2/V
+    12 => fn($veggieCounts) => set($veggieCounts, TOMATO, 4) + set($veggieCounts, CABBAGE, -2) + set($veggieCounts, PEPPER, -2),
+    // V+V = 5 (x3)
+    13 => fn($veggieCounts) => pairSet($veggieCounts, [TOMATO, TOMATO]),
+    14 => fn($veggieCounts) => pairSet($veggieCounts, [CARROT, PEPPER]),
+    15 => fn($veggieCounts) => pairSet($veggieCounts, [CABBAGE, LETTUCE]),
+    // V+V+V = 8 (x3)
+    16 => fn($veggieCounts) => tripletSet($veggieCounts, [TOMATO, TOMATO, TOMATO]),
+    17 => fn($veggieCounts) => tripletSet($veggieCounts, [CABBAGE, TOMATO, LETTUCE]),
+    18 => fn($veggieCounts) => tripletSet($veggieCounts, [ONION, TOMATO, PEPPER]),
   ],
   
   PEPPER => [
-
+    // special
+    1 => fn($veggieCounts, $otherPlayersVeggieCounts) => highestTotal($veggieCounts, $otherPlayersVeggieCounts),
+    // odd/even
+    2 => fn($veggieCounts) => evenOdd($veggieCounts, LETTUCE),
+    // most
+    3 => fn($veggieCounts, $otherPlayersVeggieCounts) => most($veggieCounts, LETTUCE, $otherPlayersVeggieCounts),
+    // least
+    4 => fn($veggieCounts, $otherPlayersVeggieCounts) => least($veggieCounts, LETTUCE, $otherPlayersVeggieCounts),
+    // 2/V
+    5 => fn($veggieCounts) => set($veggieCounts, LETTUCE, 2),
+    // 1/V 1/V (x2)
+    6 => fn($veggieCounts) => set($veggieCounts, LETTUCE, 1) + set($veggieCounts, TOMATO, 1),
+    7 => fn($veggieCounts) => set($veggieCounts, LETTUCE, 1) + set($veggieCounts, ONION, 1),
+    // 3/V -2/V
+    8 => fn($veggieCounts) => set($veggieCounts, LETTUCE, 3) + set($veggieCounts, CARROT, -2),
+    // 2/V 1/V -2/V
+    9 => fn($veggieCounts) => set($veggieCounts, LETTUCE, 2) + set($veggieCounts, ONION, 1) + set($veggieCounts, PEPPER, -2),
+    // 2/V 2/V -4/V
+    10 => fn($veggieCounts) => set($veggieCounts, LETTUCE, 2) + set($veggieCounts, CARROT, 2) + set($veggieCounts, ONION, -4),
+    // 3/V -1/V -1/V
+    11 => fn($veggieCounts) => set($veggieCounts, LETTUCE, 3) + set($veggieCounts, ONION, -1) + set($veggieCounts, PEPPER, -1),
+    // 4/V -2/V -2/V
+    12 => fn($veggieCounts) => set($veggieCounts, LETTUCE, 4) + set($veggieCounts, TOMATO, -2) + set($veggieCounts, CABBAGE, -2),
+    // V+V = 5 (x3)
+    13 => fn($veggieCounts) => pairSet($veggieCounts, [LETTUCE, LETTUCE]),
+    14 => fn($veggieCounts) => pairSet($veggieCounts, [CARROT, ONION]),
+    15 => fn($veggieCounts) => pairSet($veggieCounts, [CABBAGE, TOMATO]),
+    // V+V+V = 8 (x3)
+    16 => fn($veggieCounts) => tripletSet($veggieCounts, [LETTUCE, LETTUCE, LETTUCE]),
+    17 => fn($veggieCounts) => tripletSet($veggieCounts, [PEPPER, LETTUCE, CABBAGE]),
+    18 => fn($veggieCounts) => tripletSet($veggieCounts, [TOMATO, LETTUCE, CARROT]),
   ],
   
   TOMATO => [
-
+    // special
+    1 => fn($veggieCounts) => completeSet($veggieCounts),
+    // odd/even
+    2 => fn($veggieCounts) => evenOdd($veggieCounts, ONION),
+    // most
+    3 => fn($veggieCounts, $otherPlayersVeggieCounts) => most($veggieCounts, ONION, $otherPlayersVeggieCounts),
+    // least
+    4 => fn($veggieCounts, $otherPlayersVeggieCounts) => least($veggieCounts, ONION, $otherPlayersVeggieCounts),
+    // 2/V
+    5 => fn($veggieCounts) => set($veggieCounts, ONION, 2),
+    // 1/V 1/V (x2)
+    6 => fn($veggieCounts) => set($veggieCounts, ONION, 1) + set($veggieCounts, CARROT, 1),
+    7 => fn($veggieCounts) => set($veggieCounts, ONION, 1) + set($veggieCounts, CABBAGE, 1),
+    // 3/V -2/V
+    8 => fn($veggieCounts) => set($veggieCounts, ONION, 3) + set($veggieCounts, PEPPER, -2),
+    // 2/V 1/V -2/V
+    9 => fn($veggieCounts) => set($veggieCounts, ONION, 2) + set($veggieCounts, CABBAGE, 1) + set($veggieCounts, TOMATO, -2),
+    // 2/V 2/V -4/V
+    10 => fn($veggieCounts) => set($veggieCounts, ONION, 2) + set($veggieCounts, PEPPER, 2) + set($veggieCounts, CABBAGE, -4),
+    // 3/V -1/V -1/V
+    11 => fn($veggieCounts) => set($veggieCounts, ONION, 3) + set($veggieCounts, CABBAGE, -1) + set($veggieCounts, TOMATO, -1),
+    // 4/V -2/V -2/V
+    12 => fn($veggieCounts) => set($veggieCounts, ONION, 4) + set($veggieCounts, CARROT, -2) + set($veggieCounts, LETTUCE, -2),
+    // V+V = 5 (x3)
+    13 => fn($veggieCounts) => pairSet($veggieCounts, [ONION, ONION]),
+    14 => fn($veggieCounts) => pairSet($veggieCounts, [CABBAGE, PEPPER]),
+    15 => fn($veggieCounts) => pairSet($veggieCounts, [CARROT, LETTUCE]),
+    // V+V+V = 8 (x3)
+    16 => fn($veggieCounts) => tripletSet($veggieCounts, [ONION, ONION, ONION]),
+    17 => fn($veggieCounts) => tripletSet($veggieCounts, [CARROT, ONION, PEPPER]),
+    18 => fn($veggieCounts) => tripletSet($veggieCounts, [TOMATO, ONION, LETTUCE]),
   ],
 ];

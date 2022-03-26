@@ -203,7 +203,108 @@ CARDS_EFFECTS[LETTUCE] = [
     function () { return tripletSet([LETTUCE, PEPPER, CARROT]); },
     function () { return tripletSet([ONION, PEPPER, CABBAGE]); },
 ];
-// checked : 12 / Complete set
+CARDS_EFFECTS[ONION] = [
+    null,
+    // special
+    function () { return formatTextIcons("<div class=\"flex\">[5]<span>/</span><span>".concat(_('Veggie type with at least 2'), "</span></div>")); },
+    // odd/even
+    function () { return evenOdd(TOMATO); },
+    // most
+    function () { return most(TOMATO); },
+    // least
+    function () { return least(TOMATO); },
+    // 2/V
+    function () { return sets([[2, TOMATO]]); },
+    // 1/V 1/V (x2)
+    function () { return sets([[1, TOMATO], [1, CARROT]]); },
+    function () { return sets([[1, TOMATO], [1, CABBAGE]]); },
+    // 3/V -2/V
+    function () { return sets([[3, TOMATO], [-2, LETTUCE]]); },
+    // 2/V 1/V -2/V
+    function () { return sets([[2, TOMATO], [1, CARROT], [-2, ONION]]); },
+    // 2/V 2/V -4/V
+    function () { return sets([[2, TOMATO], [2, LETTUCE], [-4, CARROT]]); },
+    // 3/V -1/V -1/V
+    function () { return sets([[3, TOMATO], [-1, CARROT], [-1, ONION]]); },
+    // 4/V -2/V -2/V
+    function () { return sets([[4, TOMATO], [-2, CABBAGE], [-2, PEPPER]]); },
+    // V+V = 5 (x3)
+    function () { return pairSet([TOMATO, TOMATO]); },
+    function () { return pairSet([CARROT, PEPPER]); },
+    function () { return pairSet([CABBAGE, LETTUCE]); },
+    // V+V+V = 8 (x3)
+    function () { return tripletSet([TOMATO, TOMATO, TOMATO]); },
+    function () { return tripletSet([CABBAGE, TOMATO, LETTUCE]); },
+    function () { return tripletSet([ONION, TOMATO, PEPPER]); },
+];
+CARDS_EFFECTS[PEPPER] = [
+    null,
+    // special
+    function () { return formatTextIcons("<div class=\"flex\"><span>".concat(_('Highest veggie total'), "</span> = [7]</div>")); },
+    // odd/even
+    function () { return evenOdd(LETTUCE); },
+    // most
+    function () { return most(LETTUCE); },
+    // least
+    function () { return least(LETTUCE); },
+    // 2/V
+    function () { return sets([[2, LETTUCE]]); },
+    // 1/V 1/V (x2)
+    function () { return sets([[1, LETTUCE], [1, TOMATO]]); },
+    function () { return sets([[1, LETTUCE], [1, ONION]]); },
+    // 3/V -2/V
+    function () { return sets([[3, LETTUCE], [-2, CARROT]]); },
+    // 2/V 1/V -2/V
+    function () { return sets([[2, LETTUCE], [1, ONION], [-2, PEPPER]]); },
+    // 2/V 2/V -4/V
+    function () { return sets([[2, LETTUCE], [2, CARROT], [-4, ONION]]); },
+    // 3/V -1/V -1/V
+    function () { return sets([[3, LETTUCE], [-1, ONION], [-1, PEPPER]]); },
+    // 4/V -2/V -2/V
+    function () { return sets([[4, LETTUCE], [-2, TOMATO], [-2, CABBAGE]]); },
+    // V+V = 5 (x3)
+    function () { return pairSet([LETTUCE, LETTUCE]); },
+    function () { return pairSet([CARROT, ONION]); },
+    function () { return pairSet([CABBAGE, TOMATO]); },
+    // V+V+V = 8 (x3)
+    function () { return tripletSet([LETTUCE, LETTUCE, LETTUCE]); },
+    function () { return tripletSet([PEPPER, LETTUCE, CABBAGE]); },
+    function () { return tripletSet([TOMATO, LETTUCE, CARROT]); },
+];
+CARDS_EFFECTS[TOMATO] = [
+    null,
+    // special
+    function () { return formatTextIcons("\n    <div class=\"complete-set-top\">[veggie6][veggie3][veggie2]</div>\n    <div class=\"flex\"><span>[12]</span><span>/</span><span>".concat(_('Complete set'), "</span></div>\n    <div class=\"complete-set-bottom\">[veggie1][veggie5][veggie4]</div>\n    ")); },
+    // odd/even
+    function () { return evenOdd(ONION); },
+    // most
+    function () { return most(ONION); },
+    // least
+    function () { return least(ONION); },
+    // 2/V
+    function () { return sets([[2, ONION]]); },
+    // 1/V 1/V (x2)
+    function () { return sets([[1, ONION], [1, CARROT]]); },
+    function () { return sets([[1, ONION], [1, CABBAGE]]); },
+    // 3/V -2/V
+    function () { return sets([[3, ONION], [-2, PEPPER]]); },
+    // 2/V 1/V -2/V
+    function () { return sets([[2, ONION], [1, CABBAGE], [-2, TOMATO]]); },
+    // 2/V 2/V -4/V
+    function () { return sets([[2, ONION], [2, PEPPER], [-4, CABBAGE]]); },
+    // 3/V -1/V -1/V
+    function () { return sets([[3, ONION], [-1, CABBAGE], [-1, TOMATO]]); },
+    // 4/V -2/V -2/V
+    function () { return sets([[4, ONION], [-2, CARROT], [-2, LETTUCE]]); },
+    // V+V = 5 (x3)
+    function () { return pairSet([ONION, ONION]); },
+    function () { return pairSet([CABBAGE, PEPPER]); },
+    function () { return pairSet([CARROT, LETTUCE]); },
+    // V+V+V = 8 (x3)
+    function () { return tripletSet([ONION, ONION, ONION]); },
+    function () { return tripletSet([CARROT, ONION, PEPPER]); },
+    function () { return tripletSet([TOMATO, ONION, LETTUCE]); },
+];
 var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
         if (ar || !(i in from)) {

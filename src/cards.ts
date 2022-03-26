@@ -104,7 +104,7 @@ CARDS_EFFECTS[CABBAGE] = [
 CARDS_EFFECTS[CARROT] = [
     null,
     // special
-    () => formatTextIcons(`<div class="flex">[5]<span>/</span><span>${_('Veggie type with at least 3')}</span></div>`),
+    () => formatTextIcons(`<div class="flex">[5]<span>/</span><span>${_('Veggie type with at least 3')}</span></div>`), // TODO merge with similar label?
     // odd/even
     () => evenOdd(CABBAGE),
     // most
@@ -170,6 +170,112 @@ CARDS_EFFECTS[LETTUCE] = [
     () => tripletSet([LETTUCE, PEPPER, CARROT]),
     () => tripletSet([ONION, PEPPER, CABBAGE]),
 ];
-
-  // checked : 12 / Complete set
-  
+    
+CARDS_EFFECTS[ONION] = [
+    null,
+    // special
+    () => formatTextIcons(`<div class="flex">[5]<span>/</span><span>${_('Veggie type with at least 2')}</span></div>`), // TODO merge with similar label?
+    // odd/even
+    () => evenOdd(TOMATO),
+    // most
+    () => most(TOMATO),
+    // least
+    () => least(TOMATO),
+    // 2/V
+    () => sets([[2, TOMATO]]),
+    // 1/V 1/V (x2)
+    () => sets([[1, TOMATO], [1, CARROT]]),
+    () => sets([[1, TOMATO], [1, CABBAGE]]),
+    // 3/V -2/V
+    () => sets([[3, TOMATO], [-2, LETTUCE]]),
+    // 2/V 1/V -2/V
+    () => sets([[2, TOMATO], [1, CARROT], [-2, ONION]]),
+    // 2/V 2/V -4/V
+    () => sets([[2, TOMATO], [2, LETTUCE], [-4, CARROT]]),
+    // 3/V -1/V -1/V
+    () => sets([[3, TOMATO], [-1, CARROT], [-1, ONION]]),
+    // 4/V -2/V -2/V
+    () => sets([[4, TOMATO], [-2, CABBAGE], [-2, PEPPER]]),
+    // V+V = 5 (x3)
+    () => pairSet([TOMATO, TOMATO]),
+    () => pairSet([CARROT, PEPPER]),
+    () => pairSet([CABBAGE, LETTUCE]),
+    // V+V+V = 8 (x3)
+    () => tripletSet([TOMATO, TOMATO, TOMATO]),
+    () => tripletSet([CABBAGE, TOMATO, LETTUCE]),
+    () => tripletSet([ONION, TOMATO, PEPPER]),
+];
+    
+CARDS_EFFECTS[PEPPER] = [
+    null,
+    // special
+    () => formatTextIcons(`<div class="flex"><span>${_('Highest veggie total')}</span> = [7]</div>`), // TODO check text
+    // odd/even
+    () => evenOdd(LETTUCE),
+    // most
+    () => most(LETTUCE),
+    // least
+    () => least(LETTUCE),
+    // 2/V
+    () => sets([[2, LETTUCE]]),
+    // 1/V 1/V (x2)
+    () => sets([[1, LETTUCE], [1, TOMATO]]),
+    () => sets([[1, LETTUCE], [1, ONION]]),
+    // 3/V -2/V
+    () => sets([[3, LETTUCE], [-2, CARROT]]),
+    // 2/V 1/V -2/V
+    () => sets([[2, LETTUCE], [1, ONION], [-2, PEPPER]]),
+    // 2/V 2/V -4/V
+    () => sets([[2, LETTUCE], [2, CARROT], [-4, ONION]]),
+    // 3/V -1/V -1/V
+    () => sets([[3, LETTUCE], [-1, ONION], [-1, PEPPER]]),
+    // 4/V -2/V -2/V
+    () => sets([[4, LETTUCE], [-2, TOMATO], [-2, CABBAGE]]),
+    // V+V = 5 (x3)
+    () => pairSet([LETTUCE, LETTUCE]),
+    () => pairSet([CARROT, ONION]),
+    () => pairSet([CABBAGE, TOMATO]),
+    // V+V+V = 8 (x3)
+    () => tripletSet([LETTUCE, LETTUCE, LETTUCE]),
+    () => tripletSet([PEPPER, LETTUCE, CABBAGE]),
+    () => tripletSet([TOMATO, LETTUCE, CARROT]),
+];
+    
+CARDS_EFFECTS[TOMATO] = [
+    null,
+    // special
+    () => formatTextIcons(`
+    <div class="complete-set-top">[veggie6][veggie3][veggie2]</div>
+    <div class="flex"><span>[12]</span><span>/</span><span>${_('Complete set')}</span></div>
+    <div class="complete-set-bottom">[veggie1][veggie5][veggie4]</div>
+    `), // TODO check text
+    // odd/even
+    () => evenOdd(ONION),
+    // most
+    () => most(ONION),
+    // least
+    () => least(ONION),
+    // 2/V
+    () => sets([[2, ONION]]),
+    // 1/V 1/V (x2)
+    () => sets([[1, ONION], [1, CARROT]]),
+    () => sets([[1, ONION], [1, CABBAGE]]),
+    // 3/V -2/V
+    () => sets([[3, ONION], [-2, PEPPER]]),
+    // 2/V 1/V -2/V
+    () => sets([[2, ONION], [1, CABBAGE], [-2, TOMATO]]),
+    // 2/V 2/V -4/V
+    () => sets([[2, ONION], [2, PEPPER], [-4, CABBAGE]]),
+    // 3/V -1/V -1/V
+    () => sets([[3, ONION], [-1, CABBAGE], [-1, TOMATO]]),
+    // 4/V -2/V -2/V
+    () => sets([[4, ONION], [-2, CARROT], [-2, LETTUCE]]),
+    // V+V = 5 (x3)
+    () => pairSet([ONION, ONION]),
+    () => pairSet([CABBAGE, PEPPER]),
+    () => pairSet([CARROT, LETTUCE]),
+    // V+V+V = 8 (x3)
+    () => tripletSet([ONION, ONION, ONION]),
+    () => tripletSet([CARROT, ONION, PEPPER]),
+    () => tripletSet([TOMATO, ONION, LETTUCE]),
+];
