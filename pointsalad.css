@@ -24,6 +24,7 @@
   height: 140px;
   margin: 5px;
   border-radius: 10px;
+  font-family: "PointSalad";
 }
 .card[data-veggie="1"] .card-side {
   background-position-y: 0%;
@@ -68,6 +69,7 @@
   -webkit-backface-visibility: hidden;
   /* Safari */
   backface-visibility: hidden;
+  transform-origin: center center;
 }
 .card .card-sides .card-side.front {
   color: #8dc63f;
@@ -192,6 +194,19 @@
   background-image: url("img/veggie-side.jpg");
   transform: rotateX(180deg);
 }
+.card .card-sides .card-side.back .name {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 12px;
+  color: white;
+  font-weight: bold;
+}
+.card .card-sides .card-side.back .name.rotated {
+  transform: rotate(-180deg);
+}
 .card .final-score {
   position: absolute;
   top: -19px;
@@ -277,6 +292,12 @@ html, .mode_3d #game_play_area_background {
   background: #FFFFFFAA;
 }
 
+@font-face {
+  font-family: "PointSalad";
+  src: url("img/font/kosugimaru-regular-webfont.woff2") format("woff2"), url("img/font/kosugimaru-regular-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
 .icon {
   width: 32px;
   height: 32px;

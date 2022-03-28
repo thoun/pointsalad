@@ -10,12 +10,12 @@ function evenOdd(veggie: number): string {
         <div class="flex">[veggie${veggie}]</div>
         <div class="flex">
             <span class="flex wrap">${_('Even total')}</span>
-            <span> = </span>
+            <span>=</span>
             <span>[7]</span>
         </div>
         <div class="flex">
             <span class="flex wrap">${_('Odd total')}</span>
-            <span> = </span>
+            <span>=</span>
             <span>[3]</span>
         </div>
     `);
@@ -25,7 +25,7 @@ function mostLeast(word: string, veggie: number): string {
     return formatTextIcons(`
         <div class="flex">
             <span class="flex wrap">${word} [veggie${veggie}]</span>
-            <span> = </span>
+            <span>=</span>
             <span>[10]</span>
         </div>
     `);
@@ -47,7 +47,7 @@ function pairSet(veggies: number[]) {
     return formatTextIcons(`
     <div class="multiple-set">
         ${veggies.map((veggie, index) => `<span data-index="${index}">[veggie${veggie}]</span>`).join('<span class="plus">+</span>')}
-         = [5]</div>
+        =[5]</div>
     `);
 }
 
@@ -56,7 +56,7 @@ function tripletSet(veggies: number[]) {
     <div class="multiple-set">
         ${veggies.map((veggie, index) => `<span data-index="${index}">[veggie${veggie}]</span>`).join('<span class="plus">+</span>')}
     </div>
-    <div class="flex"> = [8]</div>
+    <div class="flex">=[8]</div>
     `);
 }
 
@@ -211,7 +211,7 @@ CARDS_EFFECTS[ONION] = [
 CARDS_EFFECTS[PEPPER] = [
     null,
     // special
-    () => formatTextIcons(`<div class="flex"><span>${_('Highest veggie total')}</span> = [7]</div>`), // TODO check text
+    () => formatTextIcons(`<div class="flex"><span>${_('Highest veggie total')}</span>=[7]</div>`), // TODO check text
     // odd/even
     () => evenOdd(LETTUCE),
     // most

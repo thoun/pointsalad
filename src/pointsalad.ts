@@ -195,6 +195,17 @@ class PointSalad implements PointSaladGame {
         return 1;
     }
 
+    private getVeggieName(veggie: number) {
+        switch (veggie) {
+            case CABBAGE: return _('Cabbage');
+            case CARROT: return _('Carrot');
+            case LETTUCE: return _('Lettuce');
+            case ONION: return _('Onion');
+            case PEPPER: return _('Pepper');
+            case TOMATO: return _('Tomato');
+        }
+    }
+
     public createOrMoveCard(card: Card, destinationId: string, init: boolean = false, from: string = null) {
         const existingDiv = document.getElementById(`card-${card.id}`);
         if (existingDiv) {
@@ -205,6 +216,7 @@ class PointSalad implements PointSaladGame {
             }
             existingDiv.dataset.side = ''+card.side;
         } else {
+            const name = this.getVeggieName(card.veggie);
             const div = document.createElement('div');
             div.id = `card-${card.id}`;
             div.classList.add('card');
@@ -216,7 +228,10 @@ class PointSalad implements PointSaladGame {
                     <div class="card-side front">
                         <div>${CARDS_EFFECTS[card.veggie]?.[card.index]?.() || ''}</div>
                     </div>
-                    <div class="card-side back"></div>
+                    <div class="card-side back">
+                        <div class="name">${name}</div>
+                        <div class="name rotated">${name}</div>
+                    </div>
                 </div>
             `;
             document.getElementById(destinationId).appendChild(div);

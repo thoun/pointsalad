@@ -31,3 +31,7 @@ Also add one auto-FTP upload extension (for example https://marketplace.visualst
 
 ## Hint
 Make sure ftp-sync.json and node_modules are in .gitignore
+
+# Font
+Font on cards seems to be Hoolister, only free for personal use.
+Similar free font used : https://www.1001freefonts.com/kosugi-maru.font

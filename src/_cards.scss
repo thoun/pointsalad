@@ -4,6 +4,7 @@
     height: 140px;
     margin: 5px;
     border-radius: 10px;
+    font-family: 'PointSalad';
 
     @for $i from 1 through 6 {
         &[data-veggie="#{$i}"] {
@@ -40,6 +41,7 @@
             transform-style: preserve-3d;      
             -webkit-backface-visibility: hidden; /* Safari */
             backface-visibility: hidden;
+            transform-origin: center center;
 
             &.front {
                 color: #8dc63f;
@@ -132,6 +134,21 @@
             &.back {
                 background-image: url('img/veggie-side.jpg');
                 transform: rotateX(180deg);
+
+                .name {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    padding: 10px 12px;
+                    color: white;
+                    font-weight: bold;
+
+                    &.rotated {
+                        transform: rotate(-180deg);
+                    }
+                }
             }
         }
     }

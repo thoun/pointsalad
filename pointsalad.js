@@ -105,10 +105,10 @@ var ONION = 4;
 var PEPPER = 5;
 var TOMATO = 6;
 function evenOdd(veggie) {
-    return formatTextIcons("\n        <div class=\"flex\">[veggie".concat(veggie, "]</div>\n        <div class=\"flex\">\n            <span class=\"flex wrap\">").concat(_('Even total'), "</span>\n            <span> = </span>\n            <span>[7]</span>\n        </div>\n        <div class=\"flex\">\n            <span class=\"flex wrap\">").concat(_('Odd total'), "</span>\n            <span> = </span>\n            <span>[3]</span>\n        </div>\n    "));
+    return formatTextIcons("\n        <div class=\"flex\">[veggie".concat(veggie, "]</div>\n        <div class=\"flex\">\n            <span class=\"flex wrap\">").concat(_('Even total'), "</span>\n            <span>=</span>\n            <span>[7]</span>\n        </div>\n        <div class=\"flex\">\n            <span class=\"flex wrap\">").concat(_('Odd total'), "</span>\n            <span>=</span>\n            <span>[3]</span>\n        </div>\n    "));
 }
 function mostLeast(word, veggie) {
-    return formatTextIcons("\n        <div class=\"flex\">\n            <span class=\"flex wrap\">".concat(word, " [veggie").concat(veggie, "]</span>\n            <span> = </span>\n            <span>[10]</span>\n        </div>\n    "));
+    return formatTextIcons("\n        <div class=\"flex\">\n            <span class=\"flex wrap\">".concat(word, " [veggie").concat(veggie, "]</span>\n            <span>=</span>\n            <span>[10]</span>\n        </div>\n    "));
 }
 function most(veggie) {
     return mostLeast(_('Most'), veggie);
@@ -120,10 +120,10 @@ function sets(sets) {
     return formatTextIcons(sets.map(function (set) { return "<div>[".concat(set[0], "] / [veggie").concat(set[1], "]</div>"); }).join(''));
 }
 function pairSet(veggies) {
-    return formatTextIcons("\n    <div class=\"multiple-set\">\n        ".concat(veggies.map(function (veggie, index) { return "<span data-index=\"".concat(index, "\">[veggie").concat(veggie, "]</span>"); }).join('<span class="plus">+</span>'), "\n         = [5]</div>\n    "));
+    return formatTextIcons("\n    <div class=\"multiple-set\">\n        ".concat(veggies.map(function (veggie, index) { return "<span data-index=\"".concat(index, "\">[veggie").concat(veggie, "]</span>"); }).join('<span class="plus">+</span>'), "\n        =[5]</div>\n    "));
 }
 function tripletSet(veggies) {
-    return formatTextIcons("\n    <div class=\"multiple-set\">\n        ".concat(veggies.map(function (veggie, index) { return "<span data-index=\"".concat(index, "\">[veggie").concat(veggie, "]</span>"); }).join('<span class="plus">+</span>'), "\n    </div>\n    <div class=\"flex\"> = [8]</div>\n    "));
+    return formatTextIcons("\n    <div class=\"multiple-set\">\n        ".concat(veggies.map(function (veggie, index) { return "<span data-index=\"".concat(index, "\">[veggie").concat(veggie, "]</span>"); }).join('<span class="plus">+</span>'), "\n    </div>\n    <div class=\"flex\">=[8]</div>\n    "));
 }
 var CARDS_EFFECTS = [];
 CARDS_EFFECTS[CABBAGE] = [
@@ -265,7 +265,7 @@ CARDS_EFFECTS[ONION] = [
 CARDS_EFFECTS[PEPPER] = [
     null,
     // special
-    function () { return formatTextIcons("<div class=\"flex\"><span>".concat(_('Highest veggie total'), "</span> = [7]</div>")); },
+    function () { return formatTextIcons("<div class=\"flex\"><span>".concat(_('Highest veggie total'), "</span>=[7]</div>")); },
     // odd/even
     function () { return evenOdd(LETTUCE); },
     // most
@@ -487,6 +487,16 @@ var PointSalad = /** @class */ (function () {
     PointSalad.prototype.getZoom = function () {
         return 1;
     };
+    PointSalad.prototype.getVeggieName = function (veggie) {
+        switch (veggie) {
+            case CABBAGE: return _('Cabbage');
+            case CARROT: return _('Carrot');
+            case LETTUCE: return _('Lettuce');
+            case ONION: return _('Onion');
+            case PEPPER: return _('Pepper');
+            case TOMATO: return _('Tomato');
+        }
+    };
     PointSalad.prototype.createOrMoveCard = function (card, destinationId, init, from) {
         var _this = this;
         var _a, _b;
@@ -503,13 +513,14 @@ var PointSalad = /** @class */ (function () {
             existingDiv.dataset.side = '' + card.side;
         }
         else {
+            var name_1 = this.getVeggieName(card.veggie);
             var div = document.createElement('div');
             div.id = "card-".concat(card.id);
             div.classList.add('card');
             div.dataset.side = '' + card.side;
             div.dataset.veggie = '' + card.veggie;
             div.dataset.index = '' + card.index;
-            div.innerHTML = "\n                <div class=\"card-sides\">\n                    <div class=\"card-side front\">\n                        <div>".concat(((_b = (_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index]) === null || _b === void 0 ? void 0 : _b.call(_a)) || '', "</div>\n                    </div>\n                    <div class=\"card-side back\"></div>\n                </div>\n            ");
+            div.innerHTML = "\n                <div class=\"card-sides\">\n                    <div class=\"card-side front\">\n                        <div>".concat(((_b = (_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index]) === null || _b === void 0 ? void 0 : _b.call(_a)) || '', "</div>\n                    </div>\n                    <div class=\"card-side back\">\n                        <div class=\"name\">").concat(name_1, "</div>\n                        <div class=\"name rotated\">").concat(name_1, "</div>\n                    </div>\n                </div>\n            ");
             document.getElementById(destinationId).appendChild(div);
             div.addEventListener('click', function () { return _this.onCardClick(card); });
             if (from) {
