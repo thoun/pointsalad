@@ -44,6 +44,24 @@
 .card[data-veggie="6"] .card-side {
   background-position-y: 100%;
 }
+.card[data-veggie="1"] .back .name {
+  text-shadow: 2px 2px 0 #51004e;
+}
+.card[data-veggie="2"] .back .name {
+  text-shadow: 2px 2px 0 #905501;
+}
+.card[data-veggie="3"] .back .name {
+  text-shadow: 2px 2px 0 #00652e;
+}
+.card[data-veggie="4"] .back .name {
+  text-shadow: 2px 2px 0 #71003f;
+}
+.card[data-veggie="5"] .back .name {
+  text-shadow: 2px 2px 0 #735e17;
+}
+.card[data-veggie="6"] .back .name {
+  text-shadow: 2px 2px 0 #820202;
+}
 .card[data-side="1"] .card-sides {
   transform: rotateX(180deg);
 }
