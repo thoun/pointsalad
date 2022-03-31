@@ -20,4 +20,10 @@
       }
     }
   }
+
+  &.spectator-mode {
+    * {
+      background: #e8f3d8 !important;
+    }
+  }
 }

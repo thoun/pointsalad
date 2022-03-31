@@ -59,6 +59,13 @@ trait ActionTrait {
             
             self::incStat($cardsCount, 'veggieFromMarket');
             self::incStat($cardsCount, 'veggieFromMarket', $playerId);
+
+            foreach($cards as $card) {
+                $pile = intval(substr($cards[0]->location, 6));
+                if (intval($this->cards->countCardInLocation('pile'.$pile)) == 0) {
+                    $this->refillPile($pile);
+                }
+            }
         } else {
             if (intval($this->cards->countCardInLocation('pile'.$pointCardFromPile)) == 0) {
                 $this->refillPile($pointCardFromPile);
@@ -68,7 +75,7 @@ trait ActionTrait {
             self::incStat($cardsCount, 'pointsFromMarket', $playerId);
         }
 
-        $this->updateScore($playerId);
+        $this->updateScores();
 
         $hasPointCard = intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` = 'player' AND `card_location_arg` = $playerId AND `card_type_arg` = 0")) > 0;
 
@@ -89,7 +96,7 @@ trait ActionTrait {
 
         $this->applyFlipCard($playerId, $card);
 
-        $this->updateScore($playerId);
+        $this->updateScores();
 
         self::incStat(1, 'flippedCards');
         self::incStat(1, 'flippedCards', $playerId);

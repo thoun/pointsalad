@@ -351,7 +351,9 @@ class PointSalad implements PointSaladGame {
     }
 
     notif_points(notif: Notif<NotifPointsArgs>) {
-        (this as any).scoreCtrl[notif.args.playerId]?.toValue(notif.args.points);
+        Object.keys(notif.args.points).forEach((playerId) => 
+            (this as any).scoreCtrl[playerId]?.toValue(notif.args.points[playerId])
+        );
     }
 
     notif_takenCards(notif: Notif<NotifTakenCardsArgs>) {

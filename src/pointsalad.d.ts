@@ -53,8 +53,7 @@ interface EnteringFlipCardArgs {
 }
 
 interface NotifPointsArgs {
-    playerId: number;
-    points: number;
+    points: { [playerId: number]: number };
 }
 
 interface NotifFlippedCardArgs {

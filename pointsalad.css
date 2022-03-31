@@ -17,6 +17,9 @@
 .player-board .counters .counter span {
   padding: 0 5px 0 5px;
 }
+.player-board.spectator-mode * {
+  background: #e8f3d8 !important;
+}
 
 .card {
   position: relative;
@@ -266,6 +269,9 @@
 .player-table .player-points, .player-table .player-veggies {
   display: flex;
   justify-content: center;
+}
+.player-table .player-points {
+  flex-wrap: wrap;
 }
 .player-table .player-veggie .card:not(:first-child) {
   margin-top: -120px;

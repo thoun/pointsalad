@@ -619,8 +619,8 @@ var PointSalad = /** @class */ (function () {
         });
     };
     PointSalad.prototype.notif_points = function (notif) {
-        var _a;
-        (_a = this.scoreCtrl[notif.args.playerId]) === null || _a === void 0 ? void 0 : _a.toValue(notif.args.points);
+        var _this = this;
+        Object.keys(notif.args.points).forEach(function (playerId) { var _a; return (_a = _this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(notif.args.points[playerId]); });
     };
     PointSalad.prototype.notif_takenCards = function (notif) {
         var _this = this;

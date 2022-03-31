@@ -205,7 +205,7 @@ trait UtilTrait {
         return $fn($veggieCounts, $otherPlayersVeggieCounts);
     }
 
-    function updateScore(int $playerId) {
+    function getAndUpdateScore(int $playerId) {
         $cards = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $playerId));
 
         $pointCards = array_values(array_filter($cards, fn($card) => $card->side === 0));
@@ -218,11 +218,20 @@ trait UtilTrait {
         }
 
         $this->DbQuery("UPDATE `player` SET `player_score` = $score WHERE `player_id` = $playerId"); 
+
+        return $score;
+    }
+
+    function updateScores() {
+        $playersScores = [];
+        $playersIds = $this->getPlayersIds();
+        foreach ($playersIds as $playerId) {
+            $playersScores[$playerId] = $this->getAndUpdateScore($playerId);
+        }
         
+        // we update all scores, and not only active player score, because it may change least/most on another player's score
         $this->notifyAllPlayers('points', '', [
-            'playerId' => $playerId,
-            'player_name' => $this->getPlayerName($playerId),
-            'points' => $score,
+            'points' => $playersScores,
         ]);
     }
 

@@ -10,6 +10,10 @@
         justify-content: center;
     }
 
+    .player-points {
+        flex-wrap: wrap;
+    }
+
     .player-veggie {
         .card:not(:first-child) {
             margin-top: -120px;
