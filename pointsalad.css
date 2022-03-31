@@ -262,9 +262,13 @@
 
 .player-table {
   z-index: 2;
+  border-radius: 10px;
 }
 .player-table .player-name {
   text-shadow: 0 0 5px white;
+  text-align: center;
+  font-family: "PointSalad";
+  text-transform: uppercase;
 }
 .player-table .player-points, .player-table .player-veggies {
   display: flex;

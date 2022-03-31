@@ -1,8 +1,12 @@
 .player-table {
     z-index: 2;
+    border-radius: 10px;
     
     .player-name {
         text-shadow: 0 0 5px white;
+        text-align: center;
+        font-family: "PointSalad";
+        text-transform: uppercase;
     }
 
     .player-points, .player-veggies {
