@@ -103,16 +103,20 @@ trait UtilTrait {
     function refillPile(int $pile) {
         $pileCounts = $this->getPileCounts();
 
-        $maxPile = null;
+        $maxPiles = [];
         $maxPileCount = 0;
         foreach($pileCounts as $pileId => $count) {
             if ($count > $maxPileCount) {
-                $maxPile = $pileId;
+                $maxPiles = [$pileId];
+                $maxPileCount = $count;
+            } else if ($count > 0 && $count === $maxPileCount) {
+                $maxPiles[] = $pileId;
                 $maxPileCount = $count;
             }
         }
 
-        if ($maxPile != null && $maxPileCount > 1) {
+        if (count($maxPiles) > 0 && $maxPileCount > 1) {
+            $maxPile = $maxPiles[bga_rand(0, count($maxPiles) - 1)];
             $cardsToMove = $this->getCardsFromDb($this->cards->getCardsInLocation('pile'.$maxPile, null, 'location_arg'));
             $cardsIds = array_map(fn($card) => $card->id, $cardsToMove);
             $cardsIds = array_slice($cardsIds, 0, ceil(count($cardsIds) / 2));
