@@ -96,7 +96,7 @@
   color: #8dc63f;
   text-shadow: -1px 1px 1px white;
   font-weight: bold;
-  font-size: 80%;
+  font-size: 75%;
   background-image: url("img/point-side.jpg");
   display: flex;
   justify-content: center;
@@ -107,6 +107,9 @@
 .card .card-sides .card-side.front > * {
   pointer-events: none;
   user-select: none;
+}
+.card .card-sides .card-side.front .margin {
+  margin: 0 10px;
 }
 .card .card-sides .card-side.front .flex {
   display: flex;
@@ -173,10 +176,12 @@
 .card .card-sides .card-side.front .icon {
   width: 24px;
   height: 24px;
+  min-width: 24px;
+  min-height: 24px;
 }
 .card .card-sides .card-side.front .icon.points {
   text-shadow: 1px 1px 1px #6d9d31;
-  font-size: 90%;
+  font-size: 100%;
 }
 .card .card-sides .card-side.front .multiple-set {
   position: relative;

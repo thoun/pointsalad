@@ -105,7 +105,7 @@ var ONION = 4;
 var PEPPER = 5;
 var TOMATO = 6;
 function evenOdd(veggie) {
-    return formatTextIcons("\n        <div class=\"flex\">[veggie".concat(veggie, "]</div>\n        <div class=\"flex\">\n            <span class=\"flex wrap\">").concat(_('Even total'), "</span>\n            <span>=</span>\n            <span>[7]</span>\n        </div>\n        <div class=\"flex\">\n            <span class=\"flex wrap\">").concat(_('Odd total'), "</span>\n            <span>=</span>\n            <span>[3]</span>\n        </div>\n    "));
+    return formatTextIcons("\n        <div class=\"margin\">\n            <div class=\"flex\">[veggie".concat(veggie, "]</div>\n            <div class=\"flex\">\n                <span class=\"flex wrap\">").concat(_('Even total'), "</span>\n                <span>=</span>\n                <span>[7]</span>\n            </div>\n            <div class=\"flex\">\n                <span class=\"flex wrap\">").concat(_('Odd total'), "</span>\n                <span>=</span>\n                <span>[3]</span>\n            </div>\n        </div>\n    "));
 }
 function mostLeast(word, veggie) {
     return formatTextIcons("\n        <div class=\"flex\">\n            <span class=\"flex wrap\">".concat(word, " [veggie").concat(veggie, "]</span>\n            <span>=</span>\n            <span>[10]</span>\n        </div>\n    "));
@@ -117,7 +117,7 @@ function least(veggie) {
     return mostLeast(_('Least'), veggie);
 }
 function sets(sets) {
-    return formatTextIcons(sets.map(function (set) { return "<div>[".concat(set[0], "] / [veggie").concat(set[1], "]</div>"); }).join(''));
+    return formatTextIcons(sets.map(function (set) { return "<div>[".concat(set[0], "]/[veggie").concat(set[1], "]</div>"); }).join(''));
 }
 function pairSet(veggies) {
     return formatTextIcons("\n    <div class=\"multiple-set\">\n        ".concat(veggies.map(function (veggie, index) { return "<span data-index=\"".concat(index, "\">[veggie").concat(veggie, "]</span>"); }).join('<span class="plus">+</span>'), "\n        =[5]</div>\n    "));
@@ -372,6 +372,8 @@ var PointSalad = /** @class */ (function () {
         }
         this.setupNotifications();
         log("Ending game setup");
+        // TODO TEMP
+        //this.debugSeeAllPointCards();
     };
     ///////////////////////////////////////////////////
     //// Game & client states
@@ -446,6 +448,25 @@ var PointSalad = /** @class */ (function () {
     ///////////////////////////////////////////////////
     //// Utility methods
     ///////////////////////////////////////////////////
+    // gameui.debugSeeAllPointCards()
+    PointSalad.prototype.debugSeeAllPointCards = function () {
+        var html = "<div id=\"all-point-cards\">";
+        for (var veggie = 1; veggie <= 6; veggie++) {
+            html += "<div id=\"all-point-cards-".concat(veggie, "\" style=\"display: flex; flex-wrap: nowrap;\"></div>");
+        }
+        html += "</div>";
+        dojo.place(html, 'full-table', 'before');
+        for (var veggie = 1; veggie <= 6; veggie++) {
+            for (var i = 1; i <= 12; i++) {
+                this.createOrMoveCard({
+                    id: 1000 * veggie + i,
+                    side: 0,
+                    index: i,
+                    veggie: veggie,
+                }, "all-point-cards-".concat(veggie));
+            }
+        }
+    };
     PointSalad.prototype.getPlayerId = function () {
         return Number(this.player_id);
     };

@@ -51,6 +51,9 @@ class PointSalad implements PointSaladGame {
         this.setupNotifications();
 
         log( "Ending game setup" );
+
+        // TODO TEMP
+        //this.debugSeeAllPointCards();
     }
 
     ///////////////////////////////////////////////////
@@ -138,6 +141,27 @@ class PointSalad implements PointSaladGame {
 
 
     ///////////////////////////////////////////////////
+
+    // gameui.debugSeeAllPointCards()
+    debugSeeAllPointCards() {
+        let html = `<div id="all-point-cards">`;
+        for (let veggie = 1; veggie <= 6; veggie++) {
+            html += `<div id="all-point-cards-${veggie}" style="display: flex; flex-wrap: nowrap;"></div>`;
+        }
+        html += `</div>`;
+        dojo.place(html, 'full-table', 'before');
+
+        for (let veggie = 1; veggie <= 6; veggie++) {
+            for (let i = 1; i <= 12; i++) {
+                this.createOrMoveCard({
+                    id: 1000*veggie+i,
+                    side: 0,
+                    index: i,
+                    veggie: veggie,
+                } as Card, `all-point-cards-${veggie}`);
+            }
+        }
+    }
 
     public getPlayerId(): number {
         return Number((this as any).player_id);

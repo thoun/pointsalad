@@ -7,16 +7,18 @@ const TOMATO = 6;
 
 function evenOdd(veggie: number): string {
     return formatTextIcons(`
-        <div class="flex">[veggie${veggie}]</div>
-        <div class="flex">
-            <span class="flex wrap">${_('Even total')}</span>
-            <span>=</span>
-            <span>[7]</span>
-        </div>
-        <div class="flex">
-            <span class="flex wrap">${_('Odd total')}</span>
-            <span>=</span>
-            <span>[3]</span>
+        <div class="margin">
+            <div class="flex">[veggie${veggie}]</div>
+            <div class="flex">
+                <span class="flex wrap">${_('Even total')}</span>
+                <span>=</span>
+                <span>[7]</span>
+            </div>
+            <div class="flex">
+                <span class="flex wrap">${_('Odd total')}</span>
+                <span>=</span>
+                <span>[3]</span>
+            </div>
         </div>
     `);
 }
@@ -39,7 +41,7 @@ function least(veggie: number): string {
 
 function sets(sets: number[][]) {
     return formatTextIcons(
-        sets.map(set => `<div>[${set[0]}] / [veggie${set[1]}]</div>`).join('')
+        sets.map(set => `<div>[${set[0]}]/[veggie${set[1]}]</div>`).join('')
     );
 }
 
