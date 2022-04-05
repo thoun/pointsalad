@@ -392,6 +392,15 @@ html, .mode_3d #game_play_area_background {
   font-weight: normal;
   font-style: normal;
 }
+.bgabutton_blue {
+  background: #005630;
+  border: 1px solid #00301a;
+}
+
+.notouch-device .bgabutton_blue:hover {
+  background: #006d3c;
+}
+
 .icon {
   width: 32px;
   height: 32px;
