@@ -23,7 +23,8 @@ class PlayerTable {
         player.cards.forEach(card => 
             this.game.createOrMoveCard(card, card.side === 0 ? 
                 `player-points-${player.id}` : 
-                `player-veggies-${player.id}-${card.veggie}`
+                `player-veggies-${player.id}-${card.veggie}`,
+                this.game.getPlayerCardTooltip(card),
             )
         );
     }

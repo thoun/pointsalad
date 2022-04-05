@@ -3,11 +3,12 @@ class TableCenter {
 
     constructor(private game: PointSaladGame, gamedatas: PointSaladGamedatas) {
         for (let pile = 1; pile <= 3; pile++) {
-            if (gamedatas.pileTopCard[pile]) {
-                this.game.createOrMoveCard(gamedatas.pileTopCard[pile], `pile${pile}`, true);
+            const pileTop = gamedatas.pileTopCard[pile];
+            if (pileTop) {
+                this.game.createOrMoveCard(pileTop, `pile${pile}`, this.game.getMarketCardTooltip(pileTop), true);
             }
             
-            gamedatas.market[pile].filter(card => !!card).forEach(card => this.game.createOrMoveCard(card, `market-row${card.locationArg}-card${pile}`));
+            gamedatas.market[pile].filter(card => !!card).forEach(card => this.game.createOrMoveCard(card, `market-row${card.locationArg}-card${pile}`, this.game.getMarketCardTooltip(card)));
 
             const pileCounter = new ebg.counter();
             pileCounter.create(`pile${pile}-counter`);

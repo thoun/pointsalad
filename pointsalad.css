@@ -366,3 +366,7 @@ html, .mode_3d #game_play_area_background {
 .icon[data-veggie="6"] {
   background-position-x: 100%;
 }
+
+.card-tooltip-name {
+  font-weight: bold;
+}

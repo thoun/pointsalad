@@ -66,7 +66,7 @@ var PlayerTable = /** @class */ (function () {
         player.cards.forEach(function (card) {
             return _this.game.createOrMoveCard(card, card.side === 0 ?
                 "player-points-".concat(player.id) :
-                "player-veggies-".concat(player.id, "-").concat(card.veggie));
+                "player-veggies-".concat(player.id, "-").concat(card.veggie), _this.game.getPlayerCardTooltip(card));
         });
     }
     return PlayerTable;
@@ -77,10 +77,11 @@ var TableCenter = /** @class */ (function () {
         this.game = game;
         this.pileCounters = [];
         var _loop_1 = function (pile) {
-            if (gamedatas.pileTopCard[pile]) {
-                this_1.game.createOrMoveCard(gamedatas.pileTopCard[pile], "pile".concat(pile), true);
+            var pileTop = gamedatas.pileTopCard[pile];
+            if (pileTop) {
+                this_1.game.createOrMoveCard(pileTop, "pile".concat(pile), this_1.game.getMarketCardTooltip(pileTop), true);
             }
-            gamedatas.market[pile].filter(function (card) { return !!card; }).forEach(function (card) { return _this.game.createOrMoveCard(card, "market-row".concat(card.locationArg, "-card").concat(pile)); });
+            gamedatas.market[pile].filter(function (card) { return !!card; }).forEach(function (card) { return _this.game.createOrMoveCard(card, "market-row".concat(card.locationArg, "-card").concat(pile), _this.game.getMarketCardTooltip(card)); });
             var pileCounter = new ebg.counter();
             pileCounter.create("pile".concat(pile, "-counter"));
             pileCounter.setValue(gamedatas.pileCount[pile]);
@@ -346,6 +347,7 @@ var PointSalad = /** @class */ (function () {
         this.selectedCards = [];
         this.veggieCounters = [];
         this.canTakeOnlyOneVeggie = false;
+        this.TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
     }
     /*
         setup:
@@ -463,19 +465,22 @@ var PointSalad = /** @class */ (function () {
                     side: 0,
                     index: i,
                     veggie: veggie,
-                }, "all-point-cards-".concat(veggie));
+                }, "all-point-cards-".concat(veggie), 'for test only');
             }
         }
     };
     PointSalad.prototype.getPlayerId = function () {
         return Number(this.player_id);
     };
+    PointSalad.prototype.setTooltip = function (id, html) {
+        this.addTooltipHtml(id, html, this.TOOLTIP_DELAY);
+    };
     PointSalad.prototype.createPlayerPanels = function (gamedatas) {
         var _this = this;
         Object.values(gamedatas.players).forEach(function (player) {
             var playerId = Number(player.id);
             _this.veggieCounters[playerId] = [];
-            var html = "";
+            var html = "<div id=\"veggie-counters-".concat(playerId, "\">");
             for (var veggie = 1; veggie <= 6; veggie++) {
                 if (veggie === 1 || veggie === 4) {
                     html += "<div class=\"counters\">";
@@ -485,6 +490,7 @@ var PointSalad = /** @class */ (function () {
                     html += "</div>";
                 }
             }
+            html += "</div>";
             dojo.place(html, "player_board_".concat(player.id));
             for (var veggie = 1; veggie <= 6; veggie++) {
                 var veggieCounter = new ebg.counter();
@@ -492,6 +498,7 @@ var PointSalad = /** @class */ (function () {
                 veggieCounter.setValue(player.veggieCounts[veggie]);
                 _this.veggieCounters[playerId][veggie] = veggieCounter;
             }
+            _this.setTooltip("veggie-counters-".concat(playerId), _("Veggie counters"));
         });
     };
     PointSalad.prototype.createPlayerTables = function (gamedatas) {
@@ -518,13 +525,14 @@ var PointSalad = /** @class */ (function () {
             case TOMATO: return _('Tomato');
         }
     };
-    PointSalad.prototype.createOrMoveCard = function (card, destinationId, init, from) {
+    PointSalad.prototype.createOrMoveCard = function (card, destinationId, tooltip, init, from) {
         var _this = this;
         var _a, _b;
         if (init === void 0) { init = false; }
         if (from === void 0) { from = null; }
         var existingDiv = document.getElementById("card-".concat(card.id));
         if (existingDiv) {
+            this.removeTooltip("card-".concat(card.id));
             if (init) {
                 document.getElementById(destinationId).appendChild(existingDiv);
             }
@@ -532,6 +540,7 @@ var PointSalad = /** @class */ (function () {
                 slideToObjectAndAttach(this, existingDiv, destinationId);
             }
             existingDiv.dataset.side = '' + card.side;
+            this.setTooltip(existingDiv.id, tooltip);
         }
         else {
             var name_1 = this.getVeggieName(card.veggie);
@@ -548,6 +557,26 @@ var PointSalad = /** @class */ (function () {
                 var fromCardId = document.getElementById(from).children[0].id;
                 slideFromObject(this, div, fromCardId);
             }
+            this.setTooltip(div.id, tooltip);
+        }
+    };
+    PointSalad.prototype.getPointSideTooltip = function (card) {
+        return "";
+    };
+    PointSalad.prototype.getPlayerCardTooltip = function (card) {
+        if (card.side === 0) {
+            return "<div class=\"card-tooltip\">\n                <div class=\"card-tooltip-name\">".concat(_("Point card"), "</div>\n                <div class=\"card-tooltip-description\">\n                    <div>").concat(_("At the end of the game, score Victory Points if you match the card conditions with your veggie cards. You may score a point card multiple times."), "</div>\n                    <div>").concat(this.getPointSideTooltip(card), "</div>\n                </div>\n            </div>");
+        }
+        else if (card.side === 1) {
+            return "<div class=\"card-tooltip\">\n                <div class=\"card-tooltip-name\">".concat(_("Veggie card"), "</div>\n                <div class=\"card-tooltip-description\">\n                    <div>").concat(this.getVeggieName(card.veggie), "</div>\n                </div>\n            </div>");
+        }
+    };
+    PointSalad.prototype.getMarketCardTooltip = function (card) {
+        if (card.side === 0) {
+            return "<div class=\"card-tooltip\">\n                <div class=\"card-tooltip-name\">".concat(_("Draw pile"), " (").concat(_("Point card"), ")</div>\n                <div class=\"card-tooltip-description\">\n                    <div>").concat(_("At your turn, you can take one Point card from the draw pile."), "</div>\n                    <div>").concat(this.getPointSideTooltip(card), "</div>\n                </div>\n            </div>");
+        }
+        else if (card.side === 1) {
+            return "<div class=\"card-tooltip\">\n                <div class=\"card-tooltip-name\">".concat(_("Veggie market"), " (").concat(_("Veggie card"), ")</div>\n                <div class=\"card-tooltip-description\">\n                    <div>").concat(_("At your turn, you can take two Veggie cards from the market."), "</div>\n                    <div>").concat(this.getVeggieName(card.veggie), "</div>\n                </div>\n            </div>");
         }
     };
     PointSalad.prototype.updateVeggieCount = function (playerId, veggieCounts) {
@@ -647,14 +676,14 @@ var PointSalad = /** @class */ (function () {
         var _this = this;
         var playerId = notif.args.playerId;
         notif.args.cards.forEach(function (card) {
-            return _this.createOrMoveCard(card, card.side === 0 ? "player-points-".concat(playerId) : "player-veggies-".concat(playerId, "-").concat(card.veggie));
+            return _this.createOrMoveCard(card, card.side === 0 ? "player-points-".concat(playerId) : "player-veggies-".concat(playerId, "-").concat(card.veggie), _this.getPlayerCardTooltip(card));
         });
         this.updateVeggieCount(playerId, notif.args.veggieCounts);
         var pile = notif.args.pile;
         var pileTop = notif.args.pileTop;
         var pileCount = notif.args.pileCount;
         if (pileTop) {
-            this.createOrMoveCard(pileTop, "pile".concat(pile));
+            this.createOrMoveCard(pileTop, "pile".concat(pile), this.getMarketCardTooltip(pileTop));
         }
         if (pileCount !== null) {
             this.tableCenter.pileCounters[pile].setValue(pileCount);
@@ -663,16 +692,16 @@ var PointSalad = /** @class */ (function () {
     PointSalad.prototype.notif_flippedCard = function (notif) {
         var playerId = notif.args.playerId;
         var card = notif.args.card;
-        this.createOrMoveCard(card, "player-veggies-".concat(playerId, "-").concat(card.veggie));
+        this.createOrMoveCard(card, "player-veggies-".concat(playerId, "-").concat(card.veggie), this.getPlayerCardTooltip(card));
         this.updateVeggieCount(playerId, notif.args.veggieCounts);
     };
     PointSalad.prototype.notif_marketRefill = function (notif) {
         var pile = notif.args.pile;
         var card = notif.args.card;
-        this.createOrMoveCard(card, "market-row".concat(card.locationArg, "-card").concat(pile));
+        this.createOrMoveCard(card, "market-row".concat(card.locationArg, "-card").concat(pile), this.getMarketCardTooltip(card));
         var pileTop = notif.args.pileTop;
         if (pileTop) {
-            this.createOrMoveCard(pileTop, "pile".concat(pile));
+            this.createOrMoveCard(pileTop, "pile".concat(pile), this.getMarketCardTooltip(pileTop));
         }
         this.tableCenter.pileCounters[pile].setValue(notif.args.pileCount);
     };
@@ -680,7 +709,7 @@ var PointSalad = /** @class */ (function () {
         var pile = notif.args.pile;
         var pileTop = notif.args.pileTop;
         if (pileTop) {
-            this.createOrMoveCard(pileTop, "pile".concat(pile), false, "pile".concat(notif.args.fromPile));
+            this.createOrMoveCard(pileTop, "pile".concat(pile), this.getMarketCardTooltip(pileTop), false, "pile".concat(notif.args.fromPile));
         }
         this.tableCenter.setPileCounts(notif.args.pileCounts);
     };

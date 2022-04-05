@@ -40,9 +40,11 @@ interface PointSaladGamedatas {
 }
 
 interface PointSaladGame extends Game {
-    createOrMoveCard(card: Card, destinationId: string, init?: boolean): void;
+    createOrMoveCard(card: Card, destinationId: string, tooltip: string, init?: boolean): void;
     getPlayerId(): number;
     getZoom(): number;
+    getMarketCardTooltip(card: Card): string;
+    getPlayerCardTooltip(card: Card): string;
 }
 
 interface EnteringTakeCardsArgs {

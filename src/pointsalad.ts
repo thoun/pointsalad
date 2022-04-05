@@ -15,7 +15,9 @@ class PointSalad implements PointSaladGame {
     private playersTables: PlayerTable[] = [];
     private selectedCards: Card[] = [];
     private veggieCounters: Counter[][] = [];
-    private canTakeOnlyOneVeggie: boolean = false;
+    private canTakeOnlyOneVeggie: boolean = false;    
+    
+    private TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
 
     constructor() {
     }
@@ -158,7 +160,7 @@ class PointSalad implements PointSaladGame {
                     side: 0,
                     index: i,
                     veggie: veggie,
-                } as Card, `all-point-cards-${veggie}`);
+                } as Card, `all-point-cards-${veggie}`, 'for test only');
             }
         }
     }
@@ -167,13 +169,17 @@ class PointSalad implements PointSaladGame {
         return Number((this as any).player_id);
     }
 
+    public setTooltip(id: string, html: string) {
+        (this as any).addTooltipHtml(id, html, this.TOOLTIP_DELAY);
+    }
+
     private createPlayerPanels(gamedatas: PointSaladGamedatas) {
 
         Object.values(gamedatas.players).forEach(player => {
             const playerId = Number(player.id);
             this.veggieCounters[playerId] = [];
 
-            let html = ``;
+            let html = `<div id="veggie-counters-${playerId}">`;
             for (let veggie = 1; veggie <= 6; veggie++) {
                 if (veggie === 1 || veggie === 4) {
                     html += `<div class="counters">`;
@@ -189,6 +195,7 @@ class PointSalad implements PointSaladGame {
                     html += `</div>`;
                 }
             }
+            html += `</div>`;
             
             dojo.place(html, `player_board_${player.id}`);
 
@@ -199,6 +206,7 @@ class PointSalad implements PointSaladGame {
                 this.veggieCounters[playerId][veggie] = veggieCounter;
             }
 
+            this.setTooltip(`veggie-counters-${playerId}`, _("Veggie counters"));
         });
     }
 
@@ -230,15 +238,19 @@ class PointSalad implements PointSaladGame {
         }
     }
 
-    public createOrMoveCard(card: Card, destinationId: string, init: boolean = false, from: string = null) {
+    public createOrMoveCard(card: Card, destinationId: string, tooltip: string, init: boolean = false, from: string = null) {
         const existingDiv = document.getElementById(`card-${card.id}`);
         if (existingDiv) {
+            (this as any).removeTooltip(`card-${card.id}`);
+
             if (init) {
                 document.getElementById(destinationId).appendChild(existingDiv);
             } else {
                 slideToObjectAndAttach(this, existingDiv, destinationId);
             }
             existingDiv.dataset.side = ''+card.side;
+
+            this.setTooltip(existingDiv.id, tooltip);
         } else {
             const name = this.getVeggieName(card.veggie);
             const div = document.createElement('div');
@@ -265,6 +277,51 @@ class PointSalad implements PointSaladGame {
                 const fromCardId = document.getElementById(from).children[0].id;
                 slideFromObject(this, div, fromCardId);
             }
+            
+            this.setTooltip(div.id, tooltip);
+        }
+    }
+
+    private getPointSideTooltip(card: Card) {
+        return ``;
+    }
+
+    public getPlayerCardTooltip(card: Card) {
+        if (card.side === 0) {
+            return `<div class="card-tooltip">
+                <div class="card-tooltip-name">${_("Point card")}</div>
+                <div class="card-tooltip-description">
+                    <div>${_("At the end of the game, score Victory Points if you match the card conditions with your veggie cards. You may score a point card multiple times.")}</div>
+                    <div>${this.getPointSideTooltip(card)}</div>
+                </div>
+            </div>`;
+        } else if (card.side === 1) {
+            return `<div class="card-tooltip">
+                <div class="card-tooltip-name">${_("Veggie card")}</div>
+                <div class="card-tooltip-description">
+                    <div>${this.getVeggieName(card.veggie)}</div>
+                </div>
+            </div>`;
+        }
+    }
+
+    public getMarketCardTooltip(card: Card) {
+        if (card.side === 0) {
+            return `<div class="card-tooltip">
+                <div class="card-tooltip-name">${_("Draw pile")} (${_("Point card")})</div>
+                <div class="card-tooltip-description">
+                    <div>${_("At your turn, you can take one Point card from the draw pile.")}</div>
+                    <div>${this.getPointSideTooltip(card)}</div>
+                </div>
+            </div>`;
+        } else if (card.side === 1) {
+            return `<div class="card-tooltip">
+                <div class="card-tooltip-name">${_("Veggie market")} (${_("Veggie card")})</div>
+                <div class="card-tooltip-description">
+                    <div>${_("At your turn, you can take two Veggie cards from the market.")}</div>
+                    <div>${this.getVeggieName(card.veggie)}</div>
+                </div>
+            </div>`;
         }
     }
 
@@ -383,7 +440,7 @@ class PointSalad implements PointSaladGame {
     notif_takenCards(notif: Notif<NotifTakenCardsArgs>) {
         const playerId = notif.args.playerId;
         notif.args.cards.forEach(card => 
-            this.createOrMoveCard(card, card.side === 0 ? `player-points-${playerId}` : `player-veggies-${playerId}-${card.veggie}`)
+            this.createOrMoveCard(card, card.side === 0 ? `player-points-${playerId}` : `player-veggies-${playerId}-${card.veggie}`, this.getPlayerCardTooltip(card))
         );
         this.updateVeggieCount(playerId, notif.args.veggieCounts);
 
@@ -391,7 +448,7 @@ class PointSalad implements PointSaladGame {
         const pileTop = notif.args.pileTop;
         const pileCount = notif.args.pileCount;
         if (pileTop) {
-            this.createOrMoveCard(pileTop, `pile${pile}`);
+            this.createOrMoveCard(pileTop, `pile${pile}`, this.getMarketCardTooltip(pileTop));
         }
         if (pileCount !== null) {
             this.tableCenter.pileCounters[pile].setValue(pileCount);
@@ -401,17 +458,17 @@ class PointSalad implements PointSaladGame {
     notif_flippedCard(notif: Notif<NotifFlippedCardArgs>) {
         const playerId = notif.args.playerId;
         const card = notif.args.card;
-        this.createOrMoveCard(card, `player-veggies-${playerId}-${card.veggie}`);
+        this.createOrMoveCard(card, `player-veggies-${playerId}-${card.veggie}`, this.getPlayerCardTooltip(card));
         this.updateVeggieCount(playerId, notif.args.veggieCounts);
     }
 
     notif_marketRefill(notif: Notif<NotifMarketRefillArgs>) {
         const pile = notif.args.pile;
         const card = notif.args.card;
-        this.createOrMoveCard(card, `market-row${card.locationArg}-card${pile}`);
+        this.createOrMoveCard(card, `market-row${card.locationArg}-card${pile}`, this.getMarketCardTooltip(card));
         const pileTop = notif.args.pileTop;
         if (pileTop) {
-            this.createOrMoveCard(pileTop, `pile${pile}`);
+            this.createOrMoveCard(pileTop, `pile${pile}`, this.getMarketCardTooltip(pileTop));
         }
         this.tableCenter.pileCounters[pile].setValue(notif.args.pileCount);
     }
@@ -420,7 +477,7 @@ class PointSalad implements PointSaladGame {
         const pile = notif.args.pile;
         const pileTop = notif.args.pileTop;
         if (pileTop) {
-            this.createOrMoveCard(pileTop, `pile${pile}`, false, `pile${notif.args.fromPile}`);
+            this.createOrMoveCard(pileTop, `pile${pile}`, this.getMarketCardTooltip(pileTop), false, `pile${notif.args.fromPile}`);
         }
         this.tableCenter.setPileCounts(notif.args.pileCounts);
     }
