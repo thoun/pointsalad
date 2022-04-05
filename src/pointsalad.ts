@@ -52,6 +52,10 @@ class PointSalad implements PointSaladGame {
 
         this.setupNotifications();
 
+        if (gamedatas.showAskFlipPhase) {
+            this.addAskFlipPhaseToggle(gamedatas.askFlipPhase);
+        }
+
         log( "Ending game setup" );
 
         // TODO TEMP
@@ -179,7 +183,11 @@ class PointSalad implements PointSaladGame {
             const playerId = Number(player.id);
             this.veggieCounters[playerId] = [];
 
-            let html = `<div id="veggie-counters-${playerId}">`;
+            let html = ``;
+            if (playerId === this.getPlayerId()) {
+                html += `<div id="rapid-actions"></div>`;
+            }
+            html += `<div id="veggie-counters-${playerId}">`;
             for (let veggie = 1; veggie <= 6; veggie++) {
                 if (veggie === 1 || veggie === 4) {
                     html += `<div class="counters">`;
@@ -336,6 +344,27 @@ class PointSalad implements PointSaladGame {
         return Number(div.dataset.side);
     }
 
+    private addAskFlipPhaseToggle(active: boolean) {
+        if (!document.getElementById('askFlipPhaseWrapper')) {
+            dojo.place(`<div id="askFlipPhaseWrapper">
+                <label class="switch">
+                    <input id="askFlipPhaseCheckbox" type="checkbox" ${active ? 'checked' : ''}>
+                    <span class="slider round"></span>
+                </label>
+                <label for="askFlipPhaseCheckbox" class="text-label">${_("Ask to flip cards")}</label>
+            </div>`, 'rapid-actions');
+
+            document.getElementById('askFlipPhaseCheckbox').addEventListener('change', (e: any) => this.setAskFlipPhase(e.target.checked));
+
+            this.setTooltip('askFlipPhaseWrapper', _("Disable this is you don't want to be asked to flip a Point card."));
+        }
+    }
+
+    private removeAskFlipPhaseToggle() {
+        const wrapper = document.getElementById('askFlipPhaseWrapper');
+        wrapper?.parentElement?.removeChild(wrapper);
+    }
+
     private setCardScore(cardId: number, cardScore: number) {
         dojo.place(formatTextIcons(`<div class="final-score">[${cardScore}]</div>`), `card-${cardId}`);
     }
@@ -395,9 +424,20 @@ class PointSalad implements PointSaladGame {
         this.takeAction('skipFlipCard');
     }
 
+    public setAskFlipPhase(askFlipPhase: boolean) {
+        this.takeNoLockAction('setAskFlipPhase', {
+            askFlipPhase
+        });
+    }
+
     public takeAction(action: string, data?: any) {
         data = data || {};
         data.lock = true;
+        (this as any).ajaxcall(`/pointsalad/pointsalad/${action}.html`, data, this, () => {});
+    }
+
+    public takeNoLockAction(action: string, data?: any) {
+        data = data || {};
         (this as any).ajaxcall(`/pointsalad/pointsalad/${action}.html`, data, this, () => {});
     }
 
@@ -453,6 +493,10 @@ class PointSalad implements PointSaladGame {
         if (pileCount !== null) {
             this.tableCenter.pileCounters[pile].setValue(pileCount);
         }
+
+        if (notif.args.showAskFlipCard && playerId == this.getPlayerId()) {
+            this.addAskFlipPhaseToggle(true);
+        }
     }
 
     notif_flippedCard(notif: Notif<NotifFlippedCardArgs>) {
@@ -460,6 +504,10 @@ class PointSalad implements PointSaladGame {
         const card = notif.args.card;
         this.createOrMoveCard(card, `player-veggies-${playerId}-${card.veggie}`, this.getPlayerCardTooltip(card));
         this.updateVeggieCount(playerId, notif.args.veggieCounts);
+
+        if (notif.args.hideAskFlipCard && playerId == this.getPlayerId()) {
+            this.removeAskFlipPhaseToggle();
+        }        
     }
 
     notif_marketRefill(notif: Notif<NotifMarketRefillArgs>) {

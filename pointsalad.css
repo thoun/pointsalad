@@ -21,6 +21,68 @@
   background: #e8f3d8 !important;
 }
 
+#rapid-actions {
+  margin: 10px;
+}
+
+#askFlipPhaseWrapper {
+  display: flex;
+  align-items: center;
+  /* The switch - the box around the slider */
+  /* Hide default HTML checkbox */
+  /* The slider */
+  /* Rounded sliders */
+}
+#askFlipPhaseWrapper .switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 26px;
+}
+#askFlipPhaseWrapper .switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+#askFlipPhaseWrapper .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+}
+#askFlipPhaseWrapper .slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+}
+#askFlipPhaseWrapper input:checked + .slider {
+  background-color: #8DC63F;
+}
+#askFlipPhaseWrapper input:focus + .slider {
+  box-shadow: 0 0 1px #8DC63F;
+}
+#askFlipPhaseWrapper input:checked + .slider:before {
+  transform: translateX(18px);
+}
+#askFlipPhaseWrapper .slider.round {
+  border-radius: 26px;
+}
+#askFlipPhaseWrapper .slider.round:before {
+  border-radius: 50%;
+}
+#askFlipPhaseWrapper .text-label {
+  margin-left: 5px;
+}
+
 .card {
   position: relative;
   width: 100px;

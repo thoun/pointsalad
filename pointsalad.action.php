@@ -62,6 +62,16 @@
 
       self::ajaxResponse();
     }
+  	
+    public function setAskFlipPhase() {
+        self::setAjaxMode();
+
+        $askFlipPhase = self::getArg("askFlipPhase", AT_bool, true);
+
+        $this->game->setAskFlipPhase($askFlipPhase);
+
+        self::ajaxResponse();
+    }
 
   }
   

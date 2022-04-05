@@ -37,6 +37,9 @@ interface PointSaladGamedatas {
     market: { [pile: number]: Card[] };
 
     cardScores?: { [cardId: number]: number };
+
+    showAskFlipPhase: boolean;
+    askFlipPhase: boolean;
 }
 
 interface PointSaladGame extends Game {
@@ -62,6 +65,7 @@ interface NotifFlippedCardArgs {
     playerId: number;
     card: Card;
     veggieCounts: VeggieCounts;
+    hideAskFlipCard: boolean;
 }
 
 interface NotifTakenCardsArgs {
@@ -71,6 +75,7 @@ interface NotifTakenCardsArgs {
     pile: number;
     pileTop: Card | null;
     pileCount: number | null;
+    showAskFlipCard: boolean;
 }
 
 interface NotifMarketRefillArgs {

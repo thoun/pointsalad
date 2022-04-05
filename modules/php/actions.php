@@ -38,7 +38,11 @@ trait ActionTrait {
         }
         $pointCardFromPile = $tookVeggie ? null : intval(substr($cards[0]->location, 4));
 
+        $pointCardsCountBefore = $this->getPlayerPointCardsCount($playerId);
+
         $this->cards->moveCards($ids, 'player', $playerId);
+
+        $pointCardsCountAfter = $this->getPlayerPointCardsCount($playerId);
 
         $message = $tookVeggie ? clienttranslate('${player_name} took veggies ${veggies}')
                                : clienttranslate('${player_name} took a point card');
@@ -52,6 +56,7 @@ trait ActionTrait {
             'pile' => $tookVeggie ? null : $pointCardFromPile,
             'pileTop' => $tookVeggie ? null : $this->getCardFromDb($this->cards->getCardOnTop($cards[0]->location)),
             'pileCount' => $tookVeggie ? null : intval($this->cards->countCardInLocation($cards[0]->location)),
+            'showAskFlipCard' => $pointCardsCountBefore === 0 && $pointCardsCountAfter > 0,
         ]);
 
         if ($tookVeggie) {
@@ -78,8 +83,9 @@ trait ActionTrait {
         $this->updateScores();
 
         $hasPointCard = intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` = 'player' AND `card_location_arg` = $playerId AND `card_type_arg` = 0")) > 0;
+        $goToFlipCard = $hasPointCard && $this->getAskFlipPhase($playerId);
 
-        $this->gamestate->nextState($hasPointCard ? 'flipCard' : 'nextPlayer');
+        $this->gamestate->nextState($goToFlipCard ? 'flipCard' : 'nextPlayer');
     }
         
   	
@@ -108,5 +114,18 @@ trait ActionTrait {
         self::checkAction('skipFlipCard'); 
 
         $this->gamestate->nextState('nextPlayer');
+    }
+
+    function setAskFlipPhase(bool $askFlipPhase) {
+        $playerId = $this->getCurrentPlayerId();
+        $this->DbQuery("UPDATE `player` SET `player_ask_flip_phase` = ".($askFlipPhase ? 1 : 0)." WHERE `player_id` = $playerId"); 
+
+        // dummy notif so player gets back hand
+        $this->notifyPlayer($playerId, "setAskFlipPhase", '', []);
+
+        // if the player set he don't want to be asked when he is at flip state, automatically Skip for the player
+        if (!$askFlipPhase && $this->getActivePlayerId() == $playerId && intval($this->gamestate->state_id()) == ST_PLAYER_FLIP_CARD) {
+            $this->gamestate->nextState('nextPlayer');
+        }
     }
 }

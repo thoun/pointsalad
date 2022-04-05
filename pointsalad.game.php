@@ -48,8 +48,7 @@ class PointSalad extends Table {
         $this->cards->init("card");     
 	}
 	
-    protected function getGameName( )
-    {
+    protected function getGameName() {
 		// Used for translations and stuff. Please do not modify.
         return "pointsalad";
     }	
@@ -119,6 +118,7 @@ class PointSalad extends Table {
         _ when a player refreshes the game page (F5)
     */
     protected function getAllDatas() {
+        $currentPlayerId = $this->getCurrentPlayerId();
         $result = [];
     
         // Get information about players
@@ -161,6 +161,9 @@ class PointSalad extends Table {
 
             $result['cardScores'] = $cardScores;
         }
+
+        $result['showAskFlipPhase'] = $this->getPlayerPointCardsCount($currentPlayerId) > 0;
+        $result['askFlipPhase'] = $this->getAskFlipPhase($currentPlayerId);
   
         return $result;
     }

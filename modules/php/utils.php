@@ -87,15 +87,24 @@ trait UtilTrait {
     }
 
     function applyFlipCard(int $playerId, Card &$card) {
+        $pointCardsCountBefore = 0;
+        if ($playerId > 0) {
+            $pointCardsCountBefore = $this->getPlayerPointCardsCount($playerId);
+        }
+
         $card->side = 1;
         $this->DbQuery("UPDATE `card` SET `card_type_arg` = 1 WHERE `card_id` = $card->id"); 
 
         if ($playerId > 0) {
+            $pointCardsCountAfter = $this->getPlayerPointCardsCount($playerId);
+            $hideAskFlipCard = $pointCardsCountBefore > 0 && $pointCardsCountAfter == 0;
+
             self::notifyAllPlayers('flippedCard', clienttranslate('${player_name} flips a point card to get a veggie card'), [
                 'playerId' => $playerId,
                 'player_name' => $this->getPlayerName($playerId),
                 'card' => $card,
                 'veggieCounts' => $this->getVeggieCountsByPlayer($playerId),
+                'hideAskFlipCard' => $hideAskFlipCard,
             ]);
         }
     }
@@ -255,5 +264,15 @@ trait UtilTrait {
         }
 
         return $pileCount;
+    }    
+
+    function getAskFlipPhase(int $playerId) {
+        return boolval(self::getUniqueValueFromDB("SELECT `player_ask_flip_phase` FROM `player` WHERE `player_id` = $playerId"));
+    }
+
+    function getPlayerPointCardsCount(int $playerId) {
+        $cards = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $playerId));
+
+        return count(array_filter($cards, fn($card) => $card->side === 0));
     }
 }
