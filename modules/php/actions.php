@@ -64,20 +64,18 @@ trait ActionTrait {
             
             self::incStat($cardsCount, 'veggieFromMarket');
             self::incStat($cardsCount, 'veggieFromMarket', $playerId);
-
-            foreach($cards as $card) {
-                $pile = intval(substr($cards[0]->location, 6));
-                if (intval($this->cards->countCardInLocation('pile'.$pile)) == 0) {
-                    $this->refillPile($pile);
-                }
-            }
         } else {
-            if (intval($this->cards->countCardInLocation('pile'.$pointCardFromPile)) == 0) {
-                $this->refillPile($pointCardFromPile);
-            }
-
             self::incStat($cardsCount, 'pointsFromMarket');
             self::incStat($cardsCount, 'pointsFromMarket', $playerId);
+        }
+
+        foreach($cards as $card) {
+            $matches = [];
+            preg_match('/\\d/', $card->location, $matches);
+            $pile = intval($matches[0]);
+            if (intval($this->cards->countCardInLocation('pile'.$pile)) == 0) {
+                $this->refillPile($pile);
+            }
         }
 
         $this->updateScores();
