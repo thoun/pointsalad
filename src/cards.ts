@@ -178,7 +178,7 @@ CARDS_EFFECTS[LETTUCE] = [
 CARDS_EFFECTS[ONION] = [
     null,
     // special
-    () => formatTextIcons(`<div class="flex">[5]<span>/</span><span>${_('Veggie type with at least 2')}</span></div>`), // TODO merge with similar label?
+    () => formatTextIcons(`<div class="flex">[3]<span>/</span><span>${_('Veggie type with at least 2')}</span></div>`), // TODO merge with similar label?
     // odd/even
     () => evenOdd(TOMATO),
     // most

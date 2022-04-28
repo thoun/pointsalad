@@ -232,7 +232,7 @@ CARDS_EFFECTS[LETTUCE] = [
 CARDS_EFFECTS[ONION] = [
     null,
     // special
-    function () { return formatTextIcons("<div class=\"flex\">[5]<span>/</span><span>".concat(_('Veggie type with at least 2'), "</span></div>")); },
+    function () { return formatTextIcons("<div class=\"flex\">[3]<span>/</span><span>".concat(_('Veggie type with at least 2'), "</span></div>")); },
     // odd/even
     function () { return evenOdd(TOMATO); },
     // most
