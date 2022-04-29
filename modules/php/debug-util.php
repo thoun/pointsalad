@@ -26,7 +26,8 @@ trait DebugUtilTrait {
             $this->applyFlipCard(2343492, $card);
         }
 
-        $this->debugSetCardInHand(LETTUCE * 100 + 10, 2343492);
+        $this->debugSetCardInHand(CABBAGE * 100 + 5, 2343492);
+        $this->debugSetCardInHand(CABBAGE * 100 + 9, 2343492);
         
         $this->gamestate->changeActivePlayer(2343492);
     }

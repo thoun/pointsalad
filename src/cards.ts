@@ -88,7 +88,7 @@ CARDS_EFFECTS[CABBAGE] = [
     // 3/V -2/V
     () => sets([[3, CARROT], [-2, ONION]]),
     // 2/V 1/V -2/V
-    () => sets([[2, CARROT], [1, PEPPER], [-2, ONION]]),
+    () => sets([[2, CARROT], [1, PEPPER], [-2, CABBAGE]]),
     // 2/V 2/V -4/V
     () => sets([[2, CARROT], [2, ONION], [-4, PEPPER]]),
     // 3/V -1/V -1/V
