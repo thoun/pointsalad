@@ -369,6 +369,7 @@ var PointSalad = /** @class */ (function () {
         this.createPlayerPanels(gamedatas);
         this.tableCenter = new TableCenter(this, gamedatas);
         this.createPlayerTables(gamedatas);
+        this.createPlayerJumps(gamedatas);
         if (gamedatas.cardScores) {
             Object.keys(gamedatas.cardScores).forEach(function (key) { return _this.setCardScore(Number(key), gamedatas.cardScores[key]); });
         }
@@ -508,16 +509,41 @@ var PointSalad = /** @class */ (function () {
             _this.setTooltip("veggie-counters-".concat(playerId), _("Veggie counters"));
         });
     };
-    PointSalad.prototype.createPlayerTables = function (gamedatas) {
+    PointSalad.prototype.getOrderedPlayers = function (gamedatas) {
         var _this = this;
         var players = Object.values(gamedatas.players).sort(function (a, b) { return a.playerNo - b.playerNo; });
         var playerIndex = players.findIndex(function (player) { return Number(player.id) === Number(_this.player_id); });
         var orderedPlayers = playerIndex > 0 ? __spreadArray(__spreadArray([], players.slice(playerIndex), true), players.slice(0, playerIndex), true) : players;
+        return orderedPlayers;
+    };
+    PointSalad.prototype.createPlayerTables = function (gamedatas) {
+        var _this = this;
+        var orderedPlayers = this.getOrderedPlayers(gamedatas);
         orderedPlayers.forEach(function (player) { return _this.createPlayerTable(gamedatas, Number(player.id)); });
     };
     PointSalad.prototype.createPlayerTable = function (gamedatas, playerId) {
         var playerTable = new PlayerTable(this, gamedatas.players[playerId]);
         this.playersTables.push(playerTable);
+    };
+    PointSalad.prototype.createPlayerJumps = function (gamedatas) {
+        var _this = this;
+        dojo.place("\n        <div id=\"jump-toggle\" class=\"jump-link toggle\">\n            \u21D4\n        </div>\n        <div id=\"jump-0\" class=\"jump-link\">\n            <div class=\"eye\"></div> ".concat(_('Market'), "\n        </div>"), "jump-controls");
+        document.getElementById("jump-toggle").addEventListener('click', function () { return _this.jumpToggle(); });
+        document.getElementById("jump-0").addEventListener('click', function () { return _this.jumpToPlayer(0); });
+        var orderedPlayers = this.getOrderedPlayers(gamedatas);
+        orderedPlayers.forEach(function (player) {
+            dojo.place("<div id=\"jump-".concat(player.id, "\" class=\"jump-link\" style=\"color: #").concat(player.color, "; border-color: #").concat(player.color, ";\"><div class=\"eye\" style=\"background: #").concat(player.color, ";\"></div> ").concat(player.name, "</div>"), "jump-controls");
+            document.getElementById("jump-".concat(player.id)).addEventListener('click', function () { return _this.jumpToPlayer(Number(player.id)); });
+        });
+        var jumpDiv = document.getElementById("jump-controls");
+        jumpDiv.style.marginTop = "-".concat(Math.round(jumpDiv.getBoundingClientRect().height / 2), "px");
+    };
+    PointSalad.prototype.jumpToggle = function () {
+        document.getElementById("jump-controls").classList.toggle('folded');
+    };
+    PointSalad.prototype.jumpToPlayer = function (playerId) {
+        var elementId = playerId === 0 ? "market" : "player-table-".concat(playerId);
+        document.getElementById(elementId).scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     };
     PointSalad.prototype.getZoom = function () {
         return 1;

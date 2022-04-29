@@ -44,7 +44,8 @@ class PointSalad implements PointSaladGame {
 
         this.createPlayerPanels(gamedatas); 
         this.tableCenter = new TableCenter(this, gamedatas);
-        this.createPlayerTables(gamedatas);
+        this.createPlayerTables(gamedatas);        
+        this.createPlayerJumps(gamedatas);
 
         if (gamedatas.cardScores) {
             Object.keys(gamedatas.cardScores).forEach(key => this.setCardScore(Number(key), gamedatas.cardScores[key]))
@@ -218,10 +219,15 @@ class PointSalad implements PointSaladGame {
         });
     }
 
-    private createPlayerTables(gamedatas: PointSaladGamedatas) {
+    private getOrderedPlayers(gamedatas: PointSaladGamedatas) {
         const players = Object.values(gamedatas.players).sort((a, b) => a.playerNo - b.playerNo);
         const playerIndex = players.findIndex(player => Number(player.id) === Number((this as any).player_id));
         const orderedPlayers = playerIndex > 0 ? [...players.slice(playerIndex), ...players.slice(0, playerIndex)] : players;
+        return orderedPlayers;
+    }
+
+    private createPlayerTables(gamedatas: PointSaladGamedatas) {
+        const orderedPlayers = this.getOrderedPlayers(gamedatas);
 
         orderedPlayers.forEach(player => this.createPlayerTable(gamedatas, Number(player.id)) );
     }
@@ -229,6 +235,37 @@ class PointSalad implements PointSaladGame {
     private createPlayerTable(gamedatas: PointSaladGamedatas, playerId: number) {
         const playerTable = new PlayerTable(this, gamedatas.players[playerId]);
         this.playersTables.push(playerTable);
+    }
+
+    private createPlayerJumps(gamedatas: PointSaladGamedatas) {
+        dojo.place(`
+        <div id="jump-toggle" class="jump-link toggle">
+            ⇔
+        </div>
+        <div id="jump-0" class="jump-link">
+            <div class="eye"></div> ${_('Market')}
+        </div>`, `jump-controls`);
+        document.getElementById(`jump-toggle`).addEventListener('click', () => this.jumpToggle());
+        document.getElementById(`jump-0`).addEventListener('click', () => this.jumpToPlayer(0));
+        
+        const orderedPlayers = this.getOrderedPlayers(gamedatas);
+
+        orderedPlayers.forEach(player => {
+            dojo.place(`<div id="jump-${player.id}" class="jump-link" style="color: #${player.color}; border-color: #${player.color};"><div class="eye" style="background: #${player.color};"></div> ${player.name}</div>`, `jump-controls`);
+            document.getElementById(`jump-${player.id}`).addEventListener('click', () => this.jumpToPlayer(Number(player.id)));	
+        });
+
+        const jumpDiv = document.getElementById(`jump-controls`);
+        jumpDiv.style.marginTop = `-${Math.round(jumpDiv.getBoundingClientRect().height / 2)}px`;
+    }
+    
+    private jumpToggle(): void {
+        document.getElementById(`jump-controls`).classList.toggle('folded');
+    }
+    
+    private jumpToPlayer(playerId: number): void {
+        const elementId = playerId === 0 ? `market` : `player-table-${playerId}`;
+        document.getElementById(elementId).scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     }
 
     public getZoom() {

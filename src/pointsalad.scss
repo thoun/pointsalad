@@ -66,3 +66,45 @@ html, .mode_3d #game_play_area_background {
 .card-tooltip-name {
   font-weight: bold;
 }
+
+#jump-controls {
+  position: fixed;
+  top: 50vh;
+  z-index: 5;
+
+  &.folded {
+    .jump-link:not(.toggle) {
+      display: none;
+    }
+  }
+
+  .jump-link {
+    position: relative;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 12px;
+    margin: 10px 0;
+    width: fit-content;
+    cursor: pointer;
+    height: 22px;
+    padding: 2px 8px 2px 5px;
+    background: white;
+
+    .eye {
+      width: 20px;
+      height: 20px;
+      mask: url('img/eye.svg') no-repeat center / contain;
+      -webkit-mask: url('img/eye.svg') no-repeat center / contain;
+      background: black;
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
+  &#jump-0 {
+    border-color: black;
+  }
+}
