@@ -22,7 +22,8 @@
 if (!function_exists('evenOdd')) {
 
   function evenOdd(array $veggieCounts, int $veggie) {
-    return $veggieCounts[$veggie] % 2 === 0 ? 7 : 3;
+    $veggieCount = $veggieCounts[$veggie];
+    return $veggieCount === 0 ? 0 : ($veggieCount % 2 === 0 ? 7 : 3);
   }
 
   function most(array $veggieCounts, int $veggie, array $otherPlayersVeggieCounts) {

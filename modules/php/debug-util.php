@@ -21,12 +21,20 @@ trait DebugUtilTrait {
 
         //$cards = $this->getCardsFromDb($this->cards->pickCardsForLocation(9, 'pile1', 'player', 2343492));
 
-       /*for ($i=0; $i<9; $i++) {
-            $this->applyFlipCard(0, $cards[$i]);
-        }*/
-        //$this->insertSomeRoutes(2343492);
+        for ($i=1; $i<=3; $i++) {
+            $card = $this->debugSetCardInHand(CABBAGE * 100 + $i, 2343492);
+            $this->applyFlipCard(2343492, $card);
+        }
+
+        $this->debugSetCardInHand(LETTUCE * 100 + 10, 2343492);
         
         $this->gamestate->changeActivePlayer(2343492);
+    }
+
+    function debugSetCardInHand($cardType, $playerId) {
+        $card = $this->getCardFromDb(array_values($this->cards->getCardsOfType($cardType))[0]);
+        $this->cards->moveCard($card->id, 'player', $playerId);
+        return $card;
     }
 
     function debug($debugData) {
