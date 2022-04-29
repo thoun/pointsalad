@@ -266,7 +266,7 @@ CARDS_EFFECTS[ONION] = [
 CARDS_EFFECTS[PEPPER] = [
     null,
     // special
-    function () { return formatTextIcons("<div class=\"flex\"><span>".concat(_('Highest veggie total'), "</span>=[7]</div>")); },
+    function () { return formatTextIcons("<div class=\"flex\"><span>".concat(_('Most total veggie'), "</span>=[10]</div>")); },
     // odd/even
     function () { return evenOdd(LETTUCE); },
     // most

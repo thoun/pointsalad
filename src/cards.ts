@@ -213,7 +213,7 @@ CARDS_EFFECTS[ONION] = [
 CARDS_EFFECTS[PEPPER] = [
     null,
     // special
-    () => formatTextIcons(`<div class="flex"><span>${_('Highest veggie total')}</span>=[7]</div>`), // TODO check text
+    () => formatTextIcons(`<div class="flex"><span>${_('Most total veggie')}</span>=[10]</div>`),
     // odd/even
     () => evenOdd(LETTUCE),
     // most
