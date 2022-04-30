@@ -29,30 +29,6 @@ trait StateTrait {
 
         $this->gamestate->nextState($endScore ? 'endScore' : 'nextPlayer');
     }
-
-    function setScoreAux(array $players) {
-        $activePlayerId = intval($this->getActivePlayerId());
-
-        $playerIndex = 0; 
-        foreach($players as $player) {
-            if ($player->id == $activePlayerId) {
-                break;
-            }
-            $playerIndex++;
-        }
-
-        $orderedPlayers = $players;
-        if ($playerIndex > 0) { // we start from $activePlayerId and then follow order
-            $orderedPlayers = array_merge(array_slice($players, $playerIndex), array_slice($players, 0, $playerIndex));
-        }
-
-        $playerCount = count($players);
-
-        foreach ($orderedPlayers as $index => $player) {
-            $scoreAux = $index == 0 ? $playerCount : $index;
-            $this->DbQuery("UPDATE `player` SET `player_score_aux` = $scoreAux WHERE `player_id` = $player->id"); 
-        }
-    }
     
     function notifIndividualCardScores(array $players) {
         foreach ($players as $player) {
@@ -103,7 +79,7 @@ trait StateTrait {
         $players = array_map(fn($dbResult) => new PointSaladPlayer($dbResult), array_values($dbResults));
 
         // update player_score_aux
-        $this->setScoreAux($players);
+        $this->DbQuery("UPDATE `player` SET `player_score_aux` = `player_no`"); 
 
         // notif individual card score
         $this->notifIndividualCardScores($players);

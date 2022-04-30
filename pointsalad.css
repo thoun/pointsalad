@@ -322,7 +322,7 @@
   cursor: pointer;
 }
 [data-selectable-cards=true] .card.selected {
-  box-shadow: 0 0 8px 8px white;
+  box-shadow: 0 0 8px 8px #005630;
 }
 [data-selectable-cards=true] .card.selected .card-side {
   box-shadow: unset;
