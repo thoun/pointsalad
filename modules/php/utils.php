@@ -136,6 +136,7 @@ trait UtilTrait {
                 'pileTop' => $this->getCardFromDb($this->cards->getCardOnTop('pile'.$pile)),
                 'pileCounts' => $this->getPileCounts(),
                 'fromPile' => $maxPile,
+                'fromPileTop' => $this->getCardFromDb($this->cards->getCardOnTop('pile'.$maxPile)),
             ]);
         }
     }

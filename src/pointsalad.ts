@@ -597,9 +597,14 @@ class PointSalad implements PointSaladGame {
 
     notif_pileRefill(notif: Notif<NotifPileRefillArgs>) {
         const pile = notif.args.pile;
+        const fromPile = notif.args.fromPile;
         const pileTop = notif.args.pileTop;
+        const fromPileTop = notif.args.fromPileTop;
         if (pileTop) {
-            this.createOrMoveCard(pileTop, `pile${pile}`, this.getMarketCardTooltip(pileTop), false, `pile${notif.args.fromPile}`);
+            this.createOrMoveCard(pileTop, `pile${pile}`, this.getMarketCardTooltip(pileTop), false, `pile${fromPile}`);
+        }
+        if (fromPileTop) {
+            this.createOrMoveCard(fromPileTop, `pile${fromPile}`, this.getMarketCardTooltip(fromPileTop), true);
         }
         this.tableCenter.setPileCounts(notif.args.pileCounts);
     }

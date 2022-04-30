@@ -805,9 +805,14 @@ var PointSalad = /** @class */ (function () {
     };
     PointSalad.prototype.notif_pileRefill = function (notif) {
         var pile = notif.args.pile;
+        var fromPile = notif.args.fromPile;
         var pileTop = notif.args.pileTop;
+        var fromPileTop = notif.args.fromPileTop;
         if (pileTop) {
-            this.createOrMoveCard(pileTop, "pile".concat(pile), this.getMarketCardTooltip(pileTop), false, "pile".concat(notif.args.fromPile));
+            this.createOrMoveCard(pileTop, "pile".concat(pile), this.getMarketCardTooltip(pileTop), false, "pile".concat(fromPile));
+        }
+        if (fromPileTop) {
+            this.createOrMoveCard(fromPileTop, "pile".concat(fromPile), this.getMarketCardTooltip(fromPileTop), true);
         }
         this.tableCenter.setPileCounts(notif.args.pileCounts);
     };

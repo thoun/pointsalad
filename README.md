@@ -35,3 +35,17 @@ Make sure ftp-sync.json and node_modules are in .gitignore
 # Font
 Font on cards seems to be Hoolister, only free for personal use.
 Similar free font used : https://www.1001freefonts.com/kosugi-maru.font
+
+## To replay notifs from a replay
+
+JSON.stringify(
+    [].concat(
+        ...g_gamelogs.map(log => log.data).filter(notifs => notifs.some(notif => ['takenCards', 'flippedCard', 'marketRefill', 'pileRefill'].includes(notif.type))).map(notifs => notifs.filter(notif => ['takenCards', 'flippedCard', 'marketRefill', 'pileRefill'].includes(notif.type)))
+    )
+)
+.replaceAll('28679657', '2343492')
+.replaceAll('85476842', '2343493')
+.replaceAll('85267018', '2343494')
+
+// temp1 is a stored variable, $_ is last console input
+JSON.parse(temp1).forEach((notif, notifIndex) => setTimeout(() => gameui['notif_' + notif.type](notif), notifIndex * 600))

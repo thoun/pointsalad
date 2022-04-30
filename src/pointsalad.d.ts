@@ -91,6 +91,7 @@ interface NotifPileRefillArgs {
     pileTop: Card | null;
     pileCounts: number[];
     fromPile: number;
+    fromPileTop: Card | null;
 }
 
 interface NotifCardScoreArgs {
