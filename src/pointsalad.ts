@@ -78,6 +78,9 @@ class PointSalad implements PointSaladGame {
             case 'flipCard':
                 this.onEnteringFlipCard(args.args);
                 break;
+            case 'endScore':
+                this.onEnteringShowScore();
+                break;
         }
     }
     
@@ -92,6 +95,12 @@ class PointSalad implements PointSaladGame {
         if ((this as any).isCurrentPlayerActive()) {
             document.getElementById(`player-points-${this.getPlayerId()}`).dataset.selectableCards = 'true';
         }
+    }
+
+    private onEnteringShowScore() {
+        Object.keys(this.gamedatas.players).forEach(playerId => (this as any).scoreCtrl[playerId]?.setValue(0));
+        this.gamedatas.hiddenScore = false;
+        console.log('onEnteringShowScore', this.gamedatas.hiddenScore);
     }
 
     public onLeavingState(stateName: string) {
@@ -148,6 +157,10 @@ class PointSalad implements PointSaladGame {
 
 
     ///////////////////////////////////////////////////
+
+    public isVisibleScoring(): boolean {
+        return !this.gamedatas.hiddenScore;
+    }
 
     // gameui.debugSeeAllPointCards()
     debugSeeAllPointCards() {
@@ -215,7 +228,9 @@ class PointSalad implements PointSaladGame {
                 this.veggieCounters[playerId][veggie] = veggieCounter;
             }
 
-            this.setTooltip(`veggie-counters-${playerId}`, _("Veggie counters"));
+            this.setTooltip(`veggie-counters-${playerId}`, _("Veggie counters"));   
+
+            this.setNewScore(playerId, Number(player.score));
         });
     }
 
@@ -280,6 +295,22 @@ class PointSalad implements PointSaladGame {
             case ONION: return _('Onion');
             case PEPPER: return _('Pepper');
             case TOMATO: return _('Tomato');
+        }
+    }
+
+    private setNewScore(playerId: number, score: number) {
+        if (this.gamedatas.hiddenScore) {
+            setTimeout(() => {
+                if (this.gamedatas.hiddenScore) {
+                    Object.keys(this.gamedatas.players).forEach(pId => document.getElementById(`player_score_${pId}`).innerHTML = '-');
+                }
+            }, 100);
+            console.log('hidden score');
+        } else {
+            if (!isNaN(score)) {
+                (this as any).scoreCtrl[playerId]?.toValue(score);
+                console.log('score', score);
+            }
         }
     }
 
@@ -509,8 +540,8 @@ class PointSalad implements PointSaladGame {
     }
 
     notif_points(notif: Notif<NotifPointsArgs>) {
-        Object.keys(notif.args.points).forEach((playerId) => 
-            (this as any).scoreCtrl[playerId]?.toValue(notif.args.points[playerId])
+        Object.keys(notif.args.points).forEach((playerId) =>        
+            this.setNewScore(Number(playerId), notif.args.points[playerId])
         );
     }
 

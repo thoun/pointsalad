@@ -42,7 +42,9 @@ class PointSalad extends Table {
         // Note: afterwards, you can get/set the global variables with getGameStateValue/setGameStateInitialValue/setGameStateValue
         parent::__construct();
         
-        self::initGameStateLabels([]);  
+        self::initGameStateLabels([
+            SCORING_OPTION => 100,
+        ]);  
 
         $this->cards = self::getNew("module.common.deck");
         $this->cards->init("card");     
@@ -164,6 +166,7 @@ class PointSalad extends Table {
 
         $result['showAskFlipPhase'] = $this->getPlayerPointCardsCount($currentPlayerId) > 0;
         $result['askFlipPhase'] = $this->getAskFlipPhase($currentPlayerId);
+        $result['hiddenScore'] = intval(self::getGameStateValue('SCORING_OPTION')) === 2;
   
         return $result;
     }

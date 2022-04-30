@@ -395,6 +395,9 @@ var PointSalad = /** @class */ (function () {
             case 'flipCard':
                 this.onEnteringFlipCard(args.args);
                 break;
+            case 'endScore':
+                this.onEnteringShowScore();
+                break;
         }
     };
     PointSalad.prototype.onEnteringTakeCards = function (args) {
@@ -407,6 +410,12 @@ var PointSalad = /** @class */ (function () {
         if (this.isCurrentPlayerActive()) {
             document.getElementById("player-points-".concat(this.getPlayerId())).dataset.selectableCards = 'true';
         }
+    };
+    PointSalad.prototype.onEnteringShowScore = function () {
+        var _this = this;
+        Object.keys(this.gamedatas.players).forEach(function (playerId) { var _a; return (_a = _this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.setValue(0); });
+        this.gamedatas.hiddenScore = false;
+        console.log('onEnteringShowScore', this.gamedatas.hiddenScore);
     };
     PointSalad.prototype.onLeavingState = function (stateName) {
         log('Leaving state: ' + stateName);
@@ -454,6 +463,9 @@ var PointSalad = /** @class */ (function () {
     ///////////////////////////////////////////////////
     //// Utility methods
     ///////////////////////////////////////////////////
+    PointSalad.prototype.isVisibleScoring = function () {
+        return !this.gamedatas.hiddenScore;
+    };
     // gameui.debugSeeAllPointCards()
     PointSalad.prototype.debugSeeAllPointCards = function () {
         var html = "<div id=\"all-point-cards\">";
@@ -507,6 +519,7 @@ var PointSalad = /** @class */ (function () {
                 _this.veggieCounters[playerId][veggie] = veggieCounter;
             }
             _this.setTooltip("veggie-counters-".concat(playerId), _("Veggie counters"));
+            _this.setNewScore(playerId, Number(player.score));
         });
     };
     PointSalad.prototype.getOrderedPlayers = function (gamedatas) {
@@ -556,6 +569,24 @@ var PointSalad = /** @class */ (function () {
             case ONION: return _('Onion');
             case PEPPER: return _('Pepper');
             case TOMATO: return _('Tomato');
+        }
+    };
+    PointSalad.prototype.setNewScore = function (playerId, score) {
+        var _this = this;
+        var _a;
+        if (this.gamedatas.hiddenScore) {
+            setTimeout(function () {
+                if (_this.gamedatas.hiddenScore) {
+                    Object.keys(_this.gamedatas.players).forEach(function (pId) { return document.getElementById("player_score_".concat(pId)).innerHTML = '-'; });
+                }
+            }, 100);
+            console.log('hidden score');
+        }
+        else {
+            if (!isNaN(score)) {
+                (_a = this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(score);
+                console.log('score', score);
+            }
         }
     };
     PointSalad.prototype.createOrMoveCard = function (card, destinationId, tooltip, init, from) {
@@ -725,7 +756,9 @@ var PointSalad = /** @class */ (function () {
     };
     PointSalad.prototype.notif_points = function (notif) {
         var _this = this;
-        Object.keys(notif.args.points).forEach(function (playerId) { var _a; return (_a = _this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(notif.args.points[playerId]); });
+        Object.keys(notif.args.points).forEach(function (playerId) {
+            return _this.setNewScore(Number(playerId), notif.args.points[playerId]);
+        });
     };
     PointSalad.prototype.notif_takenCards = function (notif) {
         var _this = this;

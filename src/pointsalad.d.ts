@@ -40,6 +40,7 @@ interface PointSaladGamedatas {
 
     showAskFlipPhase: boolean;
     askFlipPhase: boolean;
+    hiddenScore: boolean;
 }
 
 interface PointSaladGame extends Game {

@@ -17,6 +17,11 @@ define('ST_END_GAME', 99);
 define('END_SCORE', 100);
 
 /*
+ * Game option
+ */
+define('SCORING_OPTION', 'SCORING_OPTION');
+
+/*
  * Vegetables
  */
 define('CABBAGE', 1);
