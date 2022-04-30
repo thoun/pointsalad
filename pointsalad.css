@@ -349,6 +349,15 @@
   margin-top: -120px;
 }
 
+#table #market-title {
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  background: #00301a;
+  border-radius: 8px;
+  padding: 5px;
+  margin-bottom: 5px;
+}
 #table #piles, #table .market-row {
   display: flex;
   justify-content: center;
@@ -440,6 +449,15 @@ html, .mode_3d #game_play_area_background {
 
 .card-tooltip-name {
   font-weight: bold;
+}
+
+#columns {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+#columns #main-column {
+  min-width: 680px;
 }
 
 #jump-controls {

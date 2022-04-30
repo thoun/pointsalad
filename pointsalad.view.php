@@ -38,6 +38,7 @@
         $players_nbr = count( $players );
 
         /*********** Place your code below:  ************/
+		    $this->tpl['MARKET'] = self::_("Market");
         /*********** Do not change anything below this line  ************/
   	}
   }

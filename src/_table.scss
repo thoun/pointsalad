@@ -1,4 +1,14 @@
 #table {
+    #market-title {
+        text-align: center;
+        font-weight: bold;
+        color: white;
+        background: #00301a;
+        border-radius: 8px;
+        padding: 5px;
+        margin-bottom: 5px;
+    }
+
     #piles, .market-row {
         display: flex;
         justify-content: center;

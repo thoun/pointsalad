@@ -67,6 +67,16 @@ html, .mode_3d #game_play_area_background {
   font-weight: bold;
 }
 
+#columns {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+
+  #main-column {
+    min-width: 680px;
+  }
+}
+
 #jump-controls {
   position: fixed;
   top: 50vh;

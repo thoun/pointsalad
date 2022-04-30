@@ -377,6 +377,7 @@ var PointSalad = /** @class */ (function () {
         if (gamedatas.showAskFlipPhase) {
             this.addAskFlipPhaseToggle(gamedatas.askFlipPhase);
         }
+        this.onScreenWidthChange = function () { return _this.placeMarket(); };
         log("Ending game setup");
         // TODO TEMP
         //this.debugSeeAllPointCards();
@@ -558,6 +559,11 @@ var PointSalad = /** @class */ (function () {
         var elementId = playerId === 0 ? "market" : "player-table-".concat(playerId);
         document.getElementById(elementId).scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     };
+    PointSalad.prototype.placeMarket = function () {
+        var market = document.getElementById('table');
+        var largeScreen = document.getElementById("full-table").clientWidth >= 1020;
+        document.getElementById(largeScreen ? "table-right" : "table-inner").appendChild(market);
+    };
     PointSalad.prototype.getZoom = function () {
         return 1;
     };
@@ -580,7 +586,6 @@ var PointSalad = /** @class */ (function () {
                     Object.keys(_this.gamedatas.players).forEach(function (pId) { return document.getElementById("player_score_".concat(pId)).innerHTML = '-'; });
                 }
             }, 100);
-            console.log('hidden score');
         }
         else {
             if (!isNaN(score)) {

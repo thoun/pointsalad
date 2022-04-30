@@ -57,6 +57,8 @@ class PointSalad implements PointSaladGame {
             this.addAskFlipPhaseToggle(gamedatas.askFlipPhase);
         }
 
+        (this as any).onScreenWidthChange = () => this.placeMarket();
+
         log( "Ending game setup" );
 
         // TODO TEMP
@@ -283,6 +285,12 @@ class PointSalad implements PointSaladGame {
         document.getElementById(elementId).scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     }
 
+    private placeMarket() {
+        const market = document.getElementById('table');
+        const largeScreen = document.getElementById(`full-table`).clientWidth >= 1020;
+        document.getElementById(largeScreen ? `table-right` : `table-inner`).appendChild(market);
+    }
+
     public getZoom() {
         return 1;
     }
@@ -305,7 +313,6 @@ class PointSalad implements PointSaladGame {
                     Object.keys(this.gamedatas.players).forEach(pId => document.getElementById(`player_score_${pId}`).innerHTML = '-');
                 }
             }, 100);
-            console.log('hidden score');
         } else {
             if (!isNaN(score)) {
                 (this as any).scoreCtrl[playerId]?.toValue(score);
