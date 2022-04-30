@@ -316,7 +316,6 @@ class PointSalad implements PointSaladGame {
         } else {
             if (!isNaN(score)) {
                 (this as any).scoreCtrl[playerId]?.toValue(score);
-                console.log('score', score);
             }
         }
     }
@@ -607,6 +606,7 @@ class PointSalad implements PointSaladGame {
 
     notif_cardScore(notif: Notif<NotifCardScoreArgs>) {
         this.setCardScore(notif.args.card.id, notif.args.cardScore);
+        (this as any).scoreCtrl[notif.args.playerId]?.incValue(notif.args.cardScore);
     }
 
     /* This enable to inject translatable styled things to logs or action bar */

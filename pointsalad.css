@@ -352,11 +352,14 @@
 #table #market-title {
   text-align: center;
   font-weight: bold;
-  color: white;
-  background: #00301a;
-  border-radius: 8px;
-  padding: 5px;
-  margin-bottom: 5px;
+  padding: 6px;
+  margin-bottom: 8px;
+  user-select: none;
+  font-family: "PointSalad";
+  background: #ffffffa3;
+  border: 2px solid #00301a;
+  border-radius: 12px;
+  text-transform: uppercase;
 }
 #table #piles, #table .market-row {
   display: flex;
@@ -493,5 +496,5 @@ html, .mode_3d #game_play_area_background {
   vertical-align: middle;
 }
 #jump-controls#jump-0 {
-  border-color: black;
+  border-color: #00301a;
 }

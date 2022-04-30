@@ -590,7 +590,6 @@ var PointSalad = /** @class */ (function () {
         else {
             if (!isNaN(score)) {
                 (_a = this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(score);
-                console.log('score', score);
             }
         }
     };
@@ -813,7 +812,9 @@ var PointSalad = /** @class */ (function () {
         this.tableCenter.setPileCounts(notif.args.pileCounts);
     };
     PointSalad.prototype.notif_cardScore = function (notif) {
+        var _a;
         this.setCardScore(notif.args.card.id, notif.args.cardScore);
+        (_a = this.scoreCtrl[notif.args.playerId]) === null || _a === void 0 ? void 0 : _a.incValue(notif.args.cardScore);
     };
     /* This enable to inject translatable styled things to logs or action bar */
     /* @Override */
