@@ -15,7 +15,8 @@ class PointSalad implements PointSaladGame {
     private playersTables: PlayerTable[] = [];
     private selectedCards: Card[] = [];
     private veggieCounters: Counter[][] = [];
-    private canTakeOnlyOneVeggie: boolean = false;    
+    private canTakeOnlyOneVeggie: boolean = false;
+    private actionTimerId: number;
     
     private TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
 
@@ -147,6 +148,9 @@ class PointSalad implements PointSaladGame {
                 case 'flipCard':
                     (this as any).addActionButton('flipCard_button', _("Flip selected card"), () => this.flipCard(this.selectedCards[0].id));
                     (this as any).addActionButton('skipFlipCard_button', _("Skip"), () => this.skipFlipCard());
+                    if (this.startActionTimer('skipFlipCard_button', 6)) {
+                        (this as any).addActionButton('stopActionTimer_button', _("Let me think!"), () => this.stopActionTimer('skipFlipCard_button'));
+                    }
                     this.checkSelection();
                     break;
             }
@@ -289,6 +293,39 @@ class PointSalad implements PointSaladGame {
         const market = document.getElementById('table');
         const largeScreen = document.getElementById(`full-table`).clientWidth >= 1020;
         document.getElementById(largeScreen ? `table-right` : `table-inner`).appendChild(market);
+    }
+
+    private startActionTimer(buttonId: string, time: number): boolean {
+        if ((this as any).prefs[201]?.value === 2) {
+            return false;
+        }
+
+        const button = document.getElementById(buttonId);
+ 
+        this.actionTimerId = null;
+        button.dataset.label = button.innerHTML;
+        let _actionTimerSeconds = time;
+        const actionTimerFunction = () => {
+            const button = document.getElementById(buttonId);
+            if (button == null) {
+                window.clearInterval(this.actionTimerId);
+            } else if (_actionTimerSeconds-- > 1) {
+                button.innerHTML = button.dataset.label + ' (' + _actionTimerSeconds + ')';
+            } else {
+                window.clearInterval(this.actionTimerId);
+                button.click();
+            }
+        };
+        actionTimerFunction();
+        this.actionTimerId = window.setInterval(() => actionTimerFunction(), 1000);
+        return true;
+    }
+
+    private stopActionTimer(buttonId: string) {
+        const button = document.getElementById(buttonId);
+        button.innerHTML = button.dataset.label
+        window.clearInterval(this.actionTimerId);
+        dojo.destroy('stopActionTimer_button');
     }
 
     public getZoom() {

@@ -456,6 +456,9 @@ var PointSalad = /** @class */ (function () {
                 case 'flipCard':
                     this.addActionButton('flipCard_button', _("Flip selected card"), function () { return _this.flipCard(_this.selectedCards[0].id); });
                     this.addActionButton('skipFlipCard_button', _("Skip"), function () { return _this.skipFlipCard(); });
+                    if (this.startActionTimer('skipFlipCard_button', 6)) {
+                        this.addActionButton('stopActionTimer_button', _("Let me think!"), function () { return _this.stopActionTimer('skipFlipCard_button'); });
+                    }
                     this.checkSelection();
                     break;
             }
@@ -563,6 +566,39 @@ var PointSalad = /** @class */ (function () {
         var market = document.getElementById('table');
         var largeScreen = document.getElementById("full-table").clientWidth >= 1020;
         document.getElementById(largeScreen ? "table-right" : "table-inner").appendChild(market);
+    };
+    PointSalad.prototype.startActionTimer = function (buttonId, time) {
+        var _this = this;
+        var _a;
+        if (((_a = this.prefs[201]) === null || _a === void 0 ? void 0 : _a.value) === 2) {
+            return false;
+        }
+        var button = document.getElementById(buttonId);
+        this.actionTimerId = null;
+        button.dataset.label = button.innerHTML;
+        var _actionTimerSeconds = time;
+        var actionTimerFunction = function () {
+            var button = document.getElementById(buttonId);
+            if (button == null) {
+                window.clearInterval(_this.actionTimerId);
+            }
+            else if (_actionTimerSeconds-- > 1) {
+                button.innerHTML = button.dataset.label + ' (' + _actionTimerSeconds + ')';
+            }
+            else {
+                window.clearInterval(_this.actionTimerId);
+                button.click();
+            }
+        };
+        actionTimerFunction();
+        this.actionTimerId = window.setInterval(function () { return actionTimerFunction(); }, 1000);
+        return true;
+    };
+    PointSalad.prototype.stopActionTimer = function (buttonId) {
+        var button = document.getElementById(buttonId);
+        button.innerHTML = button.dataset.label;
+        window.clearInterval(this.actionTimerId);
+        dojo.destroy('stopActionTimer_button');
     };
     PointSalad.prototype.getZoom = function () {
         return 1;
