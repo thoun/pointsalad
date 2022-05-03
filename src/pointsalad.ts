@@ -62,6 +62,10 @@ class PointSalad implements PointSaladGame {
 
         log( "Ending game setup" );
 
+        try {
+            this.dummyCalls();
+        } catch (e) {}
+
         // TODO TEMP
         //this.debugSeeAllPointCards();
     }
@@ -178,13 +182,14 @@ class PointSalad implements PointSaladGame {
         dojo.place(html, 'full-table', 'before');
 
         for (let veggie = 1; veggie <= 6; veggie++) {
-            for (let i = 1; i <= 12; i++) {
-                this.createOrMoveCard({
+            for (let i = 1; i <= 18; i++) {
+                const card = {
                     id: 1000*veggie+i,
                     side: 0,
                     index: i,
                     veggie: veggie,
-                } as Card, `all-point-cards-${veggie}`, 'for test only');
+                } as Card;
+                this.createOrMoveCard(card, `all-point-cards-${veggie}`, this.getPlayerCardTooltip(card));
             }
         }
     }
@@ -378,10 +383,14 @@ class PointSalad implements PointSaladGame {
             div.dataset.side = ''+card.side;
             div.dataset.veggie = ''+card.veggie;
             div.dataset.index = ''+card.index;
+
+            const cardEffect = CARDS_EFFECTS[card.veggie]?.[card.index];
+            let label = (window as any)[cardEffect[0]]?.(cardEffect[1]);
+
             div.innerHTML = `
                 <div class="card-sides">
                     <div class="card-side front">
-                        <div>${CARDS_EFFECTS[card.veggie]?.[card.index]?.() || ''}</div>
+                        <div>${label}</div>
                     </div>
                     <div class="card-side back">
                         <div class="name">${name}</div>
@@ -402,6 +411,49 @@ class PointSalad implements PointSaladGame {
     }
 
     private getPointSideTooltip(card: Card) {
+        const cardEffect = CARDS_EFFECTS[card.veggie]?.[card.index];
+        let tooltip = `<br>`;
+        switch (cardEffect[0]) {
+            case 'missingType':
+                tooltip += _("Score ${points} points for each veggie type you don't have").replace('${points}', `<strong>5</strong>`);
+                return tooltip;
+            case 'typeWithLeast':
+                tooltip += _('Score ${points} points for each veggie type where you have at least ${least} cards').replace('${least}', `<strong>${cardEffect[1][0]}</strong>`).replace('${points}', `<strong>${cardEffect[1][1]}</strong>`);
+                return tooltip;
+            case 'highestTotal':
+                tooltip += _('Score ${points} points if you have the highest veggie count').replace('${points}', `<strong>10</strong>`);
+                return tooltip;
+            case 'lowestTotal':
+                tooltip += _('Score ${points} points if you have the lowest veggie count').replace('${points}', `<strong>7</strong>`);
+                return tooltip;
+            case 'completeSet':
+                tooltip += _('Score ${points} points for each complete set of veggies').replace('${points}', `<strong>12</strong>`);
+                return tooltip;
+            case 'evenOdd':
+                tooltip += _('Score ${pointsEven} points if you got an even number of ${veggieName}, or ${pointsOdd} points if you got an odd number of ${veggieName}. You need at least one ${veggieName} to score.').replace('${pointsEven}', `<strong>7</strong>`).replace('${pointsOdd}', `<strong>3</strong>`).replace(/\$\{veggieName\}/g, `<strong>${this.getVeggieName(cardEffect[1])}</strong>`);
+                return tooltip;
+            case 'most':
+                tooltip += _('Score ${points} points if you are the player with the most ${veggieName} (you will score if you tie for the most).').replace('${points}', `<strong>10</strong>`).replace('${veggieName}', `<strong>${this.getVeggieName(cardEffect[1])}</strong>`);
+                return tooltip;
+            case 'least':
+                tooltip += _('Score ${points} points if you are the player with the least ${veggieName} (you will score if you tie for the least).').replace('${points}', `<strong>10</strong>`).replace('${veggieName}', `<strong>${this.getVeggieName(cardEffect[1])}</strong>`);
+                return tooltip;
+            case 'sets':
+                tooltip += cardEffect[1].map(set => _('Score ${points} points for each ${veggieName} card in your possession.').replace('${points}', `<strong>${set[0]}</strong>`).replace('${veggieName}', `<strong>${this.getVeggieName(set[1])}</strong>`)).join(`<br>${_('AND')}<br>`);
+                return tooltip;
+            case 'pairSet':
+                const pairSet = cardEffect[1];
+                tooltip += pairSet[0] === pairSet[1] ?
+                    _('Score ${points} points for each pair of ${veggieName} card in your possession.').replace('${points}', `<strong>5</strong>`).replace('${veggieName}', `<strong>${this.getVeggieName(pairSet[0])}</strong>`) :
+                    _('Score ${points} points for each set of ${veggieName1} and ${veggieName2} card in your possession.').replace('${points}', `<strong>5</strong>`).replace('${veggieName1}', `<strong>${this.getVeggieName(pairSet[0])}</strong>`).replace('${veggieName2}', `<strong>${this.getVeggieName(pairSet[1])}</strong>`);
+                return tooltip;
+            case 'tripletSet':
+                const tripletSet = cardEffect[1];
+                tooltip += tripletSet[0] === tripletSet[1] ?
+                    _('Score ${points} points for each triplet of ${veggieName} card in your possession.').replace('${points}', `<strong>8</strong>`).replace('${veggieName}', `<strong>${this.getVeggieName(tripletSet[0])}</strong>`) :
+                    _('Score ${points} points for each set of ${veggieName1}, ${veggieName2} and ${veggieName3} card in your possession.').replace('${points}', `<strong>8</strong>`).replace('${veggieName1}', `<strong>${this.getVeggieName(tripletSet[0])}</strong>`).replace('${veggieName2}', `<strong>${this.getVeggieName(tripletSet[1])}</strong>`).replace('${veggieName3}', `<strong>${this.getVeggieName(tripletSet[2])}</strong>`);
+                return tooltip;
+        }
         return ``;
     }
 
@@ -418,7 +470,7 @@ class PointSalad implements PointSaladGame {
             return `<div class="card-tooltip">
                 <div class="card-tooltip-name">${_("Veggie card")}</div>
                 <div class="card-tooltip-description">
-                    <div>${this.getVeggieName(card.veggie)}</div>
+                    <div><br><strong>${this.getVeggieName(card.veggie)}</strong></div>
                 </div>
             </div>`;
         }
@@ -438,7 +490,7 @@ class PointSalad implements PointSaladGame {
                 <div class="card-tooltip-name">${_("Veggie market")} (${_("Veggie card")})</div>
                 <div class="card-tooltip-description">
                     <div>${_("At your turn, you can take two Veggie cards from the market.")}</div>
-                    <div>${this.getVeggieName(card.veggie)}</div>
+                    <div><br><strong>${this.getVeggieName(card.veggie)}</strong></div>
                 </div>
             </div>`;
         }
@@ -661,39 +713,46 @@ class PointSalad implements PointSaladGame {
                 if (args.veggies && typeof args.veggies == 'object') {
                     args.veggies = args.veggies.map(veggie => `<div class="icon" data-veggie="${veggie}"></div>`).join('');
                 }
-
-                /*['card_name', 'card_name2'].forEach(cardArg => {
-                    if (args[cardArg]) {
-                        let types: number[] = null;
-                        if (typeof args[cardArg] == 'number') {
-                            types = [args[cardArg]];
-                        } else if (typeof args[cardArg] == 'string' && args[cardArg][0] >= '0' && args[cardArg][0] <= '9') {
-                            types = args[cardArg].split(',').map((cardType: string) => Number(cardType));
-                        }
-                        if (types !== null) {
-                            const tags: string[] = types.map((cardType: number) => {
-                                const cardLogId = this.cardLogId++;
-
-                                setTimeout(() => (this as any).addTooltipHtml(`card-log-${cardLogId}`, this.getLogCardTooltip(cardType)), 500);
-
-                                return `<strong id="card-log-${cardLogId}" data-log-type="${cardType}">${this.getLogCardName(cardType)}</strong>`;
-                            });
-                            args[cardArg] = tags.join(', ');
-                        }
-                    }
-                });
-
-                for (const property in args) {
-                    if (args[property]?.indexOf?.(']') > 0) {
-                        args[property] = formatTextIcons(_(args[property]));
-                    }
-                }
-
-                log = formatTextIcons(_(log));*/
             }
         } catch (e) {
             console.error(log,args,"Exception thrown", e.stack);
         }
         return (this as any).inherited(arguments);
+    }
+
+    // dummy calls x2 so functions aren't moved to inline function by optimization script
+    private dummyCalls() {
+        // special
+        missingType();
+        typeWithLeast([]);
+        highestTotal();
+        lowestTotal();
+        completeSet();
+        // odd/even
+        evenOdd(0);
+        // most
+        most(0);
+        // least
+        least(0);
+        // sets
+        sets([]);
+        pairSet([]);
+        tripletSet([]);
+        // special
+        missingType();
+        typeWithLeast([]);
+        highestTotal();
+        lowestTotal();
+        completeSet();
+        // odd/even
+        evenOdd(0);
+        // most
+        most(0);
+        // least
+        least(0);
+        // sets
+        sets([]);
+        pairSet([]);
+        tripletSet([]);
     }
 }

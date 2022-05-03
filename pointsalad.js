@@ -105,6 +105,21 @@ var LETTUCE = 3;
 var ONION = 4;
 var PEPPER = 5;
 var TOMATO = 6;
+function missingType() {
+    return formatTextIcons("\n        <div class=\"flex\">\n            <span>[5]</span>\n            <span>/</span>\n            <span>".concat(_('Missing veggie type'), "</span>\n        </div>\n    "));
+}
+function typeWithLeast(param) {
+    return formatTextIcons("<div class=\"flex\">[".concat(param[1], "]<span>/</span><span>").concat(_('Veggie type with at least ${least}').replace('${least}', param[0]), "</span></div>"));
+}
+function highestTotal() {
+    return formatTextIcons("<div class=\"flex\"><span>".concat(_('Most total veggie'), "</span> = [10]</div>"));
+}
+function lowestTotal() {
+    return formatTextIcons("<div class=\"flex\"><span>".concat(_('Lowest veggie total'), "</span> = [7]</div>"));
+}
+function completeSet() {
+    return formatTextIcons("\n        <div class=\"flex complete-set top\">[veggie6][veggie3][veggie2]</div>\n        <div class=\"flex\"><span>[12]</span><span>/</span><span>".concat(_('Complete set'), "</span></div>\n        <div class=\"flex complete-set bottom\">[veggie1][veggie5][veggie4]</div>\n    "));
+}
 function evenOdd(veggie) {
     return formatTextIcons("\n        <div class=\"margin\">\n            <div class=\"flex\">[veggie".concat(veggie, "]</div>\n            <div class=\"flex\">\n                <span class=\"flex wrap\">").concat(_('Even total'), "</span>\n                <span>=</span>\n                <span>[7]</span>\n            </div>\n            <div class=\"flex\">\n                <span class=\"flex wrap\">").concat(_('Odd total'), "</span>\n                <span>=</span>\n                <span>[3]</span>\n            </div>\n        </div>\n    "));
 }
@@ -130,206 +145,206 @@ var CARDS_EFFECTS = [];
 CARDS_EFFECTS[CABBAGE] = [
     null,
     // special
-    function () { return formatTextIcons("\n        <div class=\"flex\">\n            <span>[5]</span>\n            <span>/</span>\n            <span>".concat(_('Missing veggie type'), "</span>\n        </div>\n    ")); },
+    ['missingType'],
     // odd/even
-    function () { return evenOdd(CARROT); },
+    ['evenOdd', CARROT],
     // most
-    function () { return most(CARROT); },
+    ['most', CARROT],
     // least
-    function () { return least(CARROT); },
+    ['least', CARROT],
     // 2/V
-    function () { return sets([[2, CARROT]]); },
+    ['sets', [[2, CARROT]]],
     // 1/V 1/V (x1)
-    function () { return sets([[1, CARROT], [1, PEPPER]]); },
-    function () { return sets([[1, CARROT], [1, LETTUCE]]); },
+    ['sets', [[1, CARROT], [1, PEPPER]]],
+    ['sets', [[1, CARROT], [1, LETTUCE]]],
     // 3/V -2/V
-    function () { return sets([[3, CARROT], [-2, ONION]]); },
+    ['sets', [[3, CARROT], [-2, ONION]]],
     // 2/V 1/V -2/V
-    function () { return sets([[2, CARROT], [1, PEPPER], [-2, CABBAGE]]); },
+    ['sets', [[2, CARROT], [1, PEPPER], [-2, CABBAGE]]],
     // 2/V 2/V -4/V
-    function () { return sets([[2, CARROT], [2, ONION], [-4, PEPPER]]); },
+    ['sets', [[2, CARROT], [2, ONION], [-4, PEPPER]]],
     // 3/V -1/V -1/V
-    function () { return sets([[3, CARROT], [-1, PEPPER], [-1, CABBAGE]]); },
+    ['sets', [[3, CARROT], [-1, PEPPER], [-1, CABBAGE]]],
     // 4/V -2/V -2/V
-    function () { return sets([[4, CARROT], [-2, LETTUCE], [-2, TOMATO]]); },
+    ['sets', [[4, CARROT], [-2, LETTUCE], [-2, TOMATO]]],
     // V+V = 5 (x3)
-    function () { return pairSet([CARROT, CARROT]); },
-    function () { return pairSet([LETTUCE, ONION]); },
-    function () { return pairSet([TOMATO, PEPPER]); },
+    ['pairSet', [CARROT, CARROT]],
+    ['pairSet', [LETTUCE, ONION]],
+    ['pairSet', [TOMATO, PEPPER]],
     // V+V+V = 8 (x3)
-    function () { return tripletSet([CARROT, CARROT, CARROT]); },
-    function () { return tripletSet([CABBAGE, CARROT, TOMATO]); },
-    function () { return tripletSet([LETTUCE, CARROT, ONION]); },
+    ['tripletSet', [CARROT, CARROT, CARROT]],
+    ['tripletSet', [CABBAGE, CARROT, TOMATO]],
+    ['tripletSet', [LETTUCE, CARROT, ONION]],
 ];
 CARDS_EFFECTS[CARROT] = [
     null,
     // special
-    function () { return formatTextIcons("<div class=\"flex\">[5]<span>/</span><span>".concat(_('Veggie type with at least 3'), "</span></div>")); },
+    ['typeWithLeast', [3, 5]],
     // odd/even
-    function () { return evenOdd(CABBAGE); },
+    ['evenOdd', CABBAGE],
     // most
-    function () { return most(CABBAGE); },
+    ['most', CABBAGE],
     // least
-    function () { return least(CABBAGE); },
+    ['least', CABBAGE],
     // 2/V
-    function () { return sets([[2, CABBAGE]]); },
+    ['sets', [[2, CABBAGE]]],
     // 1/V 1/V (x2)
-    function () { return sets([[1, CABBAGE], [1, LETTUCE]]); },
-    function () { return sets([[1, CABBAGE], [1, PEPPER]]); },
+    ['sets', [[1, CABBAGE], [1, LETTUCE]]],
+    ['sets', [[1, CABBAGE], [1, PEPPER]]],
     // 3/V -2/V
-    function () { return sets([[3, CABBAGE], [-2, TOMATO]]); },
+    ['sets', [[3, CABBAGE], [-2, TOMATO]]],
     // 2/V 1/V -2/V
-    function () { return sets([[2, CABBAGE], [1, LETTUCE], [-2, CARROT]]); },
+    ['sets', [[2, CABBAGE], [1, LETTUCE], [-2, CARROT]]],
     // 2/V 2/V -4/V
-    function () { return sets([[2, CABBAGE], [2, TOMATO], [-4, LETTUCE]]); },
+    ['sets', [[2, CABBAGE], [2, TOMATO], [-4, LETTUCE]]],
     // 3/V -1/V -1/V
-    function () { return sets([[3, CABBAGE], [-1, LETTUCE], [-1, CARROT]]); },
+    ['sets', [[3, CABBAGE], [-1, LETTUCE], [-1, CARROT]]],
     // 4/V -2/V -2/V
-    function () { return sets([[4, CABBAGE], [-2, PEPPER], [-2, ONION]]); },
+    ['sets', [[4, CABBAGE], [-2, PEPPER], [-2, ONION]]],
     // V+V = 5 (x3)
-    function () { return pairSet([CABBAGE, CABBAGE]); },
-    function () { return pairSet([TOMATO, LETTUCE]); },
-    function () { return pairSet([ONION, PEPPER]); },
+    ['pairSet', [CABBAGE, CABBAGE]],
+    ['pairSet', [TOMATO, LETTUCE]],
+    ['pairSet', [ONION, PEPPER]],
     // V+V+V = 8 (x3)
-    function () { return tripletSet([CABBAGE, CABBAGE, CABBAGE]); },
-    function () { return tripletSet([PEPPER, CABBAGE, TOMATO]); },
-    function () { return tripletSet([CARROT, CABBAGE, ONION]); },
+    ['tripletSet', [CABBAGE, CABBAGE, CABBAGE]],
+    ['tripletSet', [PEPPER, CABBAGE, TOMATO]],
+    ['tripletSet', [CARROT, CABBAGE, ONION]],
 ];
 CARDS_EFFECTS[LETTUCE] = [
     null,
     // special
-    function () { return formatTextIcons("<div class=\"flex\"><span>".concat(_('Lowest veggie total'), "</span> = [7]</div>")); },
+    ['lowestTotal'],
     // odd/even
-    function () { return evenOdd(PEPPER); },
+    ['evenOdd', PEPPER],
     // most
-    function () { return most(PEPPER); },
+    ['most', PEPPER],
     // least
-    function () { return least(PEPPER); },
+    ['least', PEPPER],
     // 2/V
-    function () { return sets([[2, PEPPER]]); },
+    ['sets', [[2, PEPPER]]],
     // 1/V 1/V (x2)
-    function () { return sets([[1, PEPPER], [1, ONION]]); },
-    function () { return sets([[1, PEPPER], [1, TOMATO]]); },
+    ['sets', [[1, PEPPER], [1, ONION]]],
+    ['sets', [[1, PEPPER], [1, TOMATO]]],
     // 3/V -2/V
-    function () { return sets([[3, PEPPER], [-2, CABBAGE]]); },
+    ['sets', [[3, PEPPER], [-2, CABBAGE]]],
     // 2/V 1/V -2/V
-    function () { return sets([[2, PEPPER], [1, TOMATO], [-2, LETTUCE]]); },
+    ['sets', [[2, PEPPER], [1, TOMATO], [-2, LETTUCE]]],
     // 2/V 2/V -4/V
-    function () { return sets([[2, PEPPER], [2, CABBAGE], [-4, TOMATO]]); },
+    ['sets', [[2, PEPPER], [2, CABBAGE], [-4, TOMATO]]],
     // 3/V -1/V -1/V
-    function () { return sets([[3, PEPPER], [-1, TOMATO], [-1, LETTUCE]]); },
+    ['sets', [[3, PEPPER], [-1, TOMATO], [-1, LETTUCE]]],
     // 4/V -2/V -2/V
-    function () { return sets([[4, PEPPER], [-2, ONION], [-2, CARROT]]); },
+    ['sets', [[4, PEPPER], [-2, ONION], [-2, CARROT]]],
     // V+V = 5 (x3)
-    function () { return pairSet([PEPPER, PEPPER]); },
-    function () { return pairSet([CARROT, TOMATO]); },
-    function () { return pairSet([CABBAGE, ONION]); },
+    ['pairSet', [PEPPER, PEPPER]],
+    ['pairSet', [CARROT, TOMATO]],
+    ['pairSet', [CABBAGE, ONION]],
     // V+V+V = 8 (x3)
-    function () { return tripletSet([PEPPER, PEPPER, PEPPER]); },
-    function () { return tripletSet([LETTUCE, PEPPER, CARROT]); },
-    function () { return tripletSet([ONION, PEPPER, CABBAGE]); },
+    ['tripletSet', [PEPPER, PEPPER, PEPPER]],
+    ['tripletSet', [LETTUCE, PEPPER, CARROT]],
+    ['tripletSet', [ONION, PEPPER, CABBAGE]],
 ];
 CARDS_EFFECTS[ONION] = [
     null,
     // special
-    function () { return formatTextIcons("<div class=\"flex\">[3]<span>/</span><span>".concat(_('Veggie type with at least 2'), "</span></div>")); },
+    ['typeWithLeast', [2, 3]],
     // odd/even
-    function () { return evenOdd(TOMATO); },
+    ['evenOdd', TOMATO],
     // most
-    function () { return most(TOMATO); },
+    ['most', TOMATO],
     // least
-    function () { return least(TOMATO); },
+    ['least', TOMATO],
     // 2/V
-    function () { return sets([[2, TOMATO]]); },
+    ['sets', [[2, TOMATO]]],
     // 1/V 1/V (x2)
-    function () { return sets([[1, TOMATO], [1, CARROT]]); },
-    function () { return sets([[1, TOMATO], [1, CABBAGE]]); },
+    ['sets', [[1, TOMATO], [1, CARROT]]],
+    ['sets', [[1, TOMATO], [1, CABBAGE]]],
     // 3/V -2/V
-    function () { return sets([[3, TOMATO], [-2, LETTUCE]]); },
+    ['sets', [[3, TOMATO], [-2, LETTUCE]]],
     // 2/V 1/V -2/V
-    function () { return sets([[2, TOMATO], [1, CARROT], [-2, ONION]]); },
+    ['sets', [[2, TOMATO], [1, CARROT], [-2, ONION]]],
     // 2/V 2/V -4/V
-    function () { return sets([[2, TOMATO], [2, LETTUCE], [-4, CARROT]]); },
+    ['sets', [[2, TOMATO], [2, LETTUCE], [-4, CARROT]]],
     // 3/V -1/V -1/V
-    function () { return sets([[3, TOMATO], [-1, CARROT], [-1, ONION]]); },
+    ['sets', [[3, TOMATO], [-1, CARROT], [-1, ONION]]],
     // 4/V -2/V -2/V
-    function () { return sets([[4, TOMATO], [-2, CABBAGE], [-2, PEPPER]]); },
+    ['sets', [[4, TOMATO], [-2, CABBAGE], [-2, PEPPER]]],
     // V+V = 5 (x3)
-    function () { return pairSet([TOMATO, TOMATO]); },
-    function () { return pairSet([CARROT, PEPPER]); },
-    function () { return pairSet([CABBAGE, LETTUCE]); },
+    ['pairSet', [TOMATO, TOMATO]],
+    ['pairSet', [CARROT, PEPPER]],
+    ['pairSet', [CABBAGE, LETTUCE]],
     // V+V+V = 8 (x3)
-    function () { return tripletSet([TOMATO, TOMATO, TOMATO]); },
-    function () { return tripletSet([CABBAGE, TOMATO, LETTUCE]); },
-    function () { return tripletSet([ONION, TOMATO, PEPPER]); },
+    ['tripletSet', [TOMATO, TOMATO, TOMATO]],
+    ['tripletSet', [CABBAGE, TOMATO, LETTUCE]],
+    ['tripletSet', [ONION, TOMATO, PEPPER]],
 ];
 CARDS_EFFECTS[PEPPER] = [
     null,
     // special
-    function () { return formatTextIcons("<div class=\"flex\"><span>".concat(_('Most total veggie'), "</span>=[10]</div>")); },
+    ['highestTotal'],
     // odd/even
-    function () { return evenOdd(LETTUCE); },
+    ['evenOdd', LETTUCE],
     // most
-    function () { return most(LETTUCE); },
+    ['most', LETTUCE],
     // least
-    function () { return least(LETTUCE); },
+    ['least', LETTUCE],
     // 2/V
-    function () { return sets([[2, LETTUCE]]); },
+    ['sets', [[2, LETTUCE]]],
     // 1/V 1/V (x2)
-    function () { return sets([[1, LETTUCE], [1, TOMATO]]); },
-    function () { return sets([[1, LETTUCE], [1, ONION]]); },
+    ['sets', [[1, LETTUCE], [1, TOMATO]]],
+    ['sets', [[1, LETTUCE], [1, ONION]]],
     // 3/V -2/V
-    function () { return sets([[3, LETTUCE], [-2, CARROT]]); },
+    ['sets', [[3, LETTUCE], [-2, CARROT]]],
     // 2/V 1/V -2/V
-    function () { return sets([[2, LETTUCE], [1, ONION], [-2, PEPPER]]); },
+    ['sets', [[2, LETTUCE], [1, ONION], [-2, PEPPER]]],
     // 2/V 2/V -4/V
-    function () { return sets([[2, LETTUCE], [2, CARROT], [-4, ONION]]); },
+    ['sets', [[2, LETTUCE], [2, CARROT], [-4, ONION]]],
     // 3/V -1/V -1/V
-    function () { return sets([[3, LETTUCE], [-1, ONION], [-1, PEPPER]]); },
+    ['sets', [[3, LETTUCE], [-1, ONION], [-1, PEPPER]]],
     // 4/V -2/V -2/V
-    function () { return sets([[4, LETTUCE], [-2, TOMATO], [-2, CABBAGE]]); },
+    ['sets', [[4, LETTUCE], [-2, TOMATO], [-2, CABBAGE]]],
     // V+V = 5 (x3)
-    function () { return pairSet([LETTUCE, LETTUCE]); },
-    function () { return pairSet([CARROT, ONION]); },
-    function () { return pairSet([CABBAGE, TOMATO]); },
+    ['pairSet', [LETTUCE, LETTUCE]],
+    ['pairSet', [CARROT, ONION]],
+    ['pairSet', [CABBAGE, TOMATO]],
     // V+V+V = 8 (x3)
-    function () { return tripletSet([LETTUCE, LETTUCE, LETTUCE]); },
-    function () { return tripletSet([PEPPER, LETTUCE, CABBAGE]); },
-    function () { return tripletSet([TOMATO, LETTUCE, CARROT]); },
+    ['tripletSet', [LETTUCE, LETTUCE, LETTUCE]],
+    ['tripletSet', [PEPPER, LETTUCE, CABBAGE]],
+    ['tripletSet', [TOMATO, LETTUCE, CARROT]],
 ];
 CARDS_EFFECTS[TOMATO] = [
     null,
     // special
-    function () { return formatTextIcons("\n    <div class=\"flex complete-set top\">[veggie6][veggie3][veggie2]</div>\n    <div class=\"flex\"><span>[12]</span><span>/</span><span>".concat(_('Complete set'), "</span></div>\n    <div class=\"flex complete-set bottom\">[veggie1][veggie5][veggie4]</div>\n    ")); },
+    ['completeSet'],
     // odd/even
-    function () { return evenOdd(ONION); },
+    ['evenOdd', ONION],
     // most
-    function () { return most(ONION); },
+    ['most', ONION],
     // least
-    function () { return least(ONION); },
+    ['least', ONION],
     // 2/V
-    function () { return sets([[2, ONION]]); },
+    ['sets', [[2, ONION]]],
     // 1/V 1/V (x2)
-    function () { return sets([[1, ONION], [1, CARROT]]); },
-    function () { return sets([[1, ONION], [1, CABBAGE]]); },
+    ['sets', [[1, ONION], [1, CARROT]]],
+    ['sets', [[1, ONION], [1, CABBAGE]]],
     // 3/V -2/V
-    function () { return sets([[3, ONION], [-2, PEPPER]]); },
+    ['sets', [[3, ONION], [-2, PEPPER]]],
     // 2/V 1/V -2/V
-    function () { return sets([[2, ONION], [1, CABBAGE], [-2, TOMATO]]); },
+    ['sets', [[2, ONION], [1, CABBAGE], [-2, TOMATO]]],
     // 2/V 2/V -4/V
-    function () { return sets([[2, ONION], [2, PEPPER], [-4, CABBAGE]]); },
+    ['sets', [[2, ONION], [2, PEPPER], [-4, CABBAGE]]],
     // 3/V -1/V -1/V
-    function () { return sets([[3, ONION], [-1, CABBAGE], [-1, TOMATO]]); },
+    ['sets', [[3, ONION], [-1, CABBAGE], [-1, TOMATO]]],
     // 4/V -2/V -2/V
-    function () { return sets([[4, ONION], [-2, CARROT], [-2, LETTUCE]]); },
+    ['sets', [[4, ONION], [-2, CARROT], [-2, LETTUCE]]],
     // V+V = 5 (x3)
-    function () { return pairSet([ONION, ONION]); },
-    function () { return pairSet([CABBAGE, PEPPER]); },
-    function () { return pairSet([CARROT, LETTUCE]); },
+    ['pairSet', [ONION, ONION]],
+    ['pairSet', [CABBAGE, PEPPER]],
+    ['pairSet', [CARROT, LETTUCE]],
     // V+V+V = 8 (x3)
-    function () { return tripletSet([ONION, ONION, ONION]); },
-    function () { return tripletSet([CARROT, ONION, PEPPER]); },
-    function () { return tripletSet([TOMATO, ONION, LETTUCE]); },
+    ['tripletSet', [ONION, ONION, ONION]],
+    ['tripletSet', [CARROT, ONION, PEPPER]],
+    ['tripletSet', [TOMATO, ONION, LETTUCE]],
 ];
 var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
@@ -379,6 +394,10 @@ var PointSalad = /** @class */ (function () {
         }
         this.onScreenWidthChange = function () { return _this.placeMarket(); };
         log("Ending game setup");
+        try {
+            this.dummyCalls();
+        }
+        catch (e) { }
         // TODO TEMP
         //this.debugSeeAllPointCards();
     };
@@ -479,13 +498,14 @@ var PointSalad = /** @class */ (function () {
         html += "</div>";
         dojo.place(html, 'full-table', 'before');
         for (var veggie = 1; veggie <= 6; veggie++) {
-            for (var i = 1; i <= 12; i++) {
-                this.createOrMoveCard({
+            for (var i = 1; i <= 18; i++) {
+                var card = {
                     id: 1000 * veggie + i,
                     side: 0,
                     index: i,
                     veggie: veggie,
-                }, "all-point-cards-".concat(veggie), 'for test only');
+                };
+                this.createOrMoveCard(card, "all-point-cards-".concat(veggie), this.getPlayerCardTooltip(card));
             }
         }
     };
@@ -631,7 +651,7 @@ var PointSalad = /** @class */ (function () {
     };
     PointSalad.prototype.createOrMoveCard = function (card, destinationId, tooltip, init, from) {
         var _this = this;
-        var _a, _b;
+        var _a, _b, _c;
         if (init === void 0) { init = false; }
         if (from === void 0) { from = null; }
         var existingDiv = document.getElementById("card-".concat(card.id));
@@ -654,7 +674,9 @@ var PointSalad = /** @class */ (function () {
             div.dataset.side = '' + card.side;
             div.dataset.veggie = '' + card.veggie;
             div.dataset.index = '' + card.index;
-            div.innerHTML = "\n                <div class=\"card-sides\">\n                    <div class=\"card-side front\">\n                        <div>".concat(((_b = (_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index]) === null || _b === void 0 ? void 0 : _b.call(_a)) || '', "</div>\n                    </div>\n                    <div class=\"card-side back\">\n                        <div class=\"name\">").concat(name_1, "</div>\n                        <div class=\"name rotated\">").concat(name_1, "</div>\n                    </div>\n                </div>\n            ");
+            var cardEffect = (_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index];
+            var label = (_c = (_b = window)[cardEffect[0]]) === null || _c === void 0 ? void 0 : _c.call(_b, cardEffect[1]);
+            div.innerHTML = "\n                <div class=\"card-sides\">\n                    <div class=\"card-side front\">\n                        <div>".concat(label, "</div>\n                    </div>\n                    <div class=\"card-side back\">\n                        <div class=\"name\">").concat(name_1, "</div>\n                        <div class=\"name rotated\">").concat(name_1, "</div>\n                    </div>\n                </div>\n            ");
             document.getElementById(destinationId).appendChild(div);
             div.addEventListener('click', function () { return _this.onCardClick(card); });
             if (from) {
@@ -665,6 +687,51 @@ var PointSalad = /** @class */ (function () {
         }
     };
     PointSalad.prototype.getPointSideTooltip = function (card) {
+        var _this = this;
+        var _a;
+        var cardEffect = (_a = CARDS_EFFECTS[card.veggie]) === null || _a === void 0 ? void 0 : _a[card.index];
+        var tooltip = "<br>";
+        switch (cardEffect[0]) {
+            case 'missingType':
+                tooltip += _("Score ${points} points for each veggie type you don't have").replace('${points}', "<strong>5</strong>");
+                return tooltip;
+            case 'typeWithLeast':
+                tooltip += _('Score ${points} points for each veggie type where you have at least ${least} cards').replace('${least}', "<strong>".concat(cardEffect[1][0], "</strong>")).replace('${points}', "<strong>".concat(cardEffect[1][1], "</strong>"));
+                return tooltip;
+            case 'highestTotal':
+                tooltip += _('Score ${points} points if you have the highest veggie count').replace('${points}', "<strong>10</strong>");
+                return tooltip;
+            case 'lowestTotal':
+                tooltip += _('Score ${points} points if you have the lowest veggie count').replace('${points}', "<strong>7</strong>");
+                return tooltip;
+            case 'completeSet':
+                tooltip += _('Score ${points} points for each complete set of veggies').replace('${points}', "<strong>12</strong>");
+                return tooltip;
+            case 'evenOdd':
+                tooltip += _('Score ${pointsEven} points if you got an even number of ${veggieName}, or ${pointsOdd} points if you got an odd number of ${veggieName}. You need at least one ${veggieName} to score.').replace('${pointsEven}', "<strong>7</strong>").replace('${pointsOdd}', "<strong>3</strong>").replace(/\$\{veggieName\}/g, "<strong>".concat(this.getVeggieName(cardEffect[1]), "</strong>"));
+                return tooltip;
+            case 'most':
+                tooltip += _('Score ${points} points if you are the player with the most ${veggieName} (you will score if you tie for the most).').replace('${points}', "<strong>10</strong>").replace('${veggieName}', "<strong>".concat(this.getVeggieName(cardEffect[1]), "</strong>"));
+                return tooltip;
+            case 'least':
+                tooltip += _('Score ${points} points if you are the player with the least ${veggieName} (you will score if you tie for the least).').replace('${points}', "<strong>10</strong>").replace('${veggieName}', "<strong>".concat(this.getVeggieName(cardEffect[1]), "</strong>"));
+                return tooltip;
+            case 'sets':
+                tooltip += cardEffect[1].map(function (set) { return _('Score ${points} points for each ${veggieName} card in your possession.').replace('${points}', "<strong>".concat(set[0], "</strong>")).replace('${veggieName}', "<strong>".concat(_this.getVeggieName(set[1]), "</strong>")); }).join("<br>".concat(_('AND'), "<br>"));
+                return tooltip;
+            case 'pairSet':
+                var pairSet_1 = cardEffect[1];
+                tooltip += pairSet_1[0] === pairSet_1[1] ?
+                    _('Score ${points} points for each pair of ${veggieName} card in your possession.').replace('${points}', "<strong>5</strong>").replace('${veggieName}', "<strong>".concat(this.getVeggieName(pairSet_1[0]), "</strong>")) :
+                    _('Score ${points} points for each set of ${veggieName1} and ${veggieName2} card in your possession.').replace('${points}', "<strong>5</strong>").replace('${veggieName1}', "<strong>".concat(this.getVeggieName(pairSet_1[0]), "</strong>")).replace('${veggieName2}', "<strong>".concat(this.getVeggieName(pairSet_1[1]), "</strong>"));
+                return tooltip;
+            case 'tripletSet':
+                var tripletSet_1 = cardEffect[1];
+                tooltip += tripletSet_1[0] === tripletSet_1[1] ?
+                    _('Score ${points} points for each triplet of ${veggieName} card in your possession.').replace('${points}', "<strong>8</strong>").replace('${veggieName}', "<strong>".concat(this.getVeggieName(tripletSet_1[0]), "</strong>")) :
+                    _('Score ${points} points for each set of ${veggieName1}, ${veggieName2} and ${veggieName3} card in your possession.').replace('${points}', "<strong>8</strong>").replace('${veggieName1}', "<strong>".concat(this.getVeggieName(tripletSet_1[0]), "</strong>")).replace('${veggieName2}', "<strong>".concat(this.getVeggieName(tripletSet_1[1]), "</strong>")).replace('${veggieName3}', "<strong>".concat(this.getVeggieName(tripletSet_1[2]), "</strong>"));
+                return tooltip;
+        }
         return "";
     };
     PointSalad.prototype.getPlayerCardTooltip = function (card) {
@@ -672,7 +739,7 @@ var PointSalad = /** @class */ (function () {
             return "<div class=\"card-tooltip\">\n                <div class=\"card-tooltip-name\">".concat(_("Point card"), "</div>\n                <div class=\"card-tooltip-description\">\n                    <div>").concat(_("At the end of the game, score Victory Points if you match the card conditions with your veggie cards. You may score a point card multiple times."), "</div>\n                    <div>").concat(this.getPointSideTooltip(card), "</div>\n                </div>\n            </div>");
         }
         else if (card.side === 1) {
-            return "<div class=\"card-tooltip\">\n                <div class=\"card-tooltip-name\">".concat(_("Veggie card"), "</div>\n                <div class=\"card-tooltip-description\">\n                    <div>").concat(this.getVeggieName(card.veggie), "</div>\n                </div>\n            </div>");
+            return "<div class=\"card-tooltip\">\n                <div class=\"card-tooltip-name\">".concat(_("Veggie card"), "</div>\n                <div class=\"card-tooltip-description\">\n                    <div><br><strong>").concat(this.getVeggieName(card.veggie), "</strong></div>\n                </div>\n            </div>");
         }
     };
     PointSalad.prototype.getMarketCardTooltip = function (card) {
@@ -680,7 +747,7 @@ var PointSalad = /** @class */ (function () {
             return "<div class=\"card-tooltip\">\n                <div class=\"card-tooltip-name\">".concat(_("Draw pile"), " (").concat(_("Point card"), ")</div>\n                <div class=\"card-tooltip-description\">\n                    <div>").concat(_("At your turn, you can take one Point card from the draw pile."), "</div>\n                    <div>").concat(this.getPointSideTooltip(card), "</div>\n                </div>\n            </div>");
         }
         else if (card.side === 1) {
-            return "<div class=\"card-tooltip\">\n                <div class=\"card-tooltip-name\">".concat(_("Veggie market"), " (").concat(_("Veggie card"), ")</div>\n                <div class=\"card-tooltip-description\">\n                    <div>").concat(_("At your turn, you can take two Veggie cards from the market."), "</div>\n                    <div>").concat(this.getVeggieName(card.veggie), "</div>\n                </div>\n            </div>");
+            return "<div class=\"card-tooltip\">\n                <div class=\"card-tooltip-name\">".concat(_("Veggie market"), " (").concat(_("Veggie card"), ")</div>\n                <div class=\"card-tooltip-description\">\n                    <div>").concat(_("At your turn, you can take two Veggie cards from the market."), "</div>\n                    <div><br><strong>").concat(this.getVeggieName(card.veggie), "</strong></div>\n                </div>\n            </div>");
         }
     };
     PointSalad.prototype.updateVeggieCount = function (playerId, veggieCounts) {
@@ -866,40 +933,47 @@ var PointSalad = /** @class */ (function () {
                 if (args.veggies && typeof args.veggies == 'object') {
                     args.veggies = args.veggies.map(function (veggie) { return "<div class=\"icon\" data-veggie=\"".concat(veggie, "\"></div>"); }).join('');
                 }
-                /*['card_name', 'card_name2'].forEach(cardArg => {
-                    if (args[cardArg]) {
-                        let types: number[] = null;
-                        if (typeof args[cardArg] == 'number') {
-                            types = [args[cardArg]];
-                        } else if (typeof args[cardArg] == 'string' && args[cardArg][0] >= '0' && args[cardArg][0] <= '9') {
-                            types = args[cardArg].split(',').map((cardType: string) => Number(cardType));
-                        }
-                        if (types !== null) {
-                            const tags: string[] = types.map((cardType: number) => {
-                                const cardLogId = this.cardLogId++;
-
-                                setTimeout(() => (this as any).addTooltipHtml(`card-log-${cardLogId}`, this.getLogCardTooltip(cardType)), 500);
-
-                                return `<strong id="card-log-${cardLogId}" data-log-type="${cardType}">${this.getLogCardName(cardType)}</strong>`;
-                            });
-                            args[cardArg] = tags.join(', ');
-                        }
-                    }
-                });
-
-                for (const property in args) {
-                    if (args[property]?.indexOf?.(']') > 0) {
-                        args[property] = formatTextIcons(_(args[property]));
-                    }
-                }
-
-                log = formatTextIcons(_(log));*/
             }
         }
         catch (e) {
             console.error(log, args, "Exception thrown", e.stack);
         }
         return this.inherited(arguments);
+    };
+    // dummy calls x2 so functions aren't moved to inline function by optimization script
+    PointSalad.prototype.dummyCalls = function () {
+        // special
+        missingType();
+        typeWithLeast([]);
+        highestTotal();
+        lowestTotal();
+        completeSet();
+        // odd/even
+        evenOdd(0);
+        // most
+        most(0);
+        // least
+        least(0);
+        // sets
+        sets([]);
+        pairSet([]);
+        tripletSet([]);
+        // special
+        missingType();
+        typeWithLeast([]);
+        highestTotal();
+        lowestTotal();
+        completeSet();
+        // odd/even
+        evenOdd(0);
+        // most
+        most(0);
+        // least
+        least(0);
+        // sets
+        sets([]);
+        pairSet([]);
+        tripletSet([]);
     };
     return PointSalad;
 }());
