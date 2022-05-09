@@ -294,7 +294,10 @@
   font-weight: bold;
 }
 .card .card-sides .card-side.back .name.rotated {
-  transform: rotate(-180deg);
+  transform: rotateZ(-180deg);
+  -webkit-backface-visibility: hidden;
+  /* Safari */
+  backface-visibility: hidden;
 }
 .card .final-score {
   position: absolute;

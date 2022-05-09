@@ -159,7 +159,9 @@
                     font-weight: bold;
 
                     &.rotated {
-                        transform: rotate(-180deg);
+                        transform: rotateZ(-180deg);                        
+                        -webkit-backface-visibility: hidden; /* Safari */
+                        backface-visibility: hidden;
                     }
                 }
             }
