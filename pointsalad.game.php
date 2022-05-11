@@ -128,11 +128,29 @@ class PointSalad extends Table {
         $sql = "SELECT player_id id, player_score score, player_no playerNo FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
 
+        $cardScores = [];
+
+        $isEndScore = intval($this->gamestate->state_id()) >= ST_END_SCORE;
+
         foreach ($result['players'] as $playerId => &$playerDb) {
             $playerDb['playerNo'] = intval($playerDb['playerNo']);
             $cards = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $playerId));
             $playerDb['cards'] = $cards;
             $playerDb['veggieCounts'] = $this->getVeggieCounts($cards);
+
+            if ($isEndScore) {
+                $pointCards = array_values(array_filter($cards, fn($card) => $card->side === 0));
+                $veggieCards = array_values(array_filter($cards, fn($card) => $card->side === 1));
+                $veggieCounts = $this->getVeggieCounts($veggieCards);
+                
+                foreach ($pointCards as $pointCard) {
+                    $cardScores[$pointCard->id] = $this->getScore($playerId, $pointCard, $veggieCounts);
+                }
+            }
+        }
+
+        if ($isEndScore) {
+            $result['cardScores'] = $cardScores;
         }
         
         $pileTopCard = [];
@@ -146,23 +164,6 @@ class PointSalad extends Table {
         $result['pileTopCard'] = $pileTopCard;
         $result['pileCount'] = $pileCount;
         $result['market'] = $market;
-        
-        if (intval($this->gamestate->state_id()) >= ST_END_SCORE) {
-            $cardScores = [];
-
-            foreach ($result['players'] as $playerId => $playerDb) {
-                $cards = $playerDb['cards'];
-                $pointCards = array_values(array_filter($cards, fn($card) => $card->side === 0));
-                $veggieCards = array_values(array_filter($cards, fn($card) => $card->side === 1));
-                $veggieCounts = $this->getVeggieCounts($veggieCards);
-                
-                foreach ($pointCards as $pointCard) {
-                    $cardScores[$pointCard->id] = $this->getScore($playerId, $pointCard, $veggieCounts);
-                }
-            }
-
-            $result['cardScores'] = $cardScores;
-        }
 
         $result['showAskFlipPhase'] = $this->getPlayerPointCardsCount($currentPlayerId) > 0;
         $result['askFlipPhase'] = $this->getAskFlipPhase($currentPlayerId);
