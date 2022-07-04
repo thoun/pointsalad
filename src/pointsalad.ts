@@ -174,7 +174,7 @@ class PointSalad implements PointSaladGame {
 
     // gameui.debugSeeAllPointCards()
     debugSeeAllPointCards() {
-        let html = `<div id="all-point-cards">`;
+        let html = `<div id="all-point-cards" style="min-width: fit-content;">`;
         for (let veggie = 1; veggie <= 6; veggie++) {
             html += `<div id="all-point-cards-${veggie}" style="display: flex; flex-wrap: nowrap;"></div>`;
         }
@@ -317,8 +317,10 @@ class PointSalad implements PointSaladGame {
             } else if (_actionTimerSeconds-- > 1) {
                 button.innerHTML = button.dataset.label + ' (' + _actionTimerSeconds + ')';
             } else {
-                window.clearInterval(this.actionTimerId);
-                button.click();
+                if (this.actionTimerId !== null) {
+                    window.clearInterval(this.actionTimerId);
+                    button.click();
+                }
             }
         };
         actionTimerFunction();
@@ -328,8 +330,9 @@ class PointSalad implements PointSaladGame {
 
     private stopActionTimer(buttonId: string) {
         const button = document.getElementById(buttonId);
-        button.innerHTML = button.dataset.label
+        button.innerHTML = button.dataset.label;
         window.clearInterval(this.actionTimerId);
+        //this.actionTimerId = null;
         dojo.destroy('stopActionTimer_button');
     }
 

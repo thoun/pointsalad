@@ -491,7 +491,7 @@ var PointSalad = /** @class */ (function () {
     };
     // gameui.debugSeeAllPointCards()
     PointSalad.prototype.debugSeeAllPointCards = function () {
-        var html = "<div id=\"all-point-cards\">";
+        var html = "<div id=\"all-point-cards\" style=\"min-width: fit-content;\">";
         for (var veggie = 1; veggie <= 6; veggie++) {
             html += "<div id=\"all-point-cards-".concat(veggie, "\" style=\"display: flex; flex-wrap: nowrap;\"></div>");
         }
@@ -606,8 +606,10 @@ var PointSalad = /** @class */ (function () {
                 button.innerHTML = button.dataset.label + ' (' + _actionTimerSeconds + ')';
             }
             else {
-                window.clearInterval(_this.actionTimerId);
-                button.click();
+                if (_this.actionTimerId !== null) {
+                    window.clearInterval(_this.actionTimerId);
+                    button.click();
+                }
             }
         };
         actionTimerFunction();
@@ -618,6 +620,7 @@ var PointSalad = /** @class */ (function () {
         var button = document.getElementById(buttonId);
         button.innerHTML = button.dataset.label;
         window.clearInterval(this.actionTimerId);
+        //this.actionTimerId = null;
         dojo.destroy('stopActionTimer_button');
     };
     PointSalad.prototype.getZoom = function () {

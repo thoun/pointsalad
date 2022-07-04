@@ -90,7 +90,8 @@
   height: 140px;
   margin: 5px;
   border-radius: 10px;
-  font-family: "PointSalad";
+  font-family: carlmarx, sans-serif;
+  font-weight: 700;
 }
 .card[data-veggie="1"] .card-side {
   background-position-y: 0%;
@@ -158,13 +159,12 @@
 .card .card-sides .card-side.front {
   color: #8dc63f;
   text-shadow: -1px 1px 1px white;
-  font-weight: bold;
-  font-size: 75%;
+  font-size: 10pt;
   background-image: url("img/point-side.jpg");
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px;
+  padding: 12px;
   box-sizing: border-box;
 }
 .card .card-sides .card-side.front > * {
@@ -244,7 +244,7 @@
 }
 .card .card-sides .card-side.front .icon.points {
   text-shadow: 1px 1px 1px #6d9d31;
-  font-size: 100%;
+  font-size: 10pt;
 }
 .card .card-sides .card-side.front .multiple-set {
   position: relative;
@@ -289,9 +289,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 10px 12px;
+  padding: 8px 12px;
   color: white;
-  font-weight: bold;
+  font-size: 13pt;
 }
 .card .card-sides .card-side.back .name.rotated {
   transform: rotateZ(-180deg);
@@ -338,7 +338,8 @@
 .player-table .player-name {
   text-shadow: 0 0 5px white;
   text-align: center;
-  font-family: "PointSalad";
+  font-family: carlmarx, sans-serif;
+  font-weight: 700;
   text-transform: uppercase;
 }
 .player-table .player-points, .player-table .player-veggies {
@@ -354,11 +355,11 @@
 
 #table #market-title {
   text-align: center;
-  font-weight: bold;
   padding: 6px;
   margin-bottom: 8px;
   user-select: none;
-  font-family: "PointSalad";
+  font-family: carlmarx, sans-serif;
+  font-weight: 700;
   color: #00301a;
   background: #ffffffa3;
   border: 2px solid #00301a;
@@ -403,12 +404,6 @@ html, .mode_3d #game_play_area_background {
   background: #FFFFFFAA;
 }
 
-@font-face {
-  font-family: "PointSalad";
-  src: url("img/font/kosugimaru-regular-webfont.woff2") format("woff2"), url("img/font/kosugimaru-regular-webfont.woff") format("woff");
-  font-weight: normal;
-  font-style: normal;
-}
 .bgabutton_blue {
   background: #005630;
   border: 1px solid #00301a;
