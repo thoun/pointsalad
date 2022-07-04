@@ -389,6 +389,7 @@ var PointSalad = /** @class */ (function () {
             Object.keys(gamedatas.cardScores).forEach(function (key) { return _this.setCardScore(Number(key), gamedatas.cardScores[key]); });
         }
         this.setupNotifications();
+        this.setupPreferences();
         if (gamedatas.showAskFlipPhase) {
             this.addAskFlipPhaseToggle(gamedatas.askFlipPhase);
         }
@@ -435,7 +436,6 @@ var PointSalad = /** @class */ (function () {
         var _this = this;
         Object.keys(this.gamedatas.players).forEach(function (playerId) { var _a; return (_a = _this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.setValue(0); });
         this.gamedatas.hiddenScore = false;
-        console.log('onEnteringShowScore', this.gamedatas.hiddenScore);
     };
     PointSalad.prototype.onLeavingState = function (stateName) {
         log('Leaving state: ' + stateName);
@@ -515,6 +515,23 @@ var PointSalad = /** @class */ (function () {
     PointSalad.prototype.setTooltip = function (id, html) {
         this.addTooltipHtml(id, html, this.TOOLTIP_DELAY);
     };
+    PointSalad.prototype.setupPreferences = function () {
+        var _this = this;
+        // Extract the ID and value from the UI control
+        var onchange = function (e) {
+            var match = e.target.id.match(/^preference_control_(\d+)$/);
+            if (!match) {
+                return;
+            }
+            var prefId = +match[1];
+            var prefValue = +e.target.value;
+            _this.prefs[prefId].value = prefValue;
+        };
+        // Call onPreferenceChange() when any value changes
+        dojo.query(".preference_control").connect("onchange", onchange);
+        // Call onPreferenceChange() now
+        dojo.forEach(dojo.query("#ingame_menu_content .preference_control"), function (el) { return onchange({ target: el }); });
+    };
     PointSalad.prototype.createPlayerPanels = function (gamedatas) {
         var _this = this;
         Object.values(gamedatas.players).forEach(function (player) {
@@ -590,7 +607,7 @@ var PointSalad = /** @class */ (function () {
     PointSalad.prototype.startActionTimer = function (buttonId, time) {
         var _this = this;
         var _a;
-        if (((_a = this.prefs[201]) === null || _a === void 0 ? void 0 : _a.value) === 2) {
+        if (Number((_a = this.prefs[201]) === null || _a === void 0 ? void 0 : _a.value) == 2) {
             return false;
         }
         var button = document.getElementById(buttonId);

@@ -53,6 +53,7 @@ class PointSalad implements PointSaladGame {
         }
 
         this.setupNotifications();
+        this.setupPreferences();
 
         if (gamedatas.showAskFlipPhase) {
             this.addAskFlipPhaseToggle(gamedatas.askFlipPhase);
@@ -107,7 +108,6 @@ class PointSalad implements PointSaladGame {
     private onEnteringShowScore() {
         Object.keys(this.gamedatas.players).forEach(playerId => (this as any).scoreCtrl[playerId]?.setValue(0));
         this.gamedatas.hiddenScore = false;
-        console.log('onEnteringShowScore', this.gamedatas.hiddenScore);
     }
 
     public onLeavingState(stateName: string) {
@@ -200,6 +200,28 @@ class PointSalad implements PointSaladGame {
 
     public setTooltip(id: string, html: string) {
         (this as any).addTooltipHtml(id, html, this.TOOLTIP_DELAY);
+    }
+
+    private setupPreferences() {
+        // Extract the ID and value from the UI control
+        const onchange = (e) => {
+          var match = e.target.id.match(/^preference_control_(\d+)$/);
+          if (!match) {
+            return;
+          }
+          var prefId = +match[1];
+          var prefValue = +e.target.value;
+          (this as any).prefs[prefId].value = prefValue;
+        }
+        
+        // Call onPreferenceChange() when any value changes
+        dojo.query(".preference_control").connect("onchange", onchange);
+        
+        // Call onPreferenceChange() now
+        dojo.forEach(
+          dojo.query("#ingame_menu_content .preference_control"),
+          el => onchange({ target: el })
+        );
     }
 
     private createPlayerPanels(gamedatas: PointSaladGamedatas) {
@@ -301,7 +323,7 @@ class PointSalad implements PointSaladGame {
     }
 
     private startActionTimer(buttonId: string, time: number): boolean {
-        if ((this as any).prefs[201]?.value === 2) {
+        if (Number((this as any).prefs[201]?.value) == 2) {
             return false;
         }
 
