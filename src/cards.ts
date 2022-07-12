@@ -53,20 +53,20 @@ function evenOdd(veggie: number): string {
     `);
 }
 
-function mostLeast(word: string, veggie: number): string {
+function mostLeast(word: string, points: number, veggie: number): string {
     return formatTextIcons(`
         <div class="flex">
             <span class="flex wrap">${word} [veggie${veggie}]</span>
             <span>=</span>
-            <span>[10]</span>
+            <span>[${points}]</span>
         </div>
     `);
 }
 function most(veggie: number): string {
-    return mostLeast(_('Most'), veggie);
+    return mostLeast(_('Most'), 10, veggie);
 }
 function least(veggie: number): string {
-    return mostLeast(_('Least'), veggie);
+    return mostLeast(_('Fewest'), 7, veggie);
 }
 
 function sets(sets: number[][]) {

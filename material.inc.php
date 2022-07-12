@@ -47,7 +47,7 @@ if (!function_exists('evenOdd')) {
       }
     }
 
-    return 10;
+    return 7;
   }
 
   function set(array $veggieCounts, int $veggie, int $points) {

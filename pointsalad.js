@@ -123,14 +123,14 @@ function completeSet() {
 function evenOdd(veggie) {
     return formatTextIcons("\n        <div class=\"margin\">\n            <div class=\"flex\">[veggie".concat(veggie, "]</div>\n            <div class=\"flex\">\n                <span class=\"flex wrap\">").concat(_('Even total'), "</span>\n                <span>=</span>\n                <span>[7]</span>\n            </div>\n            <div class=\"flex\">\n                <span class=\"flex wrap\">").concat(_('Odd total'), "</span>\n                <span>=</span>\n                <span>[3]</span>\n            </div>\n        </div>\n    "));
 }
-function mostLeast(word, veggie) {
-    return formatTextIcons("\n        <div class=\"flex\">\n            <span class=\"flex wrap\">".concat(word, " [veggie").concat(veggie, "]</span>\n            <span>=</span>\n            <span>[10]</span>\n        </div>\n    "));
+function mostLeast(word, points, veggie) {
+    return formatTextIcons("\n        <div class=\"flex\">\n            <span class=\"flex wrap\">".concat(word, " [veggie").concat(veggie, "]</span>\n            <span>=</span>\n            <span>[").concat(points, "]</span>\n        </div>\n    "));
 }
 function most(veggie) {
-    return mostLeast(_('Most'), veggie);
+    return mostLeast(_('Most'), 10, veggie);
 }
 function least(veggie) {
-    return mostLeast(_('Least'), veggie);
+    return mostLeast(_('Fewest'), 7, veggie);
 }
 function sets(sets) {
     return formatTextIcons(sets.map(function (set) { return "<div>[".concat(set[0], "]/[veggie").concat(set[1], "]</div>"); }).join(''));
