@@ -643,6 +643,7 @@ class PointSalad implements PointSaladGame {
     */
     setupNotifications() {
         //log( 'notifications subscriptions setup' );
+        const fastEndScoring = Number((this as any).prefs[202]?.value) == 1;
 
         const notifs = [
             ['points', 1],
@@ -650,7 +651,7 @@ class PointSalad implements PointSaladGame {
             ['flippedCard', ANIMATION_MS],
             ['marketRefill', ANIMATION_MS],
             ['pileRefill', ANIMATION_MS],
-            ['cardScore', 1000],
+            ['cardScore', fastEndScoring ? 1 : 1000],
         ];
     
         notifs.forEach((notif) => {

@@ -50,6 +50,15 @@ $game_preferences = [
         ],
         'default' => 1
     ],
+    202 => [
+        'name' => totranslate('Fast end scoring'),
+        'needReload' => true,
+        'values' => [
+            1 => ['name' => totranslate('Enabled')],
+            2 => ['name' => totranslate('Disabled')],
+        ],
+        'default' => 2
+    ],
 ];
 
 

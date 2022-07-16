@@ -866,15 +866,17 @@ var PointSalad = /** @class */ (function () {
 
     */
     PointSalad.prototype.setupNotifications = function () {
-        //log( 'notifications subscriptions setup' );
         var _this = this;
+        var _a;
+        //log( 'notifications subscriptions setup' );
+        var fastEndScoring = Number((_a = this.prefs[202]) === null || _a === void 0 ? void 0 : _a.value) == 1;
         var notifs = [
             ['points', 1],
             ['takenCards', ANIMATION_MS],
             ['flippedCard', ANIMATION_MS],
             ['marketRefill', ANIMATION_MS],
             ['pileRefill', ANIMATION_MS],
-            ['cardScore', 1000],
+            ['cardScore', fastEndScoring ? 1 : 1000],
         ];
         notifs.forEach(function (notif) {
             dojo.subscribe(notif[0], _this, "notif_".concat(notif[0]));
