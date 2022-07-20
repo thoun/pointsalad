@@ -461,7 +461,7 @@ class PointSalad implements PointSaladGame {
                 tooltip += _('Score ${points} points if you are the player with the most ${veggieName} (you will score if you tie for the most).').replace('${points}', `<strong>10</strong>`).replace('${veggieName}', `<strong>${this.getVeggieName(cardEffect[1])}</strong>`);
                 return tooltip;
             case 'least':
-                tooltip += _('Score ${points} points if you are the player with the least ${veggieName} (you will score if you tie for the least).').replace('${points}', `<strong>10</strong>`).replace('${veggieName}', `<strong>${this.getVeggieName(cardEffect[1])}</strong>`);
+                tooltip += _('Score ${points} points if you are the player with the fewest ${veggieName} (you will score if you tie for the fewest).').replace('${points}', `<strong>7</strong>`).replace('${veggieName}', `<strong>${this.getVeggieName(cardEffect[1])}</strong>`);
                 return tooltip;
             case 'sets':
                 tooltip += cardEffect[1].map(set => _('Score ${points} points for each ${veggieName} card in your possession.').replace('${points}', `<strong>${set[0]}</strong>`).replace('${veggieName}', `<strong>${this.getVeggieName(set[1])}</strong>`)).join(`<br>${_('AND')}<br>`);

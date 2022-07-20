@@ -734,7 +734,7 @@ var PointSalad = /** @class */ (function () {
                 tooltip += _('Score ${points} points if you are the player with the most ${veggieName} (you will score if you tie for the most).').replace('${points}', "<strong>10</strong>").replace('${veggieName}', "<strong>".concat(this.getVeggieName(cardEffect[1]), "</strong>"));
                 return tooltip;
             case 'least':
-                tooltip += _('Score ${points} points if you are the player with the least ${veggieName} (you will score if you tie for the least).').replace('${points}', "<strong>10</strong>").replace('${veggieName}', "<strong>".concat(this.getVeggieName(cardEffect[1]), "</strong>"));
+                tooltip += _('Score ${points} points if you are the player with the fewest ${veggieName} (you will score if you tie for the fewest).').replace('${points}', "<strong>7</strong>").replace('${veggieName}', "<strong>".concat(this.getVeggieName(cardEffect[1]), "</strong>"));
                 return tooltip;
             case 'sets':
                 tooltip += cardEffect[1].map(function (set) { return _('Score ${points} points for each ${veggieName} card in your possession.').replace('${points}', "<strong>".concat(set[0], "</strong>")).replace('${veggieName}', "<strong>".concat(_this.getVeggieName(set[1]), "</strong>")); }).join("<br>".concat(_('AND'), "<br>"));
