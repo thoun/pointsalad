@@ -385,7 +385,9 @@ var PointSalad = /** @class */ (function () {
         this.tableCenter = new TableCenter(this, gamedatas);
         this.createPlayerTables(gamedatas);
         this.createPlayerJumps(gamedatas);
+        this.scoreIsVisible = !this.gamedatas.hiddenScore;
         if (gamedatas.cardScores) {
+            this.scoreIsVisible = true;
             Object.keys(gamedatas.cardScores).forEach(function (key) { return _this.setCardScore(Number(key), gamedatas.cardScores[key]); });
         }
         this.setupNotifications();
@@ -434,8 +436,10 @@ var PointSalad = /** @class */ (function () {
     };
     PointSalad.prototype.onEnteringShowScore = function () {
         var _this = this;
-        Object.keys(this.gamedatas.players).forEach(function (playerId) { var _a; return (_a = _this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.setValue(0); });
-        this.gamedatas.hiddenScore = false;
+        this.scoreIsVisible = false;
+        if (!this.isVisibleScoring()) {
+            Object.keys(this.gamedatas.players).forEach(function (playerId) { var _a; return (_a = _this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.setValue(0); });
+        }
     };
     PointSalad.prototype.onLeavingState = function (stateName) {
         log('Leaving state: ' + stateName);
@@ -655,10 +659,10 @@ var PointSalad = /** @class */ (function () {
     };
     PointSalad.prototype.setNewScore = function (playerId, score) {
         var _this = this;
-        var _a;
-        if (this.gamedatas.hiddenScore) {
+        var _a, _b;
+        if (!this.scoreIsVisible) {
             setTimeout(function () {
-                if (_this.gamedatas.hiddenScore) {
+                if (!_this.scoreIsVisible) {
                     Object.keys(_this.gamedatas.players).forEach(function (pId) { return document.getElementById("player_score_".concat(pId)).innerHTML = '-'; });
                 }
             }, 100);
@@ -666,6 +670,7 @@ var PointSalad = /** @class */ (function () {
         else {
             if (!isNaN(score)) {
                 (_a = this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(score);
+                console.log('setNewScore', playerId, score, (_b = this.scoreCtrl[playerId]) === null || _b === void 0 ? void 0 : _b.getValue());
             }
         }
     };
@@ -944,7 +949,9 @@ var PointSalad = /** @class */ (function () {
     PointSalad.prototype.notif_cardScore = function (notif) {
         var _a;
         this.setCardScore(notif.args.card.id, notif.args.cardScore);
-        (_a = this.scoreCtrl[notif.args.playerId]) === null || _a === void 0 ? void 0 : _a.incValue(notif.args.cardScore);
+        if (!this.isVisibleScoring()) {
+            (_a = this.scoreCtrl[notif.args.playerId]) === null || _a === void 0 ? void 0 : _a.incValue(notif.args.cardScore);
+        }
     };
     /* This enable to inject translatable styled things to logs or action bar */
     /* @Override */

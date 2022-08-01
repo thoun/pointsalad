@@ -17,6 +17,7 @@ class PointSalad implements PointSaladGame {
     private veggieCounters: Counter[][] = [];
     private canTakeOnlyOneVeggie: boolean = false;
     private actionTimerId: number;
+    private scoreIsVisible: boolean;
     
     private TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
 
@@ -48,7 +49,9 @@ class PointSalad implements PointSaladGame {
         this.createPlayerTables(gamedatas);        
         this.createPlayerJumps(gamedatas);
 
+        this.scoreIsVisible = !this.gamedatas.hiddenScore;
         if (gamedatas.cardScores) {
+            this.scoreIsVisible = true;
             Object.keys(gamedatas.cardScores).forEach(key => this.setCardScore(Number(key), gamedatas.cardScores[key]))
         }
 
@@ -106,8 +109,10 @@ class PointSalad implements PointSaladGame {
     }
 
     private onEnteringShowScore() {
-        Object.keys(this.gamedatas.players).forEach(playerId => (this as any).scoreCtrl[playerId]?.setValue(0));
-        this.gamedatas.hiddenScore = false;
+        this.scoreIsVisible = false;
+        if (!this.isVisibleScoring()) {
+            Object.keys(this.gamedatas.players).forEach(playerId => (this as any).scoreCtrl[playerId]?.setValue(0));
+        }
     }
 
     public onLeavingState(stateName: string) {
@@ -374,15 +379,16 @@ class PointSalad implements PointSaladGame {
     }
 
     private setNewScore(playerId: number, score: number) {
-        if (this.gamedatas.hiddenScore) {
+        if (!this.scoreIsVisible) {
             setTimeout(() => {
-                if (this.gamedatas.hiddenScore) {
+                if (!this.scoreIsVisible) {
                     Object.keys(this.gamedatas.players).forEach(pId => document.getElementById(`player_score_${pId}`).innerHTML = '-');
                 }
             }, 100);
         } else {
             if (!isNaN(score)) {
                 (this as any).scoreCtrl[playerId]?.toValue(score);
+                console.log('setNewScore', playerId, score, (this as any).scoreCtrl[playerId]?.getValue());
             }
         }
     }
@@ -726,7 +732,9 @@ class PointSalad implements PointSaladGame {
 
     notif_cardScore(notif: Notif<NotifCardScoreArgs>) {
         this.setCardScore(notif.args.card.id, notif.args.cardScore);
-        (this as any).scoreCtrl[notif.args.playerId]?.incValue(notif.args.cardScore);
+        if (!this.isVisibleScoring()) {
+            (this as any).scoreCtrl[notif.args.playerId]?.incValue(notif.args.cardScore);
+        }
     }
 
     /* This enable to inject translatable styled things to logs or action bar */
