@@ -62,7 +62,7 @@ trait StateTrait {
 
             self::setStat($totalPointCards, 'totalPointCards', $player->id);
             self::setStat($totalVeggieCards, 'totalVeggieCards', $player->id);
-            self::setStat($playerScore / $totalVeggieCards, 'avgScoreByCard', $player->id);
+            self::setStat($totalVeggieCards == 0 ? 0 : ($playerScore / $totalVeggieCards), 'avgScoreByCard', $player->id);
         
             $tableTotalPointCards += $totalPointCards;
             $tableTotalVeggieCards += $totalVeggieCards;
