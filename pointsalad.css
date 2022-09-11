@@ -172,7 +172,7 @@
   user-select: none;
 }
 .card .card-sides .card-side.front .margin {
-  margin: 0 10px;
+  margin: 0 8px;
 }
 .card .card-sides .card-side.front .flex {
   display: flex;
