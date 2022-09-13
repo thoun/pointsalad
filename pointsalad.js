@@ -659,7 +659,7 @@ var PointSalad = /** @class */ (function () {
     };
     PointSalad.prototype.setNewScore = function (playerId, score) {
         var _this = this;
-        var _a, _b;
+        var _a;
         if (!this.scoreIsVisible) {
             setTimeout(function () {
                 if (!_this.scoreIsVisible) {
@@ -670,7 +670,6 @@ var PointSalad = /** @class */ (function () {
         else {
             if (!isNaN(score)) {
                 (_a = this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(score);
-                console.log('setNewScore', playerId, score, (_b = this.scoreCtrl[playerId]) === null || _b === void 0 ? void 0 : _b.getValue());
             }
         }
     };
@@ -827,8 +826,10 @@ var PointSalad = /** @class */ (function () {
         if (!this.checkAction('takeCards')) {
             return;
         }
+        var sortedIds = ids;
+        ids.sort();
         this.takeAction('takeCards', {
-            ids: ids.join(','),
+            ids: sortedIds.join(','),
         });
     };
     PointSalad.prototype.flipCard = function (id) {

@@ -388,7 +388,6 @@ class PointSalad implements PointSaladGame {
         } else {
             if (!isNaN(score)) {
                 (this as any).scoreCtrl[playerId]?.toValue(score);
-                console.log('setNewScore', playerId, score, (this as any).scoreCtrl[playerId]?.getValue());
             }
         }
     }
@@ -595,8 +594,11 @@ class PointSalad implements PointSaladGame {
             return;
         }
 
+        const sortedIds = ids;
+        ids.sort();
+
         this.takeAction('takeCards', {
-            ids: ids.join(','),
+            ids: sortedIds.join(','),
         });
     }
 
