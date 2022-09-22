@@ -9,6 +9,8 @@ declare const board: HTMLDivElement;
 
 const ANIMATION_MS = 500;
 
+const LOCAL_STORAGE_JUMP_KEY = 'PointSalad-jump-to-folded';
+
 class PointSalad implements PointSaladGame {
     private gamedatas: PointSaladGamedatas;
     private tableCenter: TableCenter;
@@ -22,6 +24,7 @@ class PointSalad implements PointSaladGame {
     private TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
 
     constructor() {
+        document.getElementById('jump-controls').classList.toggle('folded', localStorage.getItem(LOCAL_STORAGE_JUMP_KEY) == 'true');
     }
     
     /*
@@ -313,7 +316,9 @@ class PointSalad implements PointSaladGame {
     }
     
     private jumpToggle(): void {
-        document.getElementById(`jump-controls`).classList.toggle('folded');
+        const jumpControls = document.getElementById('jump-controls');
+        jumpControls.classList.toggle('folded');
+        localStorage.setItem(LOCAL_STORAGE_JUMP_KEY, jumpControls.classList.contains('folded').toString());
     }
     
     private jumpToPlayer(playerId: number): void {

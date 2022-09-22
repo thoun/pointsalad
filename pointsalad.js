@@ -356,6 +356,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 var ANIMATION_MS = 500;
+var LOCAL_STORAGE_JUMP_KEY = 'PointSalad-jump-to-folded';
 var PointSalad = /** @class */ (function () {
     function PointSalad() {
         this.playersTables = [];
@@ -363,6 +364,7 @@ var PointSalad = /** @class */ (function () {
         this.veggieCounters = [];
         this.canTakeOnlyOneVeggie = false;
         this.TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
+        document.getElementById('jump-controls').classList.toggle('folded', localStorage.getItem(LOCAL_STORAGE_JUMP_KEY) == 'true');
     }
     /*
         setup:
@@ -597,7 +599,9 @@ var PointSalad = /** @class */ (function () {
         jumpDiv.style.marginTop = "-".concat(Math.round(jumpDiv.getBoundingClientRect().height / 2), "px");
     };
     PointSalad.prototype.jumpToggle = function () {
-        document.getElementById("jump-controls").classList.toggle('folded');
+        var jumpControls = document.getElementById('jump-controls');
+        jumpControls.classList.toggle('folded');
+        localStorage.setItem(LOCAL_STORAGE_JUMP_KEY, jumpControls.classList.contains('folded').toString());
     };
     PointSalad.prototype.jumpToPlayer = function (playerId) {
         var elementId = playerId === 0 ? "market" : "player-table-".concat(playerId);
