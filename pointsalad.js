@@ -364,7 +364,6 @@ var PointSalad = /** @class */ (function () {
         this.veggieCounters = [];
         this.canTakeOnlyOneVeggie = false;
         this.TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
-        document.getElementById('jump-controls').classList.toggle('folded', localStorage.getItem(LOCAL_STORAGE_JUMP_KEY) == 'true');
     }
     /*
         setup:
@@ -381,6 +380,8 @@ var PointSalad = /** @class */ (function () {
     PointSalad.prototype.setup = function (gamedatas) {
         var _this = this;
         log("Starting game setup");
+        this.bga.gameArea.getElement().insertAdjacentHTML('beforeend', "\n            <link rel=\"stylesheet\" href=\"https://use.typekit.net/jim0ypy.css\">\n\n            <div id=\"full-table\">\n                <div id=\"columns\">\n                    <div id=\"main-column\">\n                        <div id=\"currentplayertable\"></div>\n\n\n                        <div id=\"table-inner\">\n                            <div id=\"table\">\n                                <div id=\"market-title\">".concat(_("Market"), "</div>\n                                <div id=\"piles\">\n                                ").concat([1, 2, 3].map(function (column) { return "\n                                    <div id=\"pile".concat(column, "\" class=\"table-space\">\n                                        <div id=\"pile").concat(column, "-counter\" class=\"pile-counter\"></div>\n                                    </div>"); }).join(''), "\n                                </div>\n                                <div id=\"market\">\n                                ").concat([1, 2].map(function (row) { return "\n                                    <div id=\"market-row".concat(row, "\" class=\"market-row\">\n                                        ").concat([1, 2, 3].map(function (column) { return "<div id=\"market-row".concat(row, "-card").concat(column, "\" class=\"table-space\"></div>"); }).join(''), "\n                                    </div>\n                                    "); }).join(''), "\n                                </div>\n                            </div>\n                        </div>\n\n                        <div id=\"playerstables\"></div>\n                    </div>\n                    <div id=\"table-right\"></div>\n                </div>\n                \n                <div id=\"jump-controls\">\n                </div>\n            </div>\n        "));
+        document.getElementById('jump-controls').classList.toggle('folded', localStorage.getItem(LOCAL_STORAGE_JUMP_KEY) == 'true');
         this.gamedatas = gamedatas;
         log('gamedatas', gamedatas);
         this.createPlayerPanels(gamedatas);
@@ -393,11 +394,10 @@ var PointSalad = /** @class */ (function () {
             Object.keys(gamedatas.cardScores).forEach(function (key) { return _this.setCardScore(Number(key), gamedatas.cardScores[key]); });
         }
         this.setupNotifications();
-        this.setupPreferences();
         if (gamedatas.showAskFlipPhase) {
             this.addAskFlipPhaseToggle(gamedatas.askFlipPhase);
         }
-        this.onScreenWidthChange = function () { return _this.placeMarket(); };
+        this.bga.gameui.onScreenWidthChange = function () { return _this.placeMarket(); };
         log("Ending game setup");
         try {
             this.dummyCalls();
@@ -426,13 +426,13 @@ var PointSalad = /** @class */ (function () {
         }
     };
     PointSalad.prototype.onEnteringTakeCards = function (args) {
-        if (this.isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             document.getElementById('table').dataset.selectableCards = 'true';
             this.canTakeOnlyOneVeggie = args.canTakeOnlyOneVeggie;
         }
     };
     PointSalad.prototype.onEnteringFlipCard = function (args) {
-        if (this.isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             document.getElementById("player-points-".concat(this.getPlayerId())).dataset.selectableCards = 'true';
         }
     };
@@ -472,17 +472,17 @@ var PointSalad = /** @class */ (function () {
     //
     PointSalad.prototype.onUpdateActionButtons = function (stateName, args) {
         var _this = this;
-        if (this.isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             switch (stateName) {
                 case 'takeCards':
-                    this.addActionButton('takeCards_button', _("Take selected card(s)"), function () { return _this.takeCards(_this.selectedCards.map(function (card) { return card.id; })); });
+                    this.bga.statusBar.addActionButton(_("Take selected card(s)"), function () { return _this.takeCards(_this.selectedCards.map(function (card) { return card.id; })); }, { id: 'takeCards_button' });
                     this.checkSelection();
                     break;
                 case 'flipCard':
-                    this.addActionButton('flipCard_button', _("Flip selected card"), function () { return _this.flipCard(_this.selectedCards[0].id); });
-                    this.addActionButton('skipFlipCard_button', _("Skip"), function () { return _this.skipFlipCard(); });
+                    this.bga.statusBar.addActionButton(_("Flip selected card"), function () { return _this.flipCard(_this.selectedCards[0].id); }, { id: 'flipCard_button' });
+                    this.bga.statusBar.addActionButton(_("Skip"), function () { return _this.skipFlipCard(); }, { id: 'skipFlipCard_button' });
                     if (this.startActionTimer('skipFlipCard_button', 6)) {
-                        this.addActionButton('stopActionTimer_button', _("Let me think!"), function () { return _this.stopActionTimer('skipFlipCard_button'); });
+                        this.bga.statusBar.addActionButton(_("Let me think!"), function () { return _this.stopActionTimer('skipFlipCard_button'); }, { id: 'stopActionTimer_button', color: 'secondary' });
                     }
                     this.checkSelection();
                     break;
@@ -516,27 +516,10 @@ var PointSalad = /** @class */ (function () {
         }
     };
     PointSalad.prototype.getPlayerId = function () {
-        return Number(this.player_id);
+        return this.bga.players.getCurrentPlayerId();
     };
     PointSalad.prototype.setTooltip = function (id, html) {
-        this.addTooltipHtml(id, html, this.TOOLTIP_DELAY);
-    };
-    PointSalad.prototype.setupPreferences = function () {
-        var _this = this;
-        // Extract the ID and value from the UI control
-        var onchange = function (e) {
-            var match = e.target.id.match(/^preference_[cf]ontrol_(\d+)$/);
-            if (!match) {
-                return;
-            }
-            var prefId = +match[1];
-            var prefValue = +e.target.value;
-            _this.prefs[prefId].value = prefValue;
-        };
-        // Call onPreferenceChange() when any value changes
-        dojo.query(".preference_control").connect("onchange", onchange);
-        // Call onPreferenceChange() now
-        dojo.forEach(dojo.query("#ingame_menu_content .preference_control"), function (el) { return onchange({ target: el }); });
+        this.bga.gameui.addTooltipHtml(id, html, this.TOOLTIP_DELAY);
     };
     PointSalad.prototype.createPlayerPanels = function (gamedatas) {
         var _this = this;
@@ -572,7 +555,7 @@ var PointSalad = /** @class */ (function () {
     PointSalad.prototype.getOrderedPlayers = function (gamedatas) {
         var _this = this;
         var players = Object.values(gamedatas.players).sort(function (a, b) { return a.playerNo - b.playerNo; });
-        var playerIndex = players.findIndex(function (player) { return Number(player.id) === Number(_this.player_id); });
+        var playerIndex = players.findIndex(function (player) { return Number(player.id) === _this.bga.players.getCurrentPlayerId(); });
         var orderedPlayers = playerIndex > 0 ? __spreadArray(__spreadArray([], players.slice(playerIndex), true), players.slice(0, playerIndex), true) : players;
         return orderedPlayers;
     };
@@ -614,8 +597,7 @@ var PointSalad = /** @class */ (function () {
     };
     PointSalad.prototype.startActionTimer = function (buttonId, time) {
         var _this = this;
-        var _a;
-        if (Number((_a = this.prefs[201]) === null || _a === void 0 ? void 0 : _a.value) == 2) {
+        if (this.bga.userPreferences.get(201) == 2) {
             return false;
         }
         var button = document.getElementById(buttonId);
@@ -684,7 +666,7 @@ var PointSalad = /** @class */ (function () {
         if (from === void 0) { from = null; }
         var existingDiv = document.getElementById("card-".concat(card.id));
         if (existingDiv) {
-            this.removeTooltip("card-".concat(card.id));
+            this.bga.gameui.removeTooltip("card-".concat(card.id));
             if (init) {
                 document.getElementById(destinationId).appendChild(existingDiv);
             }
@@ -813,7 +795,7 @@ var PointSalad = /** @class */ (function () {
     };
     PointSalad.prototype.onCardClick = function (card) {
         var div = document.getElementById("card-".concat(card.id));
-        if (!this.isCurrentPlayerActive() || !div.closest('[data-selectable-cards="true"]')) {
+        if (!this.bga.players.isCurrentPlayerActive() || !div.closest('[data-selectable-cards="true"]')) {
             return;
         }
         var index = this.selectedCards.indexOf(card);
@@ -827,7 +809,7 @@ var PointSalad = /** @class */ (function () {
         this.checkSelection();
     };
     PointSalad.prototype.takeCards = function (ids) {
-        if (!this.checkAction('takeCards')) {
+        if (!this.bga.actions.checkAction('takeCards')) {
             return;
         }
         var sortedIds = ids;
@@ -837,7 +819,7 @@ var PointSalad = /** @class */ (function () {
         });
     };
     PointSalad.prototype.flipCard = function (id) {
-        if (!this.checkAction('flipCard')) {
+        if (!this.bga.actions.checkAction('flipCard')) {
             return;
         }
         this.takeAction('flipCard', {
@@ -845,24 +827,19 @@ var PointSalad = /** @class */ (function () {
         });
     };
     PointSalad.prototype.skipFlipCard = function () {
-        if (!this.checkAction('skipFlipCard')) {
+        if (!this.bga.actions.checkAction('skipFlipCard')) {
             return;
         }
         this.takeAction('skipFlipCard');
     };
     PointSalad.prototype.setAskFlipPhase = function (askFlipPhase) {
-        this.takeNoLockAction('setAskFlipPhase', {
+        this.bga.actions.performAction('setAskFlipPhase', {
             askFlipPhase: askFlipPhase
-        });
+        }, { checkAction: false, lock: false });
     };
     PointSalad.prototype.takeAction = function (action, data) {
         data = data || {};
-        data.lock = true;
-        this.ajaxcall("/pointsalad/pointsalad/".concat(action, ".html"), data, this, function () { });
-    };
-    PointSalad.prototype.takeNoLockAction = function (action, data) {
-        data = data || {};
-        this.ajaxcall("/pointsalad/pointsalad/".concat(action, ".html"), data, this, function () { });
+        this.bga.actions.performAction(action, data, { checkAction: false });
     };
     ///////////////////////////////////////////////////
     //// Reaction to cometD notifications
@@ -877,9 +854,8 @@ var PointSalad = /** @class */ (function () {
     */
     PointSalad.prototype.setupNotifications = function () {
         var _this = this;
-        var _a;
         //log( 'notifications subscriptions setup' );
-        var fastEndScoring = Number((_a = this.prefs[202]) === null || _a === void 0 ? void 0 : _a.value) == 1;
+        var fastEndScoring = this.bga.userPreferences.get(202) == 1;
         var notifs = [
             ['points', 1],
             ['takenCards', ANIMATION_MS],
@@ -960,7 +936,7 @@ var PointSalad = /** @class */ (function () {
     };
     /* This enable to inject translatable styled things to logs or action bar */
     /* @Override */
-    PointSalad.prototype.format_string_recursive = function (log, args) {
+    PointSalad.prototype.bgaFormatText = function (log, args) {
         try {
             if (log && args && !args.processed) {
                 // Representation of the color of a card
@@ -972,7 +948,7 @@ var PointSalad = /** @class */ (function () {
         catch (e) {
             console.error(log, args, "Exception thrown", e.stack);
         }
-        return this.inherited(arguments);
+        return { log: log, args: args };
     };
     // dummy calls x2 so functions aren't moved to inline function by optimization script
     PointSalad.prototype.dummyCalls = function () {

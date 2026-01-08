@@ -8,8 +8,7 @@
       "outFile": "pointsalad.js",
     },
     "files": [
-        "src/framework.d.ts",
-        "src/counter.d.ts",
+        "bga-framework.d.ts",
         "src/pointsalad.d.ts",
         "src/slide-utils.ts",
         "src/text-icons-formatter.ts",

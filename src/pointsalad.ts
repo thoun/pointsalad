@@ -1,10 +1,3 @@
-declare const define;
-declare const ebg;
-declare const $;
-declare const dojo: Dojo;
-declare const _;
-declare const g_gamethemeurl;
-
 declare const board: HTMLDivElement;
 
 const ANIMATION_MS = 500;
@@ -23,8 +16,9 @@ class PointSalad implements PointSaladGame {
     
     private TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
 
+    public bga: Bga;
+
     constructor() {
-        document.getElementById('jump-controls').classList.toggle('folded', localStorage.getItem(LOCAL_STORAGE_JUMP_KEY) == 'true');
     }
     
     /*
@@ -42,6 +36,46 @@ class PointSalad implements PointSaladGame {
 
     public setup(gamedatas: PointSaladGamedatas) {
         log( "Starting game setup" );
+        this.bga.gameArea.getElement().insertAdjacentHTML('beforeend', `
+            <link rel="stylesheet" href="https://use.typekit.net/jim0ypy.css">
+
+            <div id="full-table">
+                <div id="columns">
+                    <div id="main-column">
+                        <div id="currentplayertable"></div>
+
+
+                        <div id="table-inner">
+                            <div id="table">
+                                <div id="market-title">${_("Market")}</div>
+                                <div id="piles">
+                                ${[1,2,3].map(column => `
+                                    <div id="pile${column}" class="table-space">
+                                        <div id="pile${column}-counter" class="pile-counter"></div>
+                                    </div>`).join('')
+                                }
+                                </div>
+                                <div id="market">
+                                ${[1,2].map(row => `
+                                    <div id="market-row${row}" class="market-row">
+                                        ${[1,2,3].map(column => `<div id="market-row${row}-card${column}" class="table-space"></div>`).join('')}
+                                    </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="playerstables"></div>
+                    </div>
+                    <div id="table-right"></div>
+                </div>
+                
+                <div id="jump-controls">
+                </div>
+            </div>
+        `);
+
+        document.getElementById('jump-controls').classList.toggle('folded', localStorage.getItem(LOCAL_STORAGE_JUMP_KEY) == 'true');
         
         this.gamedatas = gamedatas;
 
@@ -59,13 +93,12 @@ class PointSalad implements PointSaladGame {
         }
 
         this.setupNotifications();
-        this.setupPreferences();
 
         if (gamedatas.showAskFlipPhase) {
             this.addAskFlipPhaseToggle(gamedatas.askFlipPhase);
         }
 
-        (this as any).onScreenWidthChange = () => this.placeMarket();
+        this.bga.gameui.onScreenWidthChange = () => this.placeMarket();
 
         log( "Ending game setup" );
 
@@ -99,14 +132,14 @@ class PointSalad implements PointSaladGame {
     }
     
     private onEnteringTakeCards(args: EnteringTakeCardsArgs) {
-        if ((this as any).isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             document.getElementById('table').dataset.selectableCards = 'true';
             this.canTakeOnlyOneVeggie = args.canTakeOnlyOneVeggie;
         }
     }
     
     private onEnteringFlipCard(args: EnteringFlipCardArgs) {
-        if ((this as any).isCurrentPlayerActive()) {
+        if (this.bga.players.isCurrentPlayerActive()) {
             document.getElementById(`player-points-${this.getPlayerId()}`).dataset.selectableCards = 'true';
         }
     }
@@ -151,17 +184,17 @@ class PointSalad implements PointSaladGame {
     //
     public onUpdateActionButtons(stateName: string, args: any) {
 
-        if((this as any).isCurrentPlayerActive()) {
+        if(this.bga.players.isCurrentPlayerActive()) {
             switch (stateName) {
                 case 'takeCards':
-                    (this as any).addActionButton('takeCards_button', _("Take selected card(s)"), () => this.takeCards(this.selectedCards.map(card => card.id)));
+                    this.bga.statusBar.addActionButton(_("Take selected card(s)"), () => this.takeCards(this.selectedCards.map(card => card.id)), { id: 'takeCards_button' });
                     this.checkSelection();
                     break;
                 case 'flipCard':
-                    (this as any).addActionButton('flipCard_button', _("Flip selected card"), () => this.flipCard(this.selectedCards[0].id));
-                    (this as any).addActionButton('skipFlipCard_button', _("Skip"), () => this.skipFlipCard());
+                    this.bga.statusBar.addActionButton(_("Flip selected card"), () => this.flipCard(this.selectedCards[0].id), { id: 'flipCard_button' });
+                    this.bga.statusBar.addActionButton(_("Skip"), () => this.skipFlipCard(), { id: 'skipFlipCard_button' });
                     if (this.startActionTimer('skipFlipCard_button', 6)) {
-                        (this as any).addActionButton('stopActionTimer_button', _("Let me think!"), () => this.stopActionTimer('skipFlipCard_button'));
+                        this.bga.statusBar.addActionButton(_("Let me think!"), () => this.stopActionTimer('skipFlipCard_button'), { id: 'stopActionTimer_button', color: 'secondary' });
                     }
                     this.checkSelection();
                     break;
@@ -203,33 +236,11 @@ class PointSalad implements PointSaladGame {
     }
 
     public getPlayerId(): number {
-        return Number((this as any).player_id);
+        return this.bga.players.getCurrentPlayerId();
     }
 
     public setTooltip(id: string, html: string) {
-        (this as any).addTooltipHtml(id, html, this.TOOLTIP_DELAY);
-    }
-
-    private setupPreferences() {
-        // Extract the ID and value from the UI control
-        const onchange = (e) => {
-          var match = e.target.id.match(/^preference_[cf]ontrol_(\d+)$/);
-          if (!match) {
-            return;
-          }
-          var prefId = +match[1];
-          var prefValue = +e.target.value;
-          (this as any).prefs[prefId].value = prefValue;
-        }
-        
-        // Call onPreferenceChange() when any value changes
-        dojo.query(".preference_control").connect("onchange", onchange);
-        
-        // Call onPreferenceChange() now
-        dojo.forEach(
-          dojo.query("#ingame_menu_content .preference_control"),
-          el => onchange({ target: el })
-        );
+        this.bga.gameui.addTooltipHtml(id, html, this.TOOLTIP_DELAY);
     }
 
     private createPlayerPanels(gamedatas: PointSaladGamedatas) {
@@ -277,7 +288,7 @@ class PointSalad implements PointSaladGame {
 
     private getOrderedPlayers(gamedatas: PointSaladGamedatas) {
         const players = Object.values(gamedatas.players).sort((a, b) => a.playerNo - b.playerNo);
-        const playerIndex = players.findIndex(player => Number(player.id) === Number((this as any).player_id));
+        const playerIndex = players.findIndex(player => Number(player.id) === this.bga.players.getCurrentPlayerId());
         const orderedPlayers = playerIndex > 0 ? [...players.slice(playerIndex), ...players.slice(0, playerIndex)] : players;
         return orderedPlayers;
     }
@@ -333,7 +344,7 @@ class PointSalad implements PointSaladGame {
     }
 
     private startActionTimer(buttonId: string, time: number): boolean {
-        if (Number((this as any).prefs[201]?.value) == 2) {
+        if (this.bga.userPreferences.get(201) == 2) {
             return false;
         }
 
@@ -400,7 +411,7 @@ class PointSalad implements PointSaladGame {
     public createOrMoveCard(card: Card, destinationId: string, tooltip: string, init: boolean = false, from: string = null) {
         const existingDiv = document.getElementById(`card-${card.id}`);
         if (existingDiv) {
-            (this as any).removeTooltip(`card-${card.id}`);
+            this.bga.gameui.removeTooltip(`card-${card.id}`);
 
             if (init) {
                 document.getElementById(destinationId).appendChild(existingDiv);
@@ -578,7 +589,7 @@ class PointSalad implements PointSaladGame {
     private onCardClick(card: Card) {
         const div = document.getElementById(`card-${card.id}`);
 
-        if(!(this as any).isCurrentPlayerActive() || !div.closest('[data-selectable-cards="true"]')) {
+        if(!this.bga.players.isCurrentPlayerActive() || !div.closest('[data-selectable-cards="true"]')) {
             return;
         }
 
@@ -595,7 +606,7 @@ class PointSalad implements PointSaladGame {
     }
 
     public takeCards(ids: number[]) {
-        if(!(this as any).checkAction('takeCards')) {
+        if(!this.bga.actions.checkAction('takeCards')) {
             return;
         }
 
@@ -608,7 +619,7 @@ class PointSalad implements PointSaladGame {
     }
 
     public flipCard(id: number) {
-        if(!(this as any).checkAction('flipCard')) {
+        if(!this.bga.actions.checkAction('flipCard')) {
             return;
         }
 
@@ -618,7 +629,7 @@ class PointSalad implements PointSaladGame {
     }
 
     public skipFlipCard() {
-        if(!(this as any).checkAction('skipFlipCard')) {
+        if(!this.bga.actions.checkAction('skipFlipCard')) {
             return;
         }
 
@@ -626,20 +637,14 @@ class PointSalad implements PointSaladGame {
     }
 
     public setAskFlipPhase(askFlipPhase: boolean) {
-        this.takeNoLockAction('setAskFlipPhase', {
+        this.bga.actions.performAction('setAskFlipPhase', {
             askFlipPhase
-        });
+        }, { checkAction: false, lock: false });
     }
 
     public takeAction(action: string, data?: any) {
         data = data || {};
-        data.lock = true;
-        (this as any).ajaxcall(`/pointsalad/pointsalad/${action}.html`, data, this, () => {});
-    }
-
-    public takeNoLockAction(action: string, data?: any) {
-        data = data || {};
-        (this as any).ajaxcall(`/pointsalad/pointsalad/${action}.html`, data, this, () => {});
+        this.bga.actions.performAction(action, data, { checkAction: false });
     }
 
     ///////////////////////////////////////////////////
@@ -656,7 +661,7 @@ class PointSalad implements PointSaladGame {
     */
     setupNotifications() {
         //log( 'notifications subscriptions setup' );
-        const fastEndScoring = Number((this as any).prefs[202]?.value) == 1;
+        const fastEndScoring = this.bga.userPreferences.get(202) == 1;
 
         const notifs = [
             ['points', 1],
@@ -746,7 +751,7 @@ class PointSalad implements PointSaladGame {
 
     /* This enable to inject translatable styled things to logs or action bar */
     /* @Override */
-    public format_string_recursive(log: string, args: any) {
+    public bgaFormatText(log: string, args: any) {
         try {
             if (log && args && !args.processed) {
                 // Representation of the color of a card
@@ -758,7 +763,7 @@ class PointSalad implements PointSaladGame {
         } catch (e) {
             console.error(log,args,"Exception thrown", e.stack);
         }
-        return (this as any).inherited(arguments);
+        return { log, args };
     }
 
     // dummy calls x2 so functions aren't moved to inline function by optimization script

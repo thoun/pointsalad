@@ -1,0 +1,28 @@
+{
+    "201": {
+        "name": "Countdown timer for Skip button",
+        "needReload": false,
+        "values": {
+            "1": {
+                "name": "Enabled"
+            },
+            "2": {
+                "name": "Disabled"
+            }
+        },
+        "default": 1
+    },
+    "202": {
+        "name": "Fast end scoring",
+        "needReload": true,
+        "values": {
+            "1": {
+                "name": "Enabled"
+            },
+            "2": {
+                "name": "Disabled"
+            }
+        },
+        "default": 2
+    }
+}

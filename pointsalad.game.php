@@ -16,8 +16,9 @@
   *
   */
 
-
-require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
+use Bga\GameFramework\Components\Deck;
+use Bga\GameFramework\Table;
+use Bga\GameFramework\VisibleSystemException;
 
 require_once('modules/php/constants.inc.php');
 require_once('modules/php/utils.php');
@@ -33,6 +34,8 @@ class PointSalad extends Table {
     use ArgsTrait;
     use DebugUtilTrait;
 
+    public Deck $cards;
+
 	function __construct() {
         // Your global variables labels:
         //  Here, you can assign labels to global variables you are using for this game.
@@ -42,18 +45,12 @@ class PointSalad extends Table {
         // Note: afterwards, you can get/set the global variables with getGameStateValue/setGameStateInitialValue/setGameStateValue
         parent::__construct();
         
-        self::initGameStateLabels([
+        $this->initGameStateLabels([
             SCORING_OPTION => 100,
         ]);  
 
-        $this->cards = self::getNew("module.common.deck");
-        $this->cards->init("card");     
-	}
-	
-    protected function getGameName() {
-		// Used for translations and stuff. Please do not modify.
-        return "pointsalad";
-    }	
+        $this->cards = $this->deckFactory->createDeck("card");     
+	}	
 
     /*
         setupNewGame:
@@ -66,7 +63,7 @@ class PointSalad extends Table {
         // Set the colors of the players with HTML color code
         // The default below is red/green/blue/orange/brown
         // The number of colors defined here must correspond to the maximum number of players allowed for the gams
-        $gameinfos = self::getGameinfos();
+        $gameinfos = $this->getGameinfos();
         $default_colors = $gameinfos['player_colors'];
  
         // Create players
@@ -78,25 +75,14 @@ class PointSalad extends Table {
             $values[] = "('".$player_id."','$color','".$player['player_canal']."','".addslashes( $player['player_name'] )."','".addslashes( $player['player_avatar'] )."')";
         }
         $sql .= implode(',', $values);
-        self::DbQuery($sql);
-        self::reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
-        self::reloadPlayersBasicInfos();
+        $this->DbQuery($sql);
+        $this->reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
+        $this->reloadPlayersBasicInfos();
         
         /************ Start the game initialization *****/
-
-        // Init global values with their initial values
-        //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
         
         // Init game statistics
-        // (note: statistics used in this file must be defined in your stats.inc.php file)
-        self::initStat('table', 'turnNumber', 0);    // Init a table statistics
-        self::initStat('player', 'turnNumber', 0);  // Init a player statistics (for all players)
-        self::initStat('table', 'veggieFromMarket', 0);
-        self::initStat('player', 'veggieFromMarket', 0);
-        self::initStat('table', 'pointsFromMarket', 0);
-        self::initStat('player', 'pointsFromMarket', 0);
-        self::initStat('table', 'flippedCards', 0);
-        self::initStat('player', 'flippedCards', 0);
+        $this->playerStats->init(['turnNumber', 'veggieFromMarket', 'pointsFromMarket', 'flippedCards'], 0, updateTableStat: true);
 
         $this->setupCards(count($players));
         $this->refillMarket(true);
@@ -104,10 +90,7 @@ class PointSalad extends Table {
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
-        // TODO TEMP to test
-        $this->debugSetup();
-
-        /************ End of the game initialization *****/
+        return \ST_PLAYER_TAKE_CARDS;
     }
 
     /*
@@ -119,18 +102,18 @@ class PointSalad extends Table {
         _ when the game starts
         _ when a player refreshes the game page (F5)
     */
-    protected function getAllDatas() {
+    protected function getAllDatas(): array {
         $currentPlayerId = $this->getCurrentPlayerId();
         $result = [];
     
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score, player_no playerNo FROM player ";
-        $result['players'] = self::getCollectionFromDb($sql);
+        $result['players'] = $this->getCollectionFromDb($sql);
 
         $cardScores = [];
 
-        $isEndScore = intval($this->gamestate->state_id()) >= ST_END_SCORE;
+        $isEndScore = $this->gamestate->getCurrentMainStateId() >= ST_END_SCORE;
 
         foreach ($result['players'] as $playerId => &$playerDb) {
             $playerDb['playerNo'] = intval($playerDb['playerNo']);
@@ -167,7 +150,7 @@ class PointSalad extends Table {
 
         $result['showAskFlipPhase'] = $this->getPlayerPointCardsCount($currentPlayerId) > 0;
         $result['askFlipPhase'] = $this->getAskFlipPhase($currentPlayerId);
-        $result['hiddenScore'] = intval(self::getGameStateValue('SCORING_OPTION')) === 2;
+        $result['hiddenScore'] = intval($this->getGameStateValue('SCORING_OPTION')) === 2;
   
         return $result;
     }
@@ -226,7 +209,7 @@ class PointSalad extends Table {
             return;
         }
 
-        throw new feException("Zombie mode not supported at this game state: ".$statename);
+        throw new VisibleSystemException("Zombie mode not supported at this game state: ".$statename);
     }
     
 ///////////////////////////////////////////////////////////////////////////////////:
@@ -255,14 +238,14 @@ class PointSalad extends Table {
 //            // ! important ! Use DBPREFIX_<table_name> for all tables
 //
 //            $sql = "ALTER TABLE DBPREFIX_xxxxxxx ....";
-//            self::applyDbUpgradeToAllDB( $sql );
+//            $this->applyDbUpgradeToAllDB( $sql );
 //        }
 //        if( $from_version <= 1405061421 )
 //        {
 //            // ! important ! Use DBPREFIX_<table_name> for all tables
 //
 //            $sql = "CREATE TABLE DBPREFIX_xxxxxxx ....";
-//            self::applyDbUpgradeToAllDB( $sql );
+//            $this->applyDbUpgradeToAllDB( $sql );
 //        }
 //        // Please add your future database scheme changes here
 //

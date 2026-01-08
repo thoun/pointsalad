@@ -1,0 +1,76 @@
+{
+    "table": {
+        "turnNumber": {
+            "id": 10,
+            "name": "Number of turns",
+            "type": "int"
+        },
+        "veggieFromMarket": {
+            "id": 12,
+            "name": "Veggie cards collected from market",
+            "type": "int"
+        },
+        "pointsFromMarket": {
+            "id": 13,
+            "name": "Point cards collected from market",
+            "type": "int"
+        },
+        "flippedCards": {
+            "id": 14,
+            "name": "Point cards flipped to veggie card",
+            "type": "int"
+        },
+        "totalPointCards": {
+            "id": 15,
+            "name": "Final point cards count",
+            "type": "int"
+        },
+        "totalVeggieCards": {
+            "id": 16,
+            "name": "Final veggie cards count",
+            "type": "int"
+        },
+        "avgScoreByCard": {
+            "id": 17,
+            "name": "Average score by veggie card",
+            "type": "float"
+        }
+    },
+    "player": {
+        "turnNumber": {
+            "id": 10,
+            "name": "Number of turns",
+            "type": "int"
+        },
+        "veggieFromMarket": {
+            "id": 12,
+            "name": "Veggie cards collected from market",
+            "type": "int"
+        },
+        "pointsFromMarket": {
+            "id": 13,
+            "name": "Point cards collected from market",
+            "type": "int"
+        },
+        "flippedCards": {
+            "id": 14,
+            "name": "Point cards flipped to veggie card",
+            "type": "int"
+        },
+        "totalPointCards": {
+            "id": 15,
+            "name": "Final point cards count",
+            "type": "int"
+        },
+        "totalVeggieCards": {
+            "id": 16,
+            "name": "Final veggie cards count",
+            "type": "int"
+        },
+        "avgScoreByCard": {
+            "id": 17,
+            "name": "Average score by veggie card",
+            "type": "float"
+        }
+    }
+}

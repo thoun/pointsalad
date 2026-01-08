@@ -1,0 +1,15 @@
+{
+    "100": {
+        "name": "Scoring",
+        "values": {
+            "1": {
+                "name": "Visible"
+            },
+            "2": {
+                "name": "Hidden",
+                "tmdisplay": "Hidden scoring"
+            }
+        },
+        "default": 1
+    }
+}
