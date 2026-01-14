@@ -398,6 +398,20 @@ var PointSalad = /** @class */ (function () {
             this.addAskFlipPhaseToggle(gamedatas.askFlipPhase);
         }
         this.bga.gameui.onScreenWidthChange = function () { return _this.placeMarket(); };
+        if (this.bga.gameui.bgaInternal.flags['ingame_player_panels']) {
+            setTimeout(function () {
+                Object.keys(gamedatas.players).forEach(function (playerId) {
+                    var playerPanel = document.getElementById("overall_player_board_".concat(playerId));
+                    var playerTable = document.getElementById("player-name-".concat(playerId));
+                    playerTable.innerHTML = '';
+                    playerTable.insertAdjacentElement('beforeend', playerPanel);
+                    playerTable.style.color = 'black';
+                    playerTable.style.fontWeight = 'inherit';
+                    playerTable.style.textAlign = 'inherit';
+                    playerTable.style.fontSize = 'inherit';
+                });
+            });
+        }
         log("Ending game setup");
         try {
             this.dummyCalls();

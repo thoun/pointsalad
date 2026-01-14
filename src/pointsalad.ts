@@ -99,6 +99,21 @@ class PointSalad implements PointSaladGame {
         }
 
         this.bga.gameui.onScreenWidthChange = () => this.placeMarket();
+        
+        if ((this.bga.gameui as any).bgaInternal.flags['ingame_player_panels']) {
+            setTimeout(() => {
+                Object.keys(gamedatas.players).forEach(playerId => {
+                    const playerPanel = document.getElementById(`overall_player_board_${playerId}`)
+                    const playerTable = document.getElementById(`player-name-${playerId}`) as HTMLDivElement;
+                    playerTable.innerHTML = '';
+                    playerTable.insertAdjacentElement('beforeend', playerPanel);
+                    playerTable.style.color = 'black';
+                    playerTable.style.fontWeight = 'inherit';
+                    playerTable.style.textAlign = 'inherit';
+                    playerTable.style.fontSize = 'inherit';
+                });
+            });
+        }
 
         log( "Ending game setup" );
 
