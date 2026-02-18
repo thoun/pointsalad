@@ -454,7 +454,7 @@ var PointSalad = /** @class */ (function () {
         var _this = this;
         this.scoreIsVisible = false;
         if (!this.isVisibleScoring()) {
-            Object.keys(this.gamedatas.players).forEach(function (playerId) { var _a; return (_a = _this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.setValue(0); });
+            Object.keys(this.gamedatas.players).map(Number).forEach(function (playerId) { return _this.bga.playerPanels.getScoreCounter(playerId).setValue(0); });
         }
     };
     PointSalad.prototype.onLeavingState = function (stateName) {
@@ -555,7 +555,7 @@ var PointSalad = /** @class */ (function () {
                 }
             }
             html += "</div>";
-            dojo.place(html, "player_board_".concat(player.id));
+            _this.bga.playerPanels.getElement(playerId).insertAdjacentHTML('beforeend', html);
             for (var veggie = 1; veggie <= 6; veggie++) {
                 var veggieCounter = new ebg.counter();
                 veggieCounter.create("veggie".concat(veggie, "-counter-").concat(player.id));
@@ -659,17 +659,17 @@ var PointSalad = /** @class */ (function () {
     };
     PointSalad.prototype.setNewScore = function (playerId, score) {
         var _this = this;
-        var _a;
         if (!this.scoreIsVisible) {
             setTimeout(function () {
                 if (!_this.scoreIsVisible) {
-                    Object.keys(_this.gamedatas.players).forEach(function (pId) { return document.getElementById("player_score_".concat(pId)).innerHTML = '-'; });
+                    //Object.keys(this.gamedatas.players).forEach(pId => document.getElementById(`player_score_${pId}`).innerHTML = '-');
+                    _this.bga.playerPanels.getScoreCounter(playerId).disable();
                 }
             }, 100);
         }
         else {
             if (!isNaN(score)) {
-                (_a = this.scoreCtrl[playerId]) === null || _a === void 0 ? void 0 : _a.toValue(score);
+                this.bga.playerPanels.getScoreCounter(playerId).toValue(score);
             }
         }
     };
@@ -942,10 +942,9 @@ var PointSalad = /** @class */ (function () {
         this.tableCenter.setPileCounts(notif.args.pileCounts);
     };
     PointSalad.prototype.notif_cardScore = function (notif) {
-        var _a;
         this.setCardScore(notif.args.card.id, notif.args.cardScore);
         if (!this.isVisibleScoring()) {
-            (_a = this.scoreCtrl[notif.args.playerId]) === null || _a === void 0 ? void 0 : _a.incValue(notif.args.cardScore);
+            this.bga.playerPanels.getScoreCounter(notif.args.playerId).incValue(notif.args.cardScore);
         }
     };
     /* This enable to inject translatable styled things to logs or action bar */

@@ -8,43 +8,8 @@ trait UtilTrait {
     //////////// Utility functions
     ////////////
 
-    function array_find(array $array, callable $fn) {
-        foreach ($array as $value) {
-            if($fn($value)) {
-                return $value;
-            }
-        }
-        return null;
-    }
-
-    function array_some(array $array, callable $fn) {
-        foreach ($array as $value) {
-            if($fn($value)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    function array_every(array $array, callable $fn) {
-        foreach ($array as $value) {
-            if(!$fn($value)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     function getPlayersIds() {
         return array_keys($this->loadPlayersBasicInfos());
-    }
-
-    function getPlayerName(int $playerId) {
-        return self::getUniqueValueFromDB("SELECT player_name FROM player WHERE player_id = $playerId");
-    }
-
-    function getPlayerScore(int $playerId) {
-        return intval(self::getUniqueValueFromDB("SELECT player_score FROM player WHERE player_id = $playerId"));
     }
 
     function getCardFromDb(/*array|null*/ $dbCard) {
@@ -99,9 +64,9 @@ trait UtilTrait {
             $pointCardsCountAfter = $this->getPlayerPointCardsCount($playerId);
             $hideAskFlipCard = $pointCardsCountBefore > 0 && $pointCardsCountAfter == 0;
 
-            self::notifyAllPlayers('flippedCard', clienttranslate('${player_name} flips a point card to get a veggie card'), [
+            $this->notifyAllPlayers('flippedCard', clienttranslate('${player_name} flips a point card to get a veggie card'), [
                 'playerId' => $playerId,
-                'player_name' => $this->getPlayerName($playerId),
+                'player_name' => $this->getPlayerNameById($playerId),
                 'card' => $card,
                 'veggieCounts' => $this->getVeggieCountsByPlayer($playerId),
                 'hideAskFlipCard' => $hideAskFlipCard,
@@ -131,7 +96,7 @@ trait UtilTrait {
             $cardsIds = array_slice($cardsIds, 0, ceil(count($cardsIds) / 2));
             $this->cards->moveCards($cardsIds, 'pile'.$pile);
 
-            self::notifyAllPlayers('pileRefill', '', [
+            $this->notifyAllPlayers('pileRefill', '', [
                 'pile' => $pile,
                 'pileTop' => $this->getCardFromDb($this->cards->getCardOnTop('pile'.$pile)),
                 'pileCounts' => $this->getPileCounts(),
@@ -158,7 +123,7 @@ trait UtilTrait {
                 $this->applyFlipCard(0, $card); 
 
                 if (!$silent) {
-                    self::notifyAllPlayers('marketRefill', '', [
+                    $this->notifyAllPlayers('marketRefill', '', [
                         'pile' => $pile,
                         'card' => $card,
                         'pileTop' => $this->getCardFromDb($this->cards->getCardOnTop('pile'.$pile)),
@@ -231,7 +196,7 @@ trait UtilTrait {
             $score += $this->getScore($playerId, $pointCard, $veggieCounts);
         }
 
-        $this->DbQuery("UPDATE `player` SET `player_score` = $score WHERE `player_id` = $playerId"); 
+        $this->bga->playerScore->set($playerId, $score, null);
 
         return $score;
     }
@@ -250,11 +215,11 @@ trait UtilTrait {
     }
 
     function getRemainingCardCountOnTable() {
-        return intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` LIKE 'pile%' OR `card_location` LIKE 'market%'"));
+        return intval($this->getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` LIKE 'pile%' OR `card_location` LIKE 'market%'"));
     }
 
     function getRemainingCardCountOnMarket() {
-        return intval(self::getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` LIKE 'market%'"));
+        return intval($this->getUniqueValueFromDB("SELECT count(*) FROM `card` WHERE `card_location` LIKE 'market%'"));
     }
     
     function getPileCounts() {
@@ -268,7 +233,7 @@ trait UtilTrait {
     }    
 
     function getAskFlipPhase(int $playerId) {
-        return boolval(self::getUniqueValueFromDB("SELECT `player_ask_flip_phase` FROM `player` WHERE `player_id` = $playerId"));
+        return boolval($this->getUniqueValueFromDB("SELECT `player_ask_flip_phase` FROM `player` WHERE `player_id` = $playerId"));
     }
 
     function getPlayerPointCardsCount(int $playerId) {

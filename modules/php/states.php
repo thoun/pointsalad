@@ -58,7 +58,7 @@ trait StateTrait {
             $cards = $this->getCardsFromDb($this->cards->getCardsInLocation('player', $player->id));
             $totalPointCards = count(array_filter($cards, fn($card) => $card->side === 0));
             $totalVeggieCards = count(array_filter($cards, fn($card) => $card->side === 1));
-            $playerScore = $this->getPlayerScore($player->id);
+            $playerScore = $this->bga->playerScore->get($player->id);
 
             self::setStat($totalPointCards, 'totalPointCards', $player->id);
             self::setStat($totalVeggieCards, 'totalVeggieCards', $player->id);

@@ -162,7 +162,7 @@ class PointSalad implements PointSaladGame {
     private onEnteringShowScore() {
         this.scoreIsVisible = false;
         if (!this.isVisibleScoring()) {
-            Object.keys(this.gamedatas.players).forEach(playerId => (this as any).scoreCtrl[playerId]?.setValue(0));
+            Object.keys(this.gamedatas.players).map(Number).forEach(playerId => this.bga.playerPanels.getScoreCounter(playerId).setValue(0));
         }
     }
 
@@ -285,8 +285,8 @@ class PointSalad implements PointSaladGame {
                 }
             }
             html += `</div>`;
-            
-            dojo.place(html, `player_board_${player.id}`);
+
+            this.bga.playerPanels.getElement(playerId).insertAdjacentHTML('beforeend', html);
 
             for (let veggie = 1; veggie <= 6; veggie++) {
                 const veggieCounter = new ebg.counter();
@@ -413,12 +413,13 @@ class PointSalad implements PointSaladGame {
         if (!this.scoreIsVisible) {
             setTimeout(() => {
                 if (!this.scoreIsVisible) {
-                    Object.keys(this.gamedatas.players).forEach(pId => document.getElementById(`player_score_${pId}`).innerHTML = '-');
+                    //Object.keys(this.gamedatas.players).forEach(pId => document.getElementById(`player_score_${pId}`).innerHTML = '-');
+                    this.bga.playerPanels.getScoreCounter(playerId).disable();
                 }
             }, 100);
         } else {
             if (!isNaN(score)) {
-                (this as any).scoreCtrl[playerId]?.toValue(score);
+                this.bga.playerPanels.getScoreCounter(playerId).toValue(score);
             }
         }
     }
@@ -760,7 +761,7 @@ class PointSalad implements PointSaladGame {
     notif_cardScore(notif: Notif<NotifCardScoreArgs>) {
         this.setCardScore(notif.args.card.id, notif.args.cardScore);
         if (!this.isVisibleScoring()) {
-            (this as any).scoreCtrl[notif.args.playerId]?.incValue(notif.args.cardScore);
+            this.bga.playerPanels.getScoreCounter(notif.args.playerId).incValue(notif.args.cardScore);
         }
     }
 

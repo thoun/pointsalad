@@ -1,5 +1,7 @@
 <?php
 
+use Bga\GameFramework\UserException;
+
 trait ActionTrait {
 
     //////////////////////////////////////////////////////////////////////////////
@@ -14,27 +16,27 @@ trait ActionTrait {
     public function takeCards(array $ids) {
         self::checkAction('takeCards'); 
         
-        $playerId = self::getActivePlayerId();
+        $playerId = (int)$this->getActivePlayerId();
 
         $cards = $this->getCardsFromDb($this->cards->getCards($ids));
         $cardsCount = count($cards);
 
         $tookVeggie = false;
         if ($cardsCount === 2) {
-            if ($this->array_some($cards, fn($card) => strpos($card->location, 'market') !== 0)) { // str_starts_with is PHP8+, using strpos( $haystack , $needle ) === 0 instead
-                throw new BgaUserException("If you take two cards, it must be from the market");
+            if (array_any($cards, fn($card) => !str_starts_with($card->location, 'market'))) {
+                throw new UserException("If you take two cards, it must be from the market");
             }
             $tookVeggie = true;
         } else if ($cardsCount === 1) {
-            if (strpos($cards[0]->location, 'pile') !== 0) { // str_starts_with is PHP8+, using strpos( $haystack , $needle ) === 0 instead
-                if ($this->getRemainingCardCountOnMarket() === 1 && strpos($cards[0]->location, 'market') === 0) { // in case only 1 veggie remains
+            if (!str_starts_with($cards[0]->location, 'pile')) {
+                if ($this->getRemainingCardCountOnMarket() === 1 && str_starts_with($cards[0]->location, 'market')) { // in case only 1 veggie remains
                     $tookVeggie = true;
                 } else {
-                    throw new BgaUserException("If you take one card, it must be from a pile");
+                    throw new UserException("If you take one card, it must be from a pile");
                 }
             }
         } else {
-            throw new BgaUserException("You must take one or two card(s)");
+            throw new UserException("You must take one or two card(s)");
         }
         $pointCardFromPile = $tookVeggie ? null : intval(substr($cards[0]->location, 4));
 
@@ -49,7 +51,7 @@ trait ActionTrait {
         
         self::notifyAllPlayers('takenCards', $message, [
             'playerId' => $playerId,
-            'player_name' => $this->getPlayerName($playerId),
+            'player_name' => $this->getPlayerNameById($playerId),
             'cards' => $cards,
             'veggies' => array_map(fn($card) => $card->veggie, $cards),
             'veggieCounts' => $this->getVeggieCountsByPlayer($playerId),
@@ -95,7 +97,7 @@ trait ActionTrait {
         $card = $this->getCardFromDb($this->cards->getCard($id));
 
         if ($card->location !== 'player' || $card->locationArg !== $playerId) {
-            throw new BgaUserException("You can't flip this card");
+            throw new UserException("You can't flip this card");
         }
 
         $this->applyFlipCard($playerId, $card);
@@ -122,7 +124,7 @@ trait ActionTrait {
         $this->notifyPlayer($playerId, "setAskFlipPhase", '', []);
 
         // if the player set he don't want to be asked when he is at flip state, automatically Skip for the player
-        if (!$askFlipPhase && $this->getActivePlayerId() == $playerId && intval($this->gamestate->state_id()) == ST_PLAYER_FLIP_CARD) {
+        if (!$askFlipPhase && $this->getActivePlayerId() == $playerId && $this->gamestate->getCurrentMainStateId() == ST_PLAYER_FLIP_CARD) {
             $this->gamestate->nextState('nextPlayer');
         }
     }
