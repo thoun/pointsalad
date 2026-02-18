@@ -13,6 +13,8 @@ class PointSalad implements PointSaladGame {
     private canTakeOnlyOneVeggie: boolean = false;
     private actionTimerId: number;
     private scoreIsVisible: boolean;
+
+    private abortController: AbortController;
     
     private TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
 
@@ -192,6 +194,7 @@ class PointSalad implements PointSaladGame {
         if (playerPoints) {
             playerPoints.dataset.selectableCards = 'false';
         }
+        this.abortController = null;
     }
 
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -206,11 +209,9 @@ class PointSalad implements PointSaladGame {
                     this.checkSelection();
                     break;
                 case 'flipCard':
+                    this.abortController = new AbortController();
                     this.bga.statusBar.addActionButton(_("Flip selected card"), () => this.flipCard(this.selectedCards[0].id), { id: 'flipCard_button' });
-                    this.bga.statusBar.addActionButton(_("Skip"), () => this.skipFlipCard(), { id: 'skipFlipCard_button' });
-                    if (this.startActionTimer('skipFlipCard_button', 6)) {
-                        this.bga.statusBar.addActionButton(_("Let me think!"), () => this.stopActionTimer('skipFlipCard_button'), { id: 'stopActionTimer_button', color: 'secondary' });
-                    }
+                    this.bga.statusBar.addActionButton(_("Skip"), () => this.skipFlipCard(), { autoclick: { pausable: true, abortSignal: this.abortController.signal } });
                     this.checkSelection();
                     break;
             }
@@ -600,6 +601,10 @@ class PointSalad implements PointSaladGame {
             (this.selectedCards.length === (this.canTakeOnlyOneVeggie ? 1 : 2) && this.selectedCards.every(card => this.getSide(card.id) === 1));
         document.getElementById('takeCards_button')?.classList.toggle('disabled', !canTakeCards);
         document.getElementById('flipCard_button')?.classList.toggle('disabled', this.selectedCards.length !== 1);
+
+        if (this.selectedCards.length && this.abortController) {
+            this.abortController.abort();
+        }
     }
 
     private onCardClick(card: Card) {

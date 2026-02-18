@@ -480,6 +480,7 @@ var PointSalad = /** @class */ (function () {
         if (playerPoints) {
             playerPoints.dataset.selectableCards = 'false';
         }
+        this.abortController = null;
     };
     // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
     //                        action status bar (ie: the HTML links in the status bar).
@@ -493,11 +494,9 @@ var PointSalad = /** @class */ (function () {
                     this.checkSelection();
                     break;
                 case 'flipCard':
+                    this.abortController = new AbortController();
                     this.bga.statusBar.addActionButton(_("Flip selected card"), function () { return _this.flipCard(_this.selectedCards[0].id); }, { id: 'flipCard_button' });
-                    this.bga.statusBar.addActionButton(_("Skip"), function () { return _this.skipFlipCard(); }, { id: 'skipFlipCard_button' });
-                    if (this.startActionTimer('skipFlipCard_button', 6)) {
-                        this.bga.statusBar.addActionButton(_("Let me think!"), function () { return _this.stopActionTimer('skipFlipCard_button'); }, { id: 'stopActionTimer_button', color: 'secondary' });
-                    }
+                    this.bga.statusBar.addActionButton(_("Skip"), function () { return _this.skipFlipCard(); }, { autoclick: { pausable: true, abortSignal: this.abortController.signal } });
                     this.checkSelection();
                     break;
             }
@@ -806,6 +805,9 @@ var PointSalad = /** @class */ (function () {
             (this.selectedCards.length === (this.canTakeOnlyOneVeggie ? 1 : 2) && this.selectedCards.every(function (card) { return _this.getSide(card.id) === 1; }));
         (_a = document.getElementById('takeCards_button')) === null || _a === void 0 ? void 0 : _a.classList.toggle('disabled', !canTakeCards);
         (_b = document.getElementById('flipCard_button')) === null || _b === void 0 ? void 0 : _b.classList.toggle('disabled', this.selectedCards.length !== 1);
+        if (this.selectedCards.length && this.abortController) {
+            this.abortController.abort();
+        }
     };
     PointSalad.prototype.onCardClick = function (card) {
         var div = document.getElementById("card-".concat(card.id));
